@@ -1,0 +1,40 @@
+import std.stdio;
+import std.algorithm;
+import std.scan;
+
+fn main -> int
+{
+  try
+  {
+    var score = 0;
+
+    var fin = std::file::open("day02.txt");
+
+    for(var line : std::buffered_reader(&mut fin).lines)
+    {
+      switch (line[2])
+      {
+        case 'X': // loss
+          score += 0 + cast<i64>(line[0] + 0) % 3 + 1;
+
+        case 'Y': // draw
+          score += 3 + cast<i64>(line[0] + 1) % 3 + 1;
+
+        case 'Z': // win
+          score += 6 + cast<i64>(line[0] + 2) % 3 + 1;
+
+        else:
+          std::panic("unexpected ending");
+      }
+    }
+
+    std::print("part2: score according to guide ", score);
+
+  }
+  catch(std::error e)
+  {
+    std::panic(e);
+  }
+
+  return 0;
+}

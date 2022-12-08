@@ -1,0 +1,50 @@
+import std.stdio;
+import std.algorithm;
+import std.scan;
+
+fn priority(int n) -> int
+{
+  if (n < 27)
+    return n + 27;
+  else
+    return n - 32 + 1;
+}
+
+fn main -> int
+{
+  try
+  {
+    var sum = 0;
+    var state = 0;
+    var group = [<u64>: 0, 0, 0];
+
+    var fin = std::file::open("day03.txt");
+
+    for(var line : std::buffered_reader(&mut fin).lines)
+    {
+      for(var ch : line)
+        group[state] |= 1 << (ch - 65);
+
+      switch (state)
+      {
+        case 0:
+        case 1:
+          state += 1;
+
+        case 2:
+          sum += cast<i64>(priority(std::ctz(group[0] & group[1] & group[2])));
+          group = [0, 0, 0];
+          state = 0;
+      }
+    }
+
+    std::print("part2: sum of the badge priorities ", sum);
+
+  }
+  catch(std::error e)
+  {
+    std::panic(e);
+  }
+
+  return 0;
+}

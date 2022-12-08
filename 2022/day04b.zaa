@@ -1,0 +1,39 @@
+import std.stdio;
+import std.algorithm;
+import std.scan;
+
+fn intersects((i64, i64) x, (i64, i64) y) -> bool
+{
+  return x.0 <= y.1 && x.1 >= y.0;
+}
+
+fn main -> int
+{
+  try
+  {
+    var count = 0;
+
+    var fin = std::file::open("day04.txt");
+
+    for(var line : std::buffered_reader(&mut fin).lines)
+    {
+      var ab = (i64(0), i64(0));
+      var cd = (i64(0), i64(0));
+
+      if (std::sscanf(line, "{}-{},{}-{}", &mut ab.0, &mut ab.1, &mut cd.0, &mut cd.1).error)
+        std::panic("error scaning assignment pairs from input '", line, "'");
+
+      if (intersects(ab, cd))
+        count += 1;
+    }
+
+    std::print("part1: count assignment pairs overlapping ", count);
+
+  }
+  catch(std::error e)
+  {
+    std::panic(e);
+  }
+
+  return 0;
+}

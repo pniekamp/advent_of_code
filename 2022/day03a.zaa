@@ -1,0 +1,43 @@
+import std.stdio;
+import std.algorithm;
+import std.scan;
+
+fn priority(int n) -> int
+{
+  if (n < 27)
+    return n + 27;
+  else
+    return n - 32 + 1;
+}
+
+fn main -> int
+{
+  try
+  {
+    var sum = 0;
+
+    var fin = std::file::open("day03.txt");
+
+    for(var line : std::buffered_reader(&mut fin).lines)
+    {
+      var compartments = [<u64>: 0, 0];
+
+      for(var ch : line[0 .. line.len/2])
+        compartments[0] |= 1 << (ch - 65);
+
+      for(var ch : line[line.len/2 .. line.len])
+        compartments[1] |= 1 << (ch - 65);
+
+      sum += cast<i64>(priority(std::ctz(compartments[0] & compartments[1])));
+    }
+
+    std::print("part1: sum of the duplicate priorities ", sum);
+
+  }
+  catch(std::error e)
+  {
+    std::panic(e);
+  }
+
+  return 0;
+}

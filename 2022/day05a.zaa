@@ -1,0 +1,55 @@
+import std.stdio;
+import std.algorithm;
+import std.scan;
+
+fn main -> int
+{
+  try
+  {
+    var fin = std::file::open("day05.txt");
+    var reader = std::buffered_reader(&mut fin);
+
+    var defn = std::vector<std::string>();
+
+    for(var line : reader.lines)
+    {
+      if (line.empty)
+        break;
+
+      defn.push_back(line);
+    }
+
+    var stacks = std::vector<std::vector<u8>>::with_size(defn.back.len / 4 + 1);
+
+    for(var line : defn.reverse.drop_n(1))
+    {
+      for(var i = 1; i < line.len; i += 4)
+        if (line[i] != cast(' '))
+          stacks[(i - 1)/4].push_back(line[i]);
+    }
+
+    std::skip_line(&mut reader);
+
+    for(var line : reader.lines)
+    {
+      var n = usize(0);
+      var src = usize(0);
+      var dst = usize(0);
+
+      if (std::sscanf(line, "move {} from {} to {}", &mut n, &mut src, &mut dst).error)
+        std::panic("error scaning instruction from input '", line, "'");
+
+      stacks[dst - 1].append(stacks[src - 1].last_n(n).reverse);
+      stacks[src - 1].resize(stacks[src - 1].len - n);
+    }
+
+    std::print("part1: crates on top ", std::string::from_utf8(stacks.transform(|stack| stack.back)));
+
+  }
+  catch(std::error e)
+  {
+    std::panic(e);
+  }
+
+  return 0;
+}
