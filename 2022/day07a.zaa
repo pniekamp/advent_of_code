@@ -1,0 +1,64 @@
+import std.stdio;
+import std.algorithm;
+import std.flat_hash_map;
+import std.scan;
+
+fn main -> int
+{
+  try
+  {
+    var sum = 0;
+    var directories = std::flat_hash_map<std::string, u64>();
+    var current_directory = std::string();
+
+    var fin = std::file::open("day07.txt");
+
+    for(var line : std::buffered_reader(&mut fin).lines)
+    {
+      if (line.starts_with("$ cd"))
+      {
+        var arg = line[5 .. line.len];
+
+        if (arg == "/")
+          current_directory = "";
+
+        else if (arg == "..")
+          current_directory = current_directory[current_directory.begin .. current_directory.find_last('/')];
+
+        else
+          current_directory = current_directory + "/" + arg;
+      }
+
+      if (std::is_digit(line[0]))
+      {
+        var size = u64(0);
+        var name = std::string_view();
+
+        if (std::sscanf(line, "{} {}", &mut size, &mut name).error)
+          std::panic("error scaning file entry '", line, "'");
+
+        for(var part : current_directory.split("/"))
+        {
+          var path = current_directory[current_directory.begin .. part.end];
+
+          directories.emplace(path) += size;
+        }
+      }
+    }
+
+    for(var &(name, size) : directories)
+    {
+      if (size <= 100000)
+        sum += size;
+    }
+
+    std::print("part1: sum of the total directories sizes ", sum);
+
+  }
+  catch(std::error e)
+  {
+    std::panic(e);
+  }
+
+  return 0;
+}
