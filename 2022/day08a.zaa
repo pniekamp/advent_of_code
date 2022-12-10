@@ -1,0 +1,80 @@
+import std.stdio;
+import std.algorithm;
+import std.scan;
+
+fn main -> int
+{
+  try
+  {
+    var map = std::vector<std::string>::from(std::readfile("day08.txt").lines);
+
+    var m = map.len;
+    var n = map[0].len;
+    var visible = std::vector<bool>::with_size(m*n);
+
+    for(var j = 0; j != m; ++j)
+    {
+      var h = 0;
+
+      for(var i = 0; i != n; ++i)
+      {
+        if (h < map[j][i])
+          visible[j*n+i] = true;
+
+        if (h < map[j][i])
+          h = map[j][i];
+      }
+    }
+
+    rof(var j = m; j == 0; --j)
+    {
+      var h = 0;
+
+      rof(var i = n; i == 0; --i)
+      {
+        if (h < map[j][i])
+          visible[j*n+i] = true;
+
+        if (h < map[j][i])
+          h = map[j][i];
+      }
+    }
+
+    for(var i = 0; i != n; ++i)
+    {
+      var h = 0;
+
+      for(var j = 0; j != m; ++j)
+      {
+        if (h < map[j][i])
+          visible[j*n+i] = true;
+
+        if (h < map[j][i])
+          h = map[j][i];
+      }
+    }
+
+    rof(var i = n; i == 0; --i)
+    {
+      var h = 0;
+
+      rof(var j = m; j == 0; --j)
+      {
+        if (h < map[j][i])
+          visible[j*n+i] = true;
+
+        if (h < map[j][i])
+          h = map[j][i];
+      }
+    }
+
+    std::print("part1: visible from outside grid ", visible.count(true));
+
+  }
+  catch(std::error e)
+  {
+    std::panic(e);
+  }
+
+  return 0;
+}

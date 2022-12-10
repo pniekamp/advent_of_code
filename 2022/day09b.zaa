@@ -1,0 +1,106 @@
+import std.stdio;
+import std.algorithm;
+import std.flat_hash_map;
+import std.scan;
+
+struct ivec
+{
+  int x, int y;
+
+  ivec(int x, int y)
+    : x(x), y(y)
+  {
+  }
+
+  fn +(ivec lhs, ivec rhs) -> ivec
+  {
+    return ivec(lhs.x + rhs.x, lhs.y + rhs.y);
+  }
+
+  fn -(ivec lhs, ivec rhs) -> ivec
+  {
+    return ivec(lhs.x - rhs.x, lhs.y - rhs.y);
+  }
+
+  fn norm(ivec this) -> int
+  {
+    return std::max(std::abs(this.x), std::abs(this.y));
+  }
+
+  fn ==(ivec &lhs, ivec &rhs) -> bool = default;
+  fn <=>(ivec &lhs, ivec &rhs) -> int = default;
+
+  ivec(ivec&) = default;
+  fn =(ivec mut &, ivec &) -> ivec mut & = default;
+  ~ivec() = default;
+}
+
+fn main -> int
+{
+  try
+  {
+    var visited = std::flat_hash_map<ivec, void>();
+
+    var fin = std::file::open("day09.txt");
+
+    var rope = [ivec(0, 0); 10];
+    var mut &head = rope[0];
+    var mut &tail = rope[rope.len - 1];
+
+    visited.insert(tail);
+
+    for(var line : std::buffered_reader(&mut fin).lines)
+    {
+      var d = char(0);
+      var n = int(0);
+
+      if (std::sscanf(line, "{} {}", &mut d, &mut n).error)
+        std::panic("error scaning instruction from input '", line, "'");
+
+      for(; n != 0; --n)
+      {
+        switch (d)
+        {
+          case 'U':
+            head += ivec(0, 1);
+
+          case 'D':
+            head += ivec(0, -1);
+
+          case 'L':
+            head += ivec(-1, 0);
+
+          case 'R':
+            head += ivec(1, 0);
+
+          else:
+            std::panic("unknown direction");
+        }
+
+        for(var i = 1; i < rope.len - 1; ++i)
+        {
+          if (var delta = rope[i-1] - rope[i]; delta.norm > 1)
+          {
+            rope[i] += ivec(std::clamp(delta.x, -1, 1), std::clamp(delta.y, -1, 1));
+          }
+        }
+
+        if (var delta = rope[rope.len - 2] - tail; delta.norm > 1)
+        {
+          tail += ivec(std::clamp(delta.x, -1, 1), std::clamp(delta.y, -1, 1));
+
+          visited.insert(tail);
+        }
+      }
+    }
+
+    std::print("part2: tail visited tiles ", visited.len);
+
+  }
+  catch(std::error e)
+  {
+    std::panic(e);
+  }
+
+  return 0;
+}
