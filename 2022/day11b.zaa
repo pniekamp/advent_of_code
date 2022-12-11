@@ -1,0 +1,103 @@
+import std.stdio;
+import std.algorithm;
+import std.scan;
+
+struct monkey
+{
+  usize id;
+  std::vector<i64> items;
+  i64[3] coefficients; // ax2 + bx + c
+  i64 divisor;
+  usize[2] target; // false, true
+
+  monkey() = default;
+  monkey(monkey&&) = default;
+  ~monkey() = default;
+}
+
+fn main -> int
+{
+  try
+  {
+    var lcd = 1;
+    var monkeys = std::vector<monkey>();
+    
+    var input = std::readfile("day11.txt").gsub("\r\n", "\n");
+
+    for(var defn : input.split("\n\n"))
+    {
+      var monkey = monkey();
+      var items = std::string_view();
+      var operation = std::string_view();
+      var test = std::string_view();
+      var if_true = std::string_view();
+      var if_false = std::string_view();
+  
+      if (!std::sscanf(defn, "Monkey {}:\n Starting items: {}\n Operation: {}\n Test: {}\n If true: {}\n If false: {}\n", &mut monkey.id, &mut items, &mut operation, &mut test, &mut if_true, &mut if_false))
+        std::panic("error scaning monkey from input '", defn, "'");
+
+      for(var item : items.split(", "))
+      {
+        var level = i64(0);
+        if (!std::sscanf(item, "{}", &mut level))
+          std::panic("error scaning level from input '", item, "'");
+          
+        monkey.items.push_back(level);
+      }
+      
+      if (operation == "new = old * old")
+        monkey.coefficients[0] = 1;
+     
+      if (std::sscanf(operation, "new = old + {}", &mut monkey.coefficients[2]))
+        monkey.coefficients[1] = 1;
+
+      std::sscanf(operation, "new = old * {}", &mut monkey.coefficients[1]);
+
+      if (monkey.coefficients == [0, 0, 0])
+        std::panic("unhandled operation - ", operation);
+
+      if (!std::sscanf(test, "divisible by {}", &mut monkey.divisor))
+        std::panic("unhandled test - ", test);
+
+      if (!std::sscanf(if_false, "throw to monkey {}", &mut monkey.target[0]))
+        std::panic("invalid false target - ", if_false);
+
+      if (!std::sscanf(if_true, "throw to monkey {}", &mut monkey.target[1]))
+        std::panic("invalid true target - ", if_true);
+        
+      if (lcd % monkey.divisor != 0)
+        lcd *= monkey.divisor;
+
+      monkeys.push_back(monkey);
+    }
+
+    var counts = std::vector<i64>::with_size(monkeys.len);
+
+    for(var round = 0; round < 10000; ++round)
+    {
+      for(var mut &monkey : monkeys)
+      {
+        for(var item : monkey.items.take!(monkey.items.begin, monkey.items.end))
+        {
+          var level = (monkey.coefficients[0]*item*item + monkey.coefficients[1]*item + monkey.coefficients[2]) % lcd;
+          var target = monkey.target[cast<usize>(level % monkey.divisor == 0)];
+
+          monkeys[target].items.push_back(level);
+          
+          counts[monkey.id] += 1;
+        }
+      }   
+    }
+
+    std::partial_sort!(&mut counts, counts.begin + 2, std::greater);
+
+    std::print("part2: total monkey business ", counts[0] * counts[1]);
+
+  }
+  catch(std::error e)
+  {
+    std::panic(e);
+  }
+
+  return 0;
+}
