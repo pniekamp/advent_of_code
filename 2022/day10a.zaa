@@ -1,0 +1,90 @@
+import std.stdio;
+import std.algorithm;
+import std.scan;
+
+struct tricorder
+{
+  int ax = 1;
+  int clk = 0;
+  int sum = 0;
+
+  union instruction
+  {
+    noop,
+    addx(int),
+
+    ~instruction() = default;
+  }
+
+  fn decode(std::string_view line) -> instruction
+  {
+    switch (line[0])
+    {
+      case 'n':
+        if (line.starts_with("noop"))
+          return noop;
+
+      case 'a':
+        if (line.starts_with("addx"))
+        {
+          var imm = 0;
+
+          if (std::sscanf(line, "addx {}", &mut imm).error)
+            std::panic("error scaning instruction from input '", line, "'");
+
+          return addx(imm);
+        }
+    }
+
+    std::panic("unknown instruction in decode");
+  }
+
+  fn execute(this mut &, instruction op) -> void
+  {
+    fn step[this]()
+    {
+      this.clk += 1;
+
+      if (this.clk % 40 == 20)
+        this.sum += this.clk * this.ax;
+    }
+
+    switch (op)
+    {
+      case noop:
+        step();
+
+      case addx[imm]:
+        step();
+        step();
+        this.ax += imm;
+    }
+  }
+
+  tricorder() = default;
+  ~tricorder() = default;
+}
+
+fn main -> int
+{
+  try
+  {
+    var tricorder = tricorder();
+
+    var fin = std::file::open("day10.txt");
+
+    for(var line : std::buffered_reader(&mut fin).lines)
+    {
+      tricorder.execute(tricorder::decode(line));
+    }
+
+    std::print("part1: sum of these six signal strengths ", tricorder.sum);
+
+  }
+  catch(std::error e)
+  {
+    std::panic(e);
+  }
+
+  return 0;
+}
