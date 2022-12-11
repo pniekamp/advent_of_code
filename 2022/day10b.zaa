@@ -69,9 +69,9 @@ struct tricorder
     for(var &row : this.crt)
     {
       for(var &ch : row)
-        std::stdout.putc(ch);
+        std::putc(ch);
 
-      std::stdout.putc('\n');
+      std::putc('\n');
     }
   }
 
