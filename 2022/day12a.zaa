@@ -1,0 +1,88 @@
+import std.stdio;
+import std.algorithm;
+import std.scan;
+
+using position = (usize, usize);
+
+fn main -> int
+{
+  try
+  {
+    var s = position();
+    var e = position();
+    var heightmap = std::vector<std::string>();
+
+    var fin = std::file::open("day12.txt");
+
+    for(var line : std::buffered_reader(&mut fin).lines)
+    {
+      if (var j = line.find_first('S'); j != line.end)
+        s = (j - line.begin, heightmap.len);
+
+      if (var j = line.find_first('E'); j != line.end)
+        e = (j - line.begin, heightmap.len);
+
+      heightmap.push_back(line);
+    }
+
+    var m = heightmap.len;
+    var n = heightmap[0].len;
+
+    heightmap[s.1][s.0] = cast('a');
+    heightmap[e.1][e.0] = cast('z');
+
+    var steps = 1;
+    var visited = heightmap;
+    var paths = std::vector::from([std::vector::from([s])]);
+
+    for(; !paths.empty; steps += 1)
+    {
+      for(var &path : paths.take!(paths.begin, paths.end))
+      {
+        var p = path.back;
+        var h = heightmap[p.1][p.0];
+
+        if (p.1 > 0)
+        {
+          if (visited[p.1 - 1][p.0] <= h+1)
+            paths.push_back(path).push_back((p.0, p.1 - 1));
+        }
+
+        if (p.1 < m-1)
+        {
+          if (visited[p.1 + 1][p.0] <= h+1)
+            paths.push_back(path).push_back((p.0, p.1 + 1));
+        }
+
+        if (p.0 > 0)
+        {
+          if (visited[p.1][p.0 - 1] <= h+1)
+            paths.push_back(path).push_back((p.0 - 1, p.1));
+        }
+
+        if (p.0 < n-1)
+        {
+          if (visited[p.1][p.0 + 1] <= h+1)
+            paths.push_back(path).push_back((p.0 + 1, p.1));
+        }
+
+        for(var &path : paths)
+        {
+          visited[path.back.1][path.back.0] = 126;
+        }
+      }
+
+      if (std::any_of(paths, |path| [e] path.back == e))
+        break;
+    }
+
+    std::print("part1: shortest path from start ", steps);
+
+  }
+  catch(std::error e)
+  {
+    std::panic(e);
+  }
+
+  return 0;
+}
