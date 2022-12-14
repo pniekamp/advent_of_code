@@ -1,0 +1,164 @@
+import std.stdio;
+import std.algorithm;
+import std.scan;
+
+enum result
+{
+  ordered,
+  unordered,
+  unknown,
+}
+
+struct token
+{
+  enum type
+  {
+    list,
+    integer,
+    comma,
+    eof,
+  }
+
+  type type;
+  std::string_view text;
+
+  token(type type, std::string_view text)
+    : type(type), text(text)
+  {
+  }
+
+  ~token() = default;
+}
+
+fn lex(std::string_view packet, usize mut &cursor) -> token
+{
+  if (cursor == packet.len)
+    return token(token::type::eof, packet[cursor .. cursor]);
+
+  switch (packet[cursor])
+  {
+    case '[':
+      var beg = cursor;
+
+      for(var nesting = 0; cursor != packet.len; )
+      {
+        if (packet[cursor] == cast('['))
+          nesting += 1;
+
+        if (packet[cursor] == cast(']'))
+          if (--nesting <= 0)
+            break;
+
+        cursor += 1;
+      }
+
+      if (cursor != packet.len)
+        ++cursor;
+
+      return token(token::type::list, packet[beg + 1 .. cursor - 1]);
+
+    case '0' ..= '9':
+      var beg = cursor;
+
+      while (cursor != packet.len && std::is_digit(packet[cursor]))
+        ++cursor;
+
+      return token(token::type::integer, packet[beg .. cursor]);
+
+    case ',':
+      return token(token::type::comma, packet[cursor .. ++cursor]);
+
+    else:
+      std::panic("unhandled packet - ", cast<char>(packet[cursor]));
+  }
+}
+
+fn compare(std::string_view left, std::string_view right) -> result
+{
+  for(var i = 0, var j = 0;; )
+  {
+    var lhs = lex(left, &mut i);
+    var rhs = lex(right, &mut j);
+
+    //std::print(lhs, "\n", rhs, "\n");
+
+    if (lhs.type == token::type::eof || rhs.type == token::type::eof)
+    {
+      if (rhs.type != token::type::eof)
+        return ordered;
+
+      if (lhs.type != token::type::eof)
+        return unordered;
+
+      return unknown;
+    }
+
+    if (lhs.type == token::type::list || rhs.type == token::type::list)
+    {
+      switch (compare(lhs.text, rhs.text))
+      {
+        case ordered:
+          return ordered;
+
+        case unordered:
+          return unordered;
+      }
+
+      continue;
+    }
+
+    if (lhs.type == token::type::integer && rhs.type == token::type::integer)
+    {
+      var x = int(0);
+      var y = int(0);
+
+      std::atoi(lhs.text.begin, lhs.text.end, &mut x);
+      std::atoi(rhs.text.begin, rhs.text.end, &mut y);
+
+      if (x < y)
+        return ordered;
+
+      if (x != y)
+        return unordered;
+
+      continue;
+    }
+
+    if (lhs.type == token::type::comma && rhs.type == token::type::comma)
+    {
+      continue;
+    }
+
+    std::panic("unhandled input");
+  }
+}
+
+fn main -> int
+{
+  try
+  {
+    var sum = 0;
+    var index = 1;
+
+    var input = std::readfile("day13.txt").gsub("\r\n", "\n");
+
+    for(var pairs : input.split("\n\n"))
+    {
+      var packets = pairs.trim.cut('\n');
+
+      if (compare(packets.0, packets.1) == result::ordered)
+        sum += index;
+
+      index += 1;
+    }
+
+    std::print("part1: sum of indices of ordered pairs ", sum);
+
+  }
+  catch(std::error e)
+  {
+    std::panic(e);
+  }
+
+  return 0;
+}
