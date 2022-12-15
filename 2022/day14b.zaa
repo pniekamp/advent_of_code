@@ -1,0 +1,132 @@
+import std.stdio;
+import std.algorithm;
+import std.flat_hash_map;
+import std.scan;
+
+enum fill
+{
+  rock,
+  sand,
+}
+
+using position = (int, int);
+
+fn dump(std::flat_hash_map<position, fill> &cave, int[4] extents)
+{
+  for(var j = 0; j <= extents[2]; ++j)
+  {
+    for(var i = extents[1]; i <= extents[3]; ++i)
+    {
+      if (var j = cave.find((i, j)); j != cave.end)
+        switch (cave[j].value)
+        {
+          case rock:
+            std::putc('#');
+
+          case sand:
+            std::putc('O');
+        }
+      else
+        std::putc('.');
+    }
+
+    std::putc('\n');
+  }
+
+  std::putc('\n');
+}
+
+fn simulate(std::flat_hash_map<position, fill> mut &cave, int[4] extents) -> usize
+{
+  var count = 0;
+
+  while (true)
+  {
+    var current = position(500, 0);
+
+    while (true)
+    {
+      if (current.1 < extents[2])
+      {
+        if (var j = cave.find((current.0, current.1 + 1)); j == cave.end)
+        {
+          current.1 += 1;
+          continue;
+        }
+
+        if (var j = cave.find((current.0 - 1, current.1 + 1)); j == cave.end)
+        {
+          current.0 -= 1;
+          current.1 += 1;
+          continue;
+        }
+
+        if (var j = cave.find((current.0 + 1, current.1 + 1)); j == cave.end)
+        {
+          current.0 += 1;
+          current.1 += 1;
+          continue;
+        }
+      }
+
+      if (current.1 == 0)
+        return count + 1;
+
+      cave.insert(current, fill::sand);
+      count += 1;
+      break;
+    }
+  }
+}
+
+fn main -> int
+{
+  try
+  {
+    var cave = std::flat_hash_map<position, fill>();
+    var extents = [999999, 999999, 0, 0]; // top, left, bottom, right
+
+    var fin = std::file::open("day14.txt");
+
+    for(var line : std::buffered_reader(&mut fin).lines)
+    {
+      var start = position();
+      line.remove_prefix!(std::sscanf(line, "{},{}", &mut start.0, &mut start.1).len);
+
+      while (!line.empty)
+      {
+        var next = position();
+        line.remove_prefix!(std::sscanf(line, " -> {},{}", &mut next.0, &mut next.1).len);
+
+        var dx = std::signum(next.0 - start.0);
+        var dy = std::signum(next.1 - start.1);
+
+        for(; start != next; start.0 += dx, start.1 += dy)
+          cave.insert(start, fill::rock);
+
+        cave.insert(next, fill::rock);
+      }
+    }
+
+    for(var &(pos, fill) : cave)
+    {
+      extents[0] = std::min(extents[0], pos.1);
+      extents[1] = std::min(extents[1], pos.0);
+      extents[2] = std::max(extents[2], pos.1);
+      extents[3] = std::max(extents[3], pos.0);
+    }
+
+    extents[2] += 1;
+
+    var count = simulate(&mut cave, extents);
+
+    std::print("part2: count of settled units of sand ", count);
+
+  }
+  catch(std::error e)
+  {
+    std::panic(e);
+  }
+
+  return 0;
+}
