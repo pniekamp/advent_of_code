@@ -1,0 +1,74 @@
+import std.stdio;
+import std.algorithm;
+import std.scan;
+
+struct sensor
+{
+  int x, int y;
+  int bx, int by;
+
+  fn range(this &sensor) -> int
+  {
+    return std::abs(sensor.x - sensor.bx) + std::abs(sensor.y - sensor.by);
+  }
+
+  fn span_at(this &sensor, int y) -> (int, int)
+  {
+    var min = sensor.x - std::max(sensor.range - std::abs(y - sensor.y), 0);
+    var max = sensor.x + std::max(sensor.range - std::abs(y - sensor.y) + 1, 0);
+
+    return (min, max);
+  }
+
+  sensor() = default;
+  sensor(sensor&) = default;
+  ~sensor() = default;
+}
+
+fn main -> int
+{
+  try
+  {
+    var sensors = std::vector<sensor>();
+
+    var fin = std::file::open("day15.txt");
+
+    for(var line : std::buffered_reader(&mut fin).lines)
+    {
+      var sensor = sensor();
+
+      if (!std::sscanf(line, "Sensor at x={}, y={}: closest beacon is at x={}, y={}", &mut sensor.x, &mut sensor.y, &mut sensor.bx, &mut sensor.by))
+        std::panic("error scaning sensor from input '", line, "'");
+
+      sensors.push_back(sensor);
+    }
+
+    for(var y = 0; y <= 4000000; ++y)
+    {
+      for(var x = 0; x <= 4000000; ++x)
+      {
+        var possible = true;
+
+        for(var &sensor : sensors)
+        {
+          var span = sensor.span_at(y);
+
+          if (span.0 <= x && x < span.1)
+          {
+            possible = false;
+            x = span.1 - 1;
+          }
+        }
+
+        if (possible)
+          std::print("part2: candidate beacon tuning frequency ", cast<i64>(x)*4000000 + cast<i64>(y));
+      }
+    }
+  }
+  catch(std::error e)
+  {
+    std::panic(e);
+  }
+
+  return 0;
+}

@@ -1,0 +1,82 @@
+import std.stdio;
+import std.algorithm;
+import std.scan;
+
+struct sensor
+{
+  int x, int y;
+  int bx, int by;
+
+  fn range(this &sensor) -> int
+  {
+    return std::abs(sensor.x - sensor.bx) + std::abs(sensor.y - sensor.by);
+  }
+
+  fn span_at(this &sensor, int y) -> (int, int)
+  {
+    var min = sensor.x - std::max(sensor.range - std::abs(y - sensor.y), 0);
+    var max = sensor.x + std::max(sensor.range - std::abs(y - sensor.y) + 1, 0);
+
+    return (min, max);
+  }
+
+  sensor() = default;
+  sensor(sensor&) = default;
+  ~sensor() = default;
+}
+
+fn main -> int
+{
+  try
+  {
+    var count = 0;
+    var sensors = std::vector<sensor>();
+
+    var fin = std::file::open("day15.txt");
+
+    for(var line : std::buffered_reader(&mut fin).lines)
+    {
+      var sensor = sensor();
+
+      if (!std::sscanf(line, "Sensor at x={}, y={}: closest beacon is at x={}, y={}", &mut sensor.x, &mut sensor.y, &mut sensor.bx, &mut sensor.by))
+        std::panic("error scaning sensor from input '", line, "'");
+
+      sensors.push_back(sensor);
+    }
+
+    var y = 2000000;
+    var row = std::vector<(int, int)>();
+
+    for(var &sensor : sensors)
+    {
+      row.push_back(sensor.span_at(y));
+    }
+
+    std::sort(&mut row);
+
+    for(var column = row[0].0, var segment : row)
+    {
+      if (segment.1 < column)
+        continue;
+
+      count += segment.1 - std::max(column, segment.0);
+
+      column = segment.1;
+    }
+
+    for(var i = 0; i != sensors.len; ++i)
+    {
+      if (sensors[i].by == y && sensors[0 .. i].count_if(|k| [var x = sensors[i].bx] k.bx == x) == 0)
+        count -= 1;
+    }
+
+    std::print("part1: count of positions that cannot contain a beacon ", count);
+
+  }
+  catch(std::error e)
+  {
+    std::panic(e);
+  }
+
+  return 0;
+}
