@@ -1,0 +1,130 @@
+import std.stdio;
+import std.algorithm;
+import std.flat_hash_map;
+import std.scan;
+
+struct valve
+{
+  std::string name;
+  int flow_rate;
+  std::vector<std::string> tunnels;
+
+  valve() = default;
+  valve(valve&) = default;
+  ~valve() = default;
+}
+
+fn dijkstra(std::vector<std::vector<usize>> &graph, usize src, usize dst) -> int
+{
+  var dist = std::vector<int>::with_size(graph.len);
+  var prev = std::vector<usize>::with_size(graph.len);
+  var queue = std::vector<(usize, int)>::with_size(graph.len);
+
+  std::fill(dist.begin, dist.end, std::numeric_traits<int>::max);
+
+  dist[src] = 0;
+  queue[0] = (src, 0);
+
+  rof(var last = 1; last == 0; --last)
+  {
+    var u = queue[0].0;
+
+    std::pop_heap(&mut queue[0 ..= last], |a, b| a.1 > b.1);
+
+    for(var v : graph[u])
+    {
+      if (dist[u] + 1 < dist[v])
+      {
+        prev[v] = u;
+        dist[v] = dist[u] + 1;
+        queue[last++] = (v, dist[v]);
+        std::sift_up_heap(&mut queue[0 .. last], |a, b| a.1 > b.1);
+      }
+    }
+  }
+
+  return dist[dst];
+}
+
+fn solve(std::vector<valve> &valves, std::vector<int> &matrix, usize location, int rate, int time_remaining, std::mutable_span<usize> targets) -> int
+{
+  var best = time_remaining * rate;
+
+  for(var k = 0; k < targets.len; ++k)
+  {
+    var target = targets.head;
+
+    var time_to_target = matrix[location*valves.len + target];
+
+    if (time_to_target + 1 < time_remaining)
+    {
+      var released = (time_to_target + 1) * rate +
+        solve(valves, matrix, target, rate + valves[target].flow_rate, time_remaining - time_to_target - 1, targets.tail);
+
+      if (released > best)
+        best = released;
+    }
+
+    std::rotate_left(&mut targets);
+  }
+
+  return best;
+}
+
+fn main -> int
+{
+  try
+  {
+    var count = 0;
+    var valves = std::vector<valve>();
+    var valvemap = std::flat_hash_map<std::string, usize>();
+
+    var fin = std::file::open("day16.txt");
+
+    for(var line : std::buffered_reader(&mut fin).lines)
+    {
+      var valve = valve();
+      var s = std::string_view();
+      var tunnels = std::string_view();
+
+      if (!std::sscanf(line, "Valve {} has flow rate={}; tunnel{} lead{} to valve{} {}", &mut valve.name, &mut valve.flow_rate, &mut s, &mut s, &mut s, &mut tunnels))
+        std::panic("error scaning valve from input '", line, "'");
+
+      valve.tunnels.append(tunnels.split(", "));
+
+      valves.push_back(valve);
+      valvemap.insert(valve.name, valves.len - 1);
+    }
+
+    var graph = std::vector<std::vector<usize>>();
+
+    for(var &valve : valves)
+    {
+      graph.push_back(std::vector::from(valve.tunnels.transform(|tunnel| [valvemap] valvemap[valvemap.find(tunnel)].value)));
+    }
+
+    var matrix = std::vector<int>::with_size(valves.len * valves.len);
+
+    for(var j = 0; j != valves.len; ++j)
+    {
+      for(var i = 0; i != valves.len; ++i)
+      {
+        matrix[j*valves.len + i] = dijkstra(graph, j, i);
+      }
+    }
+
+    var start = valvemap[valvemap.find("AA")].value;
+    var targets = std::vector::from(std::iota(0, valves.len).filter(|i| [valves] valves[i].flow_rate != 0));
+
+    var best = solve(valves, matrix, start, 0, 30, targets.all);
+
+    std::print("part1: most pressure released ", best);
+
+  }
+  catch(std::error e)
+  {
+    std::panic(e);
+  }
+
+  return 0;
+}
