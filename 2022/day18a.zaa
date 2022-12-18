@@ -1,0 +1,50 @@
+import std.stdio;
+import std.algorithm;
+import std.scan;
+
+using position = (int, int, int);
+
+fn main -> int
+{
+  const D = [(-1, 0, 0), (+1, 0, 0), (0, -1, 0), (0, +1, 0), (0, 0, -1), (0, 0, +1)];
+
+  try
+  {
+    var count = 0;
+    var cubes = std::vector<position>();
+
+    var fin = std::file::open("day18.txt");
+
+    for(var line : std::buffered_reader(&mut fin).lines)
+    {
+      var pt = position();
+
+      if (std::sscanf(line, "{},{},{}", &mut pt.0, &mut pt.1, &mut pt.2).error)
+        std::panic("error scaning cube location from input '", line, "'");
+
+      cubes.push_back(pt);
+    }
+
+    for(var pt : cubes)
+    {
+      var adjacent = 0;
+
+      for(var d : D)
+      {
+        if (cubes.find((pt.0 + d.0, pt.1 + d.1, pt.2 + d.2)) != cubes.end)
+          adjacent += 1;
+      }
+
+      count += 6 - adjacent;
+    }
+
+    std::print("part1: surface area of scanned droplet ", count);
+
+  }
+  catch(std::error e)
+  {
+    std::panic(e);
+  }
+
+  return 0;
+}

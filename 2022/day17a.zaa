@@ -1,0 +1,189 @@
+import std.stdio;
+import std.algorithm;
+import std.flat_hash_map;
+import std.scan;
+
+using position = (int, int);
+
+struct rock
+{
+  int width;
+  int height;
+  std::vector<position> shape;
+
+  rock() = default;
+  rock(rock&) = default;
+  ~rock() = default;
+}
+
+struct chamber
+{
+  int width;
+  int height;
+  std::flat_hash_map<position, bool> fill;
+
+  chamber()
+  {
+    width = 7;
+  }
+
+  chamber(chamber&) = default;
+  ~chamber() = default;
+}
+
+fn hit(rock &rock, position position) -> bool
+{
+  return rock.shape.find(position) != rock.shape.end;
+}
+
+fn hit(chamber &chamber, position position) -> bool
+{
+  return chamber.fill.find(position) != chamber.fill.end;
+}
+
+fn fits(chamber &chamber, rock &rock, position &position) -> bool
+{
+  if (position.0 < 0)
+    return false;
+
+  if (position.0 + rock.width > chamber.width)
+    return false;
+
+  if (position.1 - rock.height < -1)
+    return false;
+
+  for(var &(x, y) : rock.shape)
+  {
+    if (chamber.hit((position.0 + x, position.1 - y)))
+      return false;
+  }
+
+  return true;
+}
+
+fn insert(chamber mut &chamber, rock &rock, position &position) -> bool
+{
+  for(var &(x, y) : rock.shape)
+  {
+    chamber.fill.insert((position.0 + x, position.1 - y), true);
+  }
+
+  if (position.1 >= chamber.height)
+    chamber.height = position.1 + 1;
+
+  return true;
+}
+
+fn dump(chamber &chamber, rock &rock, position &position)
+{
+  std::print(position, " ", rock);
+
+  for(var y = position.1; y >= 0; --y)
+  {
+    std::putc('|');
+
+    for(var x = 0; x < chamber.width; ++x)
+    {
+      if (rock.hit((x - position.0, position.1 - y)))
+      {
+        std::putc('@');
+      }
+
+      else if (chamber.hit((x, y)))
+      {
+        std::putc('#');
+      }
+
+      else
+      {
+        std::putc('.');
+      }
+    }
+
+    std::putc('|');
+    std::putc('\n');
+  }
+
+  for(var x = 0; x < chamber.width + 2; ++x)
+    std::putc('-');
+
+  std::putc('\n');
+}
+
+fn main -> int
+{
+  try
+  {
+    var count = 0;
+    var rocks = std::vector<rock>();
+    var chamber = chamber();
+
+    var input = std::readfile("day17.rocks.txt").chomp.gsub("\r\n", "\n");
+
+    for(var lines : input.split("\n\n"))
+    {
+      var rock = rock();
+
+      for(var y = 0, var line : lines.split("\n");; ++y)
+      {
+        for(var x = 0, var ch : line;; ++x)
+        {
+          if (ch == cast('#'))
+            rock.shape.push_back((x, y));
+
+          rock.width = std::max(rock.width, x + 1);
+        }
+
+        rock.height = std::max(rock.height, y + 1);
+      }
+
+      rocks.push_back(rock);
+    }
+
+    var rock = 0;
+    var position = position(2, 2 + rocks[rock].height);
+
+    var pattern = std::readfile("day17.txt").chomp;
+
+    for(var n = 2022; count < n; )
+    {
+      for(var ch : pattern)
+      {
+        switch (ch)
+        {
+          case '<':
+            if (chamber.fits(rocks[rock], (position.0 - 1, position.1)))
+              position.0 -= 1;
+
+          case '>':
+            if (chamber.fits(rocks[rock], (position.0 + 1, position.1)))
+              position.0 += 1;
+        }
+
+        if (!chamber.fits(rocks[rock], (position.0, position.1 - 1)))
+        {
+          chamber.insert(rocks[rock], position);
+
+          rock = (rock + 1) % rocks.len;
+          position = (2, 2 + chamber.height + rocks[rock].height);
+
+          if (++count == n)
+            break;
+
+          continue;
+        }
+
+        position.1 -= 1;
+      }
+    }
+
+    std::print("part1: tower units tall ", chamber.height);
+
+  }
+  catch(std::error e)
+  {
+    std::panic(e);
+  }
+
+  return 0;
+}

@@ -1,0 +1,237 @@
+import std.stdio;
+import std.algorithm;
+import std.flat_hash_map;
+import std.scan;
+
+using position = (int, int);
+
+struct rock
+{
+  int width;
+  int height;
+  std::vector<position> shape;
+
+  rock() = default;
+  rock(rock&) = default;
+  ~rock() = default;
+}
+
+struct chamber
+{
+  int width;
+  int height;
+  i64 collapsed;
+  std::flat_hash_map<position, bool> fill;
+
+  fn hash(this&)
+  {
+    return std::hash()(this.fill);
+  }
+
+  fn totalheight(this&)
+  {
+    return this.collapsed + cast(this.height);
+  }
+
+  chamber()
+  {
+    width = 7;
+  }
+
+  chamber(chamber&) = default;
+  ~chamber() = default;
+}
+
+fn hit(rock &rock, position position) -> bool
+{
+  return rock.shape.find(position) != rock.shape.end;
+}
+
+fn hit(chamber &chamber, position position) -> bool
+{
+  return chamber.fill.find(position) != chamber.fill.end;
+}
+
+fn fits(chamber &chamber, rock &rock, position &position) -> bool
+{
+  if (position.0 < 0)
+    return false;
+
+  if (position.0 + rock.width > chamber.width)
+    return false;
+
+  if (position.1 - rock.height < -1)
+    return false;
+
+  for(var &(x, y) : rock.shape)
+  {
+    if (chamber.hit((position.0 + x, position.1 - y)))
+      return false;
+  }
+
+  return true;
+}
+
+fn insert(chamber mut &chamber, rock &rock, position &position) -> bool
+{
+  for(var &(x, y) : rock.shape)
+  {
+    chamber.fill.insert((position.0 + x, position.1 - y), true);
+  }
+
+  if (position.1 >= chamber.height)
+    chamber.height = position.1 + 1;
+
+  var max = 0;
+  for(var i = 0; i < chamber.width; ++i)
+  {
+    var depth = 0;
+    while (depth < chamber.height && !chamber.hit((i, chamber.height - depth)))
+      depth += 1;
+
+    if (depth > max)
+      max = depth;
+  }
+
+  if (max != chamber.height)
+  {
+    var y = chamber.height - max;
+    var remaining = std::flat_hash_map<position, bool>();
+
+    for(var &(pt, _) : chamber.fill)
+    {
+      if (pt.1 >= y)
+        remaining.insert((pt.0, pt.1 - y), true);
+    }
+
+    chamber.height -= y;
+    chamber.fill = remaining;
+    chamber.collapsed += cast(y);
+  }
+
+  return true;
+}
+
+fn dump(chamber &chamber, rock &rock, position &position)
+{
+  std::print(position, " ", rock);
+
+  for(var y = position.1; y >= 0; --y)
+  {
+    std::putc('|');
+
+    for(var x = 0; x < chamber.width; ++x)
+    {
+      if (rock.hit((x - position.0, position.1 - y)))
+      {
+        std::putc('@');
+      }
+
+      else if (chamber.hit((x, y)))
+      {
+        std::putc('#');
+      }
+
+      else
+      {
+        std::putc('.');
+      }
+    }
+
+    std::putc('|');
+    std::putc('\n');
+  }
+
+  for(var x = 0; x < chamber.width + 2; ++x)
+    std::putc('-');
+
+  std::putc('\n');
+}
+
+fn main -> int
+{
+  try
+  {
+    var count = 0;
+    var rocks = std::vector<rock>();
+    var chamber = chamber();
+
+    var input = std::readfile("day17.rocks.txt").chomp.gsub("\r\n", "\n");
+
+    for(var lines : input.split("\n\n"))
+    {
+      var rock = rock();
+
+      for(var y = 0, var line : lines.split("\n");; ++y)
+      {
+        for(var x = 0, var ch : line;; ++x)
+        {
+          if (ch == cast('#'))
+            rock.shape.push_back((x, y));
+
+          rock.width = std::max(rock.width, x + 1);
+        }
+
+        rock.height = std::max(rock.height, y + 1);
+      }
+
+      rocks.push_back(rock);
+    }
+
+    var rock = 0;
+    var position = position(2, 2 + rocks[rock].height);
+    var history = std::flat_hash_map<(usize, usize, usize), (i64, i64)>();
+
+    var pattern = std::readfile("day17.txt").chomp;
+
+    for(var n = i64(1000000000000); count < n; )
+    {
+      for(var index = 0, var ch : pattern;; ++index)
+      {
+        switch (ch)
+        {
+          case '<':
+            if (chamber.fits(rocks[rock], (position.0 - 1, position.1)))
+              position.0 -= 1;
+
+          case '>':
+            if (chamber.fits(rocks[rock], (position.0 + 1, position.1)))
+              position.0 += 1;
+        }
+
+        if (!chamber.fits(rocks[rock], (position.0, position.1 - 1)))
+        {
+          chamber.insert(rocks[rock], position);
+
+          if (++count == n)
+            break;
+
+          if (var (j, ok) = history.insert((chamber.hash, index, rock), (count, chamber.totalheight)); !ok)
+          {
+            var cycle = count - history[j].value.0;
+            var height = chamber.totalheight - history[j].value.1;
+
+            chamber.collapsed += ((n - count) / cycle) * height;
+            count += ((n - count) / cycle) * cycle;
+          }
+
+          rock = (rock + 1) % rocks.len;
+          position = (2, 2 + chamber.height + rocks[rock].height);
+
+          continue;
+        }
+
+        position.1 -= 1;
+      }
+    }
+
+    std::print("part2: tower units tall ", chamber.totalheight);
+
+  }
+  catch(std::error e)
+  {
+    std::panic(e);
+  }
+
+  return 0;
+}
