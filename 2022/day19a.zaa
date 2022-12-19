@@ -1,0 +1,220 @@
+import std.stdio;
+import std.algorithm;
+import std.flat_hash_map;
+import std.scan;
+
+enum resource
+{
+  ore,
+  clay,
+  obsidian,
+  geode,
+
+  fn from(std::String &tok) -> resource
+  {
+    #for(const k : std::meta::enumerators_of($resource))
+      if (tok == std::meta::name_of(k))
+        return resource::#k;
+
+    std::panic("unknown resource");
+  }
+}
+
+struct stockpile : pub int[std::meta::enumerators_of($resource).len]
+{
+  fn [](this&&, resource resource)
+  {
+    return &this[cast<usize>(resource)];
+  }
+
+  fn clear(this mut &) -> void
+  {
+    std::memset(this.data, 0, sizeof(this));
+  }
+
+  fn ==(stockpile&, stockpile&) -> bool = default;
+
+  stockpile() = default;
+  stockpile(stockpile&&) = default;
+  fn =(stockpile mut &, stockpile&&) -> stockpile mut & = default;
+  ~stockpile() = default;
+}
+
+struct blueprint
+{
+  int id;
+  std::flat_hash_map<resource, stockpile> recipes;
+
+  blueprint() = default;
+  blueprint(blueprint&&) = default;
+  ~blueprint() = default;
+}
+
+fn main -> int
+{
+  try
+  {
+    var sum = 0;
+    var blueprints = std::vector<blueprint>();
+
+    var input = std::readfile("day19.txt").chomp.gsub("\r\n", "\n");
+
+    struct parser
+    {
+      int state;
+
+      resource robot;
+      stockpile cost;
+      resource resource;
+      int n;
+
+      parser() = default;
+      ~parser() = default;
+    }
+
+    var parser = parser();
+
+    for(var tok : input.words)
+    {
+      switch (parser.state)
+      {
+        case 0:
+          if (tok == "Blueprint")
+            parser.state = 1;
+          if (tok == "Each")
+            parser.state = 2;
+
+        case 1:
+          blueprints.push_back();
+          std::atoi(tok.begin, tok.end, &mut blueprints.back.id);
+          parser.state = 0;
+
+        case 2:
+          parser.robot = resource::from(tok);
+          parser.state += 1;
+
+        case 3:
+          parser.state += 1;
+
+        case 4:
+          parser.state += 1;
+
+        case 5:
+          std::atoi(tok.begin, tok.end, &mut parser.n);
+          parser.state += 1;
+
+        case 6:
+          parser.resource = resource::from(tok.strip_suffix("."));
+          parser.cost[parser.resource] += parser.n;
+          parser.state += 1;
+
+          if (tok.ends_with("."))
+          {
+            blueprints.back.recipes.insert(parser.robot, parser.cost);
+            parser.cost.clear();
+            parser.state = 0;
+          }
+
+        case 7:
+          parser.state = 5;
+
+        else:
+          std::panic("unhandled");
+      }
+    }
+
+    for(var &blueprint : blueprints)
+    {
+      struct state
+      {
+        stockpile stockpile;
+        std::flat_hash_map<resource, int> bots;
+
+        fn ==(state&, state&) -> bool = default;
+
+        state() = default;
+        state(state&&) = default;
+        fn =(state mut &, state&&) -> state mut & = default;
+        ~state() = default;
+      }
+
+      var maxcpm = stockpile();
+      for(var &(type, cost) : blueprint.recipes)
+      {
+        for(var i = 0; i < cost.len; ++i)
+          maxcpm[i] = std::max(maxcpm[i], cost[i]);
+      }
+
+      var best = 0;
+      var history = std::flat_hash_map<state, void>();
+      var threads = std::vector<state>::from([state()]);
+
+      threads[0].bots.insert(resource::ore, 1);
+
+      for(var time_remaining = 24; time_remaining != 0; --time_remaining)
+      {
+        //std::print("time: ", time_remaining, " ", threads.len);
+        //for(var &thread : threads)
+        //  std::print("  ", thread.bots, " ", thread.stockpile);
+
+        for(var mut &thread : threads.take(threads.begin, threads.end))
+        {
+          var estimate = thread.stockpile[resource::geode] + thread.bots.emplace(resource::geode)*time_remaining;
+
+          if (estimate > best)
+            best = estimate;
+
+          if (estimate + time_remaining*(time_remaining-1)/2 < best)
+            continue;
+
+          if (history.contains(thread))
+            continue;
+
+          for(var &(type, cost) : blueprint.recipes)
+          {
+            if (type != resource::geode && thread.bots.emplace(type) == maxcpm[type])
+              continue;
+
+            if (std::all_of(std::zip(cost, thread.stockpile), |c| c.0 <= c.1))
+            {
+              var thread = thread;
+
+              for(var i = 0; i < cost.len; ++i)
+                thread.stockpile[i] -= cost[i];
+
+              for(var mut &(type, count) : thread.bots)
+                thread.stockpile[type] += count;
+
+              thread.bots.emplace(type) += 1;
+
+              threads.push_back(&move thread);
+            }
+          }
+
+          if (std::all_of(std::zip(thread.stockpile, maxcpm), |c| c.0 >= c.1))
+            continue;
+
+          history.insert(thread);
+
+          for(var mut &(type, count) : thread.bots)
+            thread.stockpile[type] += count;
+
+          threads.push_back(&move thread);
+        }
+      }
+
+      std::print("part1: blueprint ", blueprint.id, " quality level ", blueprint.id * best);
+
+      sum += blueprint.id * best;
+    }
+
+    std::print("part1: sum of blueprint quality level ", sum);
+
+  }
+  catch(std::error e)
+  {
+    std::panic(e);
+  }
+
+  return 0;
+}

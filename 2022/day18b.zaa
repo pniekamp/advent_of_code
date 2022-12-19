@@ -68,7 +68,7 @@ fn main -> int
 
       for(var d : D)
       {
-        if (cubes.find((pt.0 + d.0, pt.1 + d.1, pt.2 + d.2)) == cubes.end && exterior.contains((pt.0 + d.0, pt.1 + d.1, pt.2 + d.2)))
+        if (exterior.contains((pt.0 + d.0, pt.1 + d.1, pt.2 + d.2)))
           surface += 1;
       }
 
