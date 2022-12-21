@@ -1,0 +1,125 @@
+import std.stdio;
+import std.algorithm;
+import std.flat_hash_map;
+import std.scan;
+
+struct monkey
+{
+  std::string name;
+
+  union action
+  {
+    yell(i64),
+    solve((std::string, char, std::string)),
+
+    action() = default;
+    action(action&&) = default;
+    fn =(action mut &, action &&) -> action mut & = default;
+    ~action() = default;
+  }
+
+  action action;
+
+  monkey() = default;
+  monkey(monkey&&) = default;
+  ~monkey() = default;
+}
+
+fn main -> int
+{
+  try
+  {
+    var outcome = 0;
+    var monkeys = std::vector<monkey>();
+
+    var fin = std::file::open("day21.txt");
+
+    for(var line : std::buffered_reader(&mut fin).lines)
+    {
+      var monkey = monkey();
+
+      if (std::is_digit(line[6]))
+      {
+        var n = i64(0);
+        if (!std::sscanf(line, "{}: {}", &mut monkey.name, &mut n))
+          std::panic("error scaning monkey from input '", line, "'");
+
+        monkey.action = monkey::action::yell(n);
+      }
+      else
+      {
+        var lhs = std::string();
+        var op = char();
+        var rhs = std::string();
+
+        if (!std::sscanf(line, "{}: {} {} {}", &mut monkey.name, &mut lhs, &mut op, &mut rhs))
+          std::panic("error scaning monkey from input '", line, "'");
+
+        monkey.action = monkey::action::solve((&move lhs, op, &move rhs));
+      }
+
+      monkeys.push_back(monkey);
+    }
+
+    var stack = std::vector<monkey&>();
+    var results = std::flat_hash_map<std::string_view, i64>();
+
+    for(var &monkey : monkeys)
+    {
+      switch (monkey.action)
+      {
+        case yell[n]:
+          results.insert(monkey.name, n);
+
+        case solve:
+          stack.push_back(&monkey);
+      }
+    }
+
+    while (results.len != monkeys.len)
+    {
+      for(var &monkey : stack.take(stack.begin, stack.end))
+      {
+        switch (monkey.action)
+        {
+          case solve[var &(lhs, op, rhs)]:
+            var i = results.find(lhs);
+            var j = results.find(rhs);
+
+            if (i != results.end && j != results.end)
+            {
+              switch (op)
+              {
+                case '+':
+                  results.insert(monkey.name, results[i].value + results[j].value);
+
+                case '-':
+                  results.insert(monkey.name, results[i].value - results[j].value);
+
+                case '*':
+                  results.insert(monkey.name, results[i].value * results[j].value);
+
+                case '/':
+                  results.insert(monkey.name, results[i].value / results[j].value);
+              }
+            }
+            else
+            {
+              stack.push_back(monkey);
+            }
+        }
+      }
+    }
+
+    outcome = results.get("root");
+
+    std::print("part1: number root will yell ", outcome);
+
+  }
+  catch(std::error e)
+  {
+    std::panic(e);
+  }
+
+  return 0;
+}
