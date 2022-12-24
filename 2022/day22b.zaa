@@ -1,0 +1,280 @@
+import std.stdio;
+import std.algorithm;
+import std.scan;
+
+using position = (usize, usize);
+
+enum direction
+{
+  east,
+  south,
+  west,
+  north,
+
+  fn turn_left(direction &direction) -> direction
+  {
+    return cast<direction>((cast<int>(direction) + 3) % 4);
+  }
+
+  fn turn_right(direction &direction) -> direction
+  {
+    return cast<direction>((cast<int>(direction) + 1) % 4);
+  }
+}
+
+struct map
+{
+  const N = 50;
+
+  std::vector<std::string> tiles;
+
+  fn at(this&, position position) -> char
+  {
+    return cast<char>(this.tiles[position.1][position.0]);
+  }
+
+  fn face(position position) -> usize
+  {
+    // +---+
+    // | 12|
+    // | 4 |
+    // |67 |
+    // |9  |
+    // +---+
+
+    return (position.1 / N)*3 + (position.0 / N);
+  }
+
+  fn move(this &map, position position, direction direction) -> (position, direction)
+  {
+    var face = face(position);
+
+    switch (direction)
+    {
+      case east:
+        position = ((position.0 + 1) % (3*N), position.1);
+
+        if (var newface = face(position); face != newface)
+        {
+          switch (face)
+          {
+            case 1: // -> 2
+              ;
+
+            case 2: // -> 7
+              position = (2*N-1, (3*N-1) - position.1);
+              direction = direction::west;
+
+            case 4: // -> 2
+              position = (position.1 + (1*N), N-1);
+              direction = direction::north;
+
+            case 6: // -> 7
+              ;
+
+            case 7: // -> 2
+              position = (3*N-1, (3*N-1) - position.1);
+              direction = direction::west;
+
+            case 9: // -> 7
+              position = (position.1 - (2*N), 3*N-1);
+              direction = direction::north;
+
+            else:
+              std::panic("unhandled ", position, " ", direction, " ", face, " ", newface);
+          }
+        }
+
+      case south:
+        position = (position.0, (position.1 + 1) % (4*N));
+
+        if (var newface = face(position); face != newface)
+        {
+          switch (face)
+          {
+            case 1: // -> 4
+              ;
+
+            case 2: // -> 4
+              position = (2*N-1, position.0 - (1*N));
+              direction = direction::west;
+
+            case 4: // -> 7
+              ;
+
+            case 6: // -> 9
+              ;
+
+            case 7: // -> 9
+              position = (1*N-1, position.0 + (2*N));
+              direction = direction::west;
+
+            case 9: // -> 2
+              position = (position.0 + (2*N), 0*N);
+              direction = direction::south;
+
+            else:
+              std::panic("unhandled ", position, " ", direction, " ", face, " ", newface);
+          }
+        }
+
+      case west:
+        position = ((position.0 + 3*N - 1) % (3*N), position.1);
+
+        if (var newface = face(position); face != newface)
+        {
+          switch (face)
+          {
+            case 1: // -> 6
+              position = (0*N, (3*N-1) - position.1);
+              direction = direction::east;
+
+            case 2: // -> 1
+              ;
+
+            case 4: // -> 6
+              position = (position.1 - (1*N), 2*N);
+              direction = direction::south;
+
+            case 6: // -> 1
+              position = (1*N, (3*N-1) - position.1);
+              direction = direction::east;
+
+            case 7: // -> 6
+              ;
+
+            case 9: // -> 1
+              position = (position.1 - (2*N), 0*N);
+              direction = direction::south;
+
+            else:
+              std::panic("unhandled ", position, " ", direction, " ", face, " ", newface);
+          }
+        }
+
+      case north:
+        position = (position.0, (position.1 + 4*N - 1) % (4*N));
+
+        if (var newface = face(position); face != newface)
+        {
+          switch (face)
+          {
+            case 1: // -> 9
+              position = (0*N, position.0 + (2*N));
+              direction = direction::east;
+
+            case 2: // -> 9
+              position = (position.0 - (2*N), 4*N-1);
+              direction = direction::north;
+
+            case 4: // -> 1
+              ;
+
+            case 6: // -> 4
+              position = (1*N, position.0 + (1*N));
+              direction = direction::east;
+
+            case 7: // -> 4
+              ;
+
+            case 9: // -> 6
+              ;
+
+            else:
+              std::panic("unhandled ", position, " ", direction, " ", face, " ", newface);
+          }
+        }
+    }
+
+    return (position, direction);
+  }
+
+  map() = default;
+  ~map() = default;
+}
+
+fn dump(map&map, position position)
+{
+  for(var y = 0; y < map.tiles.len; ++y)
+  {
+    for(var x = 0; x < map.tiles[y].len; ++x)
+    {
+      if (x == position.0 && y == position.1)
+        std::putc('@');
+      else
+        std::putc(map.tiles[y][x]);
+    }
+
+    std::putc('\n');
+  }
+
+  std::putc('\n');
+}
+
+fn main -> int
+{
+  try
+  {
+    var map = map();
+    var path = std::string();
+
+    var fin = std::file::open("day22.txt");
+    var reader = std::buffered_reader(&mut fin);
+
+    for(var line : reader.lines)
+    {
+      if (line.empty)
+        break;
+
+      map.tiles.push_back(line);
+    }
+
+    std::skip_line(&mut reader);
+    std::read_line(&mut reader, &mut path);
+
+    var facing = direction::east;
+    var position = position(map.tiles[0].find_first('.') - map.tiles[0].begin, 0);
+
+    for(var ch = path.begin; ch != path.end; )
+    {
+      switch (*ch)
+      {
+        case 'L':
+          facing = facing.turn_left;
+          ch += 1;
+
+        case 'R':
+          facing = facing.turn_right;
+          ch += 1;
+
+        case '0' ..= '9':
+          var n = int();
+          ch += std::atoi(ch, path.end, &mut n).len;
+
+          for(var i = 0; i < n; ++i)
+          {
+            if (var (newpos, newfac) = map.move(position, facing); map.at(newpos) == '.')
+            {
+              position = newpos;
+              facing = newfac;
+            }
+          }
+
+          //dump(map, position);
+
+        else:
+          ch += 1;
+      }
+
+    }
+
+    std::print("part1: final password ", (position.1 + 1) * 1000 + (position.0 + 1) * 4 + cast<usize>(facing));
+
+  }
+  catch(std::error e)
+  {
+    std::panic(e);
+  }
+
+  return 0;
+}

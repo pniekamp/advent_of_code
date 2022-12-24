@@ -1,0 +1,154 @@
+import std.stdio;
+import std.algorithm;
+import std.scan;
+
+using position = (usize, usize);
+
+enum direction
+{
+  east,
+  south,
+  west,
+  north,
+
+  fn turn_left(direction &direction) -> direction
+  {
+    return cast<direction>((cast<int>(direction) + 3) % 4);
+  }
+
+  fn turn_right(direction &direction) -> direction
+  {
+    return cast<direction>((cast<int>(direction) + 1) % 4);
+  }
+}
+
+struct map
+{
+  std::vector<std::string> tiles;
+
+  fn at(this&, position position) -> char
+  {
+    if (position.0 >= this.tiles[position.1].len)
+      return ' ';
+
+    return cast<char>(this.tiles[position.1][position.0]);
+  }
+
+  fn move(this &map, position position, direction direction) -> position
+  {
+    switch (direction)
+    {
+      case east:
+        position = ((position.0 + 1) % map.tiles[position.1].len, position.1);
+
+        if (map.at(position) == ' ')
+          position.0 = map.tiles[position.1].find_first_of(".#") - map.tiles[position.1].begin;
+
+      case south:
+        position = (position.0, (position.1 + 1) % map.tiles.len);
+
+        while (map.at(position) == ' ')
+          position.1 = (position.1 + 1) % map.tiles.len;
+
+      case west:
+        position = ((position.0 + map.tiles[position.1].len - 1) % map.tiles[position.1].len, position.1);
+
+        if (map.at(position) == ' ')
+          position.0 = map.tiles[position.1].find_last_of(".#") - map.tiles[position.1].begin;
+
+      case north:
+        position = (position.0, (position.1 + map.tiles.len - 1) % map.tiles.len);
+
+        while (map.at(position) == ' ')
+          position.1 = (position.1 + map.tiles.len - 1) % map.tiles.len;
+    }
+
+    return position;
+  }
+
+  map() = default;
+  ~map() = default;
+}
+
+fn dump(map&map, position position)
+{
+  for(var y = 0; y < map.tiles.len; ++y)
+  {
+    for(var x = 0; x < map.tiles[y].len; ++x)
+    {
+      if (x == position.0 && y == position.1)
+        std::putc('@');
+      else
+        std::putc(map.tiles[y][x]);
+    }
+
+    std::putc('\n');
+  }
+
+  std::putc('\n');
+}
+
+fn main -> int
+{
+  try
+  {
+    var map = map();
+    var path = std::string();
+
+    var fin = std::file::open("day22.txt");
+    var reader = std::buffered_reader(&mut fin);
+
+    for(var line : reader.lines)
+    {
+      if (line.empty)
+        break;
+
+      map.tiles.push_back(line);
+    }
+
+    std::skip_line(&mut reader);
+    std::read_line(&mut reader, &mut path);
+
+    var facing = direction::east;
+    var position = position(map.tiles[0].find_first('.') - map.tiles[0].begin, 0);
+
+    for(var ch = path.begin; ch != path.end; )
+    {
+      switch (*ch)
+      {
+        case 'L':
+          facing = facing.turn_left;
+          ch += 1;
+
+        case 'R':
+          facing = facing.turn_right;
+          ch += 1;
+
+        case '0' ..= '9':
+          var n = int();
+          ch += std::atoi(ch, path.end, &mut n).len;
+
+          for(var i = 0; i < n; ++i)
+          {
+            if (var newpos = map.move(position, facing); map.at(newpos) == '.')
+              position = newpos;
+          }
+
+          //dump(map, position);
+
+        else:
+          ch += 1;
+      }
+
+    }
+
+    std::print("part1: final password ", (position.1 + 1) * 1000 + (position.0 + 1) * 4 + cast<usize>(facing));
+
+  }
+  catch(std::error e)
+  {
+    std::panic(e);
+  }
+
+  return 0;
+}
