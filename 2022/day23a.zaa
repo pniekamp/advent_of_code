@@ -1,0 +1,191 @@
+import std.stdio;
+import std.algorithm;
+import std.flat_hash_map;
+import std.scan;
+
+using position = (int, int);
+
+struct map
+{
+  std::flat_hash_map<position, void> elves;
+
+  map() = default;
+  ~map() = default;
+}
+
+fn dump(map &map)
+{
+  var extents = [999999, 999999, 0, 0]; // top, left, bottom, right
+
+  for(var &(elf, _) : map.elves)
+  {
+    extents[0] = std::min(extents[0], elf.1);
+    extents[1] = std::min(extents[1], elf.0);
+    extents[2] = std::max(extents[2], elf.1);
+    extents[3] = std::max(extents[3], elf.0);
+  }
+
+  for(var y = extents[0]; y <= extents[2]; ++y)
+  {
+    for(var x = extents[1]; x <= extents[3]; ++x)
+    {
+      if (map.elves.contains((x, y)))
+        std::putc('#');
+      else
+        std::putc('.');
+    }
+
+    std::putc('\n');
+  }
+
+  std::putc('\n');
+}
+
+fn simulate(map mut &map, usize round) -> usize
+{
+  const N = 0;
+  const NE = 1;
+  const E = 2;
+  const SE = 3;
+  const S = 4;
+  const SW = 5;
+  const W = 6;
+  const NW = 7;
+
+  const adjacent_positions = [<(int, int)>: (0, -1), (1, -1), (1, 0), (1, 1), (0, 1), (-1, 1), (-1, 0), (-1, -1) ];
+
+  var n = 0;
+  var elves = &move map.elves;
+  var proposals = std::vector<(position, position)>();
+
+  map.elves.clear();
+
+  for(var (p, _) : elves)
+  {
+    var adjacent = [false; 8];
+    for(var j = 0; j < adjacent.len; ++j)
+    {
+      var dp = adjacent_positions[j];
+
+      adjacent[j] = elves.contains((p.0 + dp.0, p.1 + dp.1));
+    }
+
+    if (std::any_of(adjacent, |k| k))
+    {
+      var dp = (0, 0);
+
+      for(var n = 0; n < 4; ++n)
+      {
+        switch ((n + round) % 4)
+        {
+          case 0:
+            if (!adjacent[N] && !adjacent[NE] && !adjacent[NW])
+              dp = adjacent_positions[N];
+
+          case 1:
+            if (!adjacent[S] && !adjacent[SE] && !adjacent[SW])
+              dp = adjacent_positions[S];
+
+          case 2:
+            if (!adjacent[W] && !adjacent[NW] && !adjacent[SW])
+              dp = adjacent_positions[W];
+
+          case 3:
+            if (!adjacent[E] && !adjacent[NE] && !adjacent[SE])
+              dp = adjacent_positions[E];
+        }
+
+        if (dp != (0, 0))
+          break;
+      }
+
+      proposals.push_back(p, (p.0 + dp.0, p.1 + dp.1));
+    }
+    else
+    {
+      map.elves.insert(p);
+    }
+  }
+
+  std::sort(&mut proposals, |a, b| a.1 < b.1);
+
+  for(var i = proposals.begin; i != proposals.end; ++i)
+  {
+    if (i+1 != proposals.end && proposals[i].1 == proposals[i+1].1)
+    {
+      map.elves.insert(proposals[i].0);
+
+      for(var j = i+1; j != proposals.end && proposals[j].1 == proposals[i].1; ++j)
+      {
+        map.elves.insert(proposals[j].0);
+
+        ++i;
+      }
+    }
+    else
+    {
+      map.elves.insert(proposals[i].1);
+
+      ++n;
+    }
+  }
+
+  return n;
+}
+
+fn main -> int
+{
+  try
+  {
+    var map = map();
+
+    var fin = std::file::open("day23.txt");
+
+    for(var y = 0, var line : std::buffered_reader(&mut fin).lines)
+    {
+      for(var x = 0, var ch : line)
+      {
+        if (ch == cast('#'))
+          map.elves.insert((x, y));
+
+        x += 1;
+      }
+
+      y += 1;
+    }
+
+    for(var round = 0; round < 10; ++round)
+    {
+      simulate(&mut map, round);
+    }
+
+    var count = 0;
+    var extents = [999999, 999999, 0, 0]; // top, left, bottom, right
+
+    for(var &(elf, _) : map.elves)
+    {
+      extents[0] = std::min(extents[0], elf.1);
+      extents[1] = std::min(extents[1], elf.0);
+      extents[2] = std::max(extents[2], elf.1);
+      extents[3] = std::max(extents[3], elf.0);
+    }
+
+    for(var y = extents[0]; y <= extents[2]; ++y)
+    {
+      for(var x = extents[1]; x <= extents[3]; ++x)
+      {
+        if (!map.elves.contains((x, y)))
+          ++count;
+      }
+    }
+
+    std::print("part1: count of empty ground tiles ", count);
+
+  }
+  catch(std::error e)
+  {
+    std::panic(e);
+  }
+
+  return 0;
+}

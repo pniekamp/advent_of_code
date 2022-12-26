@@ -268,7 +268,7 @@ fn main -> int
 
     }
 
-    std::print("part1: final password ", (position.1 + 1) * 1000 + (position.0 + 1) * 4 + cast<usize>(facing));
+    std::print("part2: final password ", (position.1 + 1) * 1000 + (position.0 + 1) * 4 + cast<usize>(facing));
 
   }
   catch(std::error e)
