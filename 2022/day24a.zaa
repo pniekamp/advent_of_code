@@ -1,0 +1,169 @@
+import std.stdio;
+import std.algorithm;
+import std.flat_hash_map;
+import std.scan;
+
+using position = (int, int);
+
+struct map
+{
+  std::vector<std::string> tiles;
+  std::vector<(position, u8)> blizzards;
+
+  fn at(this &map, position p) -> char
+  {
+    var j = std::lower_bound(map.blizzards.transform(|k| k.0), p);
+
+    if (j != map.blizzards.end && map.blizzards[j.base].0 == p)
+      return '*';
+
+    if (0 <= p.1 && cast<usize>(p.1) < map.tiles.len && 0 <= p.0 && cast<usize>(p.0) < map.tiles[cast<usize>(p.1)].len)
+      return cast<char>(map.tiles[cast<usize>(p.1)][cast<usize>(p.0)]);
+
+    return '#';
+  }
+
+  map() = default;
+  ~map() = default;
+}
+
+fn dump(map &map, position p) -> void
+{
+  for(var y = 0, var &line : map.tiles)
+  {
+    for(var x = 0, var ch : line)
+    {
+      var j = std::equal_range(map.blizzards.transform(|k| k.0), (x, y));
+
+      switch (j.1 - j.0)
+      {
+        case 0:
+          std::putc((x, y) == p ? cast<u8>('X') : ch);
+
+        case 1:
+          std::putc(map.blizzards[j.0.base].1);
+
+        case 2 ..= 9:
+          std::putc('0' + cast(j.1 - j.0));
+
+        else:
+          std::putc('*');
+      }
+
+      x += 1;
+    }
+
+    std::putc('\n');
+
+    y += 1;
+  }
+
+  std::putc('\n');
+}
+
+fn simulate(map mut &map) -> void
+{
+  for(var mut &(xy, d) : map.blizzards)
+  {
+    switch (d)
+    {
+      case '<':
+        xy.0 -= 1;
+        if (xy.0 == 0)
+          xy.0 = cast<int>(map.tiles[cast<usize>(xy.1)].len - 2);
+
+      case '>':
+        xy.0 += 1;
+        if (xy.0 == cast<int>(map.tiles[cast<usize>(xy.1)].len - 1))
+          xy.0 = 1;
+
+      case 'v':
+        xy.1 += 1;
+        if (xy.1 == cast<int>(map.tiles.len - 1))
+          xy.1 = 1;
+
+      case '^':
+        xy.1 -= 1;
+        if (xy.1 == 0)
+          xy.1 = cast<int>(map.tiles.len - 2);
+    }
+  }
+
+  std::sort(&mut map.blizzards);
+}
+
+fn main -> int
+{
+  try
+  {
+    var map = map();
+
+    var fin = std::file::open("day24.txt");
+
+    for(var y = 0, var line : std::buffered_reader(&mut fin).lines)
+    {
+      for(var x = 0, var ch : line)
+      {
+        switch (ch)
+        {
+          case '<':
+          case '>':
+          case 'v':
+          case '^':
+            map.blizzards.push_back((x, y), ch);
+        }
+
+        x += 1;
+      }
+
+      map.tiles.push_back(line);
+
+      y += 1;
+    }
+
+    for(var &(xy, d) : map.blizzards)
+    {
+      map.tiles[cast<usize>(xy.1)][cast<usize>(xy.0)] = cast('.');
+    }
+
+    std::sort(&mut map.blizzards);
+
+    var E = (cast<int>(map.tiles[0].find_first('.') - map.tiles[0].begin), 0);
+    var X = (cast<int>(map.tiles.back.find_first('.') - map.tiles.back.begin), cast<int>(map.tiles.len - 1));
+
+    var time = 0;
+    var stack = std::flat_hash_map<position, void>();
+
+    stack.insert(E);
+
+    while (stack.len != 0)
+    {
+      simulate(&mut map);
+
+      for(var (p, _) : stack.take(stack.begin, stack.end))
+      {
+        for(var d : [(0, 0), (0, -1), (+1, 0), (0, +1), (-1, 0)])
+        {
+          var np = (p.0 + d.0, p.1 + d.1);
+
+          if (map.at(np) == '.')
+            stack.insert(np);
+        }
+      }
+
+      time += 1;
+
+      if (stack.find(X) != stack.end)
+        break;
+    }
+
+    std::print("part1: minutes to reach the goal ", time);
+
+  }
+  catch(std::error e)
+  {
+    std::panic(e);
+  }
+
+  return 0;
+}

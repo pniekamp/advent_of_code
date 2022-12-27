@@ -55,10 +55,8 @@ fn simulate(map mut &map, usize round) -> usize
   const adjacent_positions = [<(int, int)>: (0, -1), (1, -1), (1, 0), (1, 1), (0, 1), (-1, 1), (-1, 0), (-1, -1) ];
 
   var n = 0;
-  var elves = &move map.elves;
+  var elves = map.elves.take(map.elves.begin, map.elves.end);
   var proposals = std::vector<(position, position)>();
-
-  map.elves.clear();
 
   for(var (p, _) : elves)
   {
