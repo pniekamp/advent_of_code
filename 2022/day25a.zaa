@@ -1,0 +1,88 @@
+import std.stdio;
+import std.algorithm;
+import std.scan;
+
+fn main -> int
+{
+  try
+  {
+    var sum = i64(0);
+
+    var fin = std::file::open("day25.txt");
+
+    for(var line : std::buffered_reader(&mut fin).lines)
+    {
+      var fuel = 0;
+
+      rof(var i = 0, var ch : line)
+      {
+        switch (ch)
+        {
+          case '=':
+            fuel -= 2 * std::pow(5, i);
+
+          case '-':
+            fuel -= 1 * std::pow(5, i);
+
+          case '0':
+            fuel += 0 * std::pow(5, i);
+
+          case '1':
+            fuel += 1 * std::pow(5, i);
+
+          case '2':
+            fuel += 2 * std::pow(5, i);
+
+          else:
+            std::panic("unhandled digit");
+        }
+
+        i += 1;
+      }
+
+      sum += fuel;
+    }
+
+    var snafu = std::string();
+
+    while (var n = sum;; n != 0)
+    {
+      switch (n % 5)
+      {
+        case 3:
+          snafu += '=';
+          n += 2;
+
+        case 4:
+          snafu += '-';
+          n += 1;
+
+        case 0:
+          snafu += '0';
+          n -= 0;
+
+        case 1:
+          snafu += '1';
+          n -= 1;
+
+        case 2:
+          snafu += '2';
+          n -= 2;
+      }
+
+      n /= 5;
+    }
+
+    std::reverse!(&mut snafu);
+
+    std::print("part1: sum of fuel requirements ", sum);
+    std::print("part1: sanfu of fuel requirements ", snafu);
+
+  }
+  catch(std::error e)
+  {
+    std::panic(e);
+  }
+
+  return 0;
+}
