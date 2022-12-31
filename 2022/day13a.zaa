@@ -140,7 +140,7 @@ fn main -> int
     var sum = 0;
     var index = 1;
 
-    var input = std::readfile("day13.txt").gsub("\r\n", "\n");
+    var input = std::readfile("day13.txt").chomp.gsub("\r\n", "\n");
 
     for(var pairs : input.split("\n\n"))
     {

@@ -111,7 +111,7 @@ fn main -> int
       }
     }
 
-    outcome = results.get("root");
+    outcome = results["root"];
 
     std::print("part1: number root will yell ", outcome);
 

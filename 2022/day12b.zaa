@@ -37,7 +37,7 @@ fn main -> int
 
     for(; !paths.empty; steps += 1)
     {
-      for(var &path : paths.take!(paths.begin, paths.end))
+      for(var &path : paths.take(paths.begin, paths.end))
       {
         var p = path;
         var h = heightmap[p.1][p.0];

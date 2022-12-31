@@ -21,7 +21,7 @@ fn main -> int
   {
     var monkeys = std::vector<monkey>();
     
-    var input = std::readfile("day11.txt").gsub("\r\n", "\n");
+    var input = std::readfile("day11.txt").chomp.gsub("\r\n", "\n");
 
     for(var defn : input.split("\n\n"))
     {
@@ -73,7 +73,7 @@ fn main -> int
     {
       for(var mut &monkey : monkeys)
       {
-        for(var item : monkey.items.take!(monkey.items.begin, monkey.items.end))
+        for(var item : monkey.items.take(monkey.items.begin, monkey.items.end))
         {
           var level = (monkey.coefficients[0]*item*item + monkey.coefficients[1]*item + monkey.coefficients[2]) / 3;
           var target = monkey.target[cast<usize>(level % monkey.divisor == 0)];
@@ -85,7 +85,7 @@ fn main -> int
       }   
     }
 
-    std::partial_sort!(&mut counts, counts.begin + 2, std::greater);
+    std::partial_sort(&mut counts, counts.begin + 2, std::greater);
     
     std::print("part1: total monkey business ", counts[0] * counts[1]);
 

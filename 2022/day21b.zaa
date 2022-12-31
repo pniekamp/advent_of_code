@@ -121,12 +121,12 @@ fn main -> int
         }
       }
 
-      if (results.get("root") == 0)
+      if (results["root"] == 0)
         break;
 
-      std::print(outcome, " ", results.get("root"));
+      //std::print(outcome, " ", results["root"]);
 
-      outcome += results.get("root") / 25; // or maybe -25
+      outcome += results["root"] / 25; // or maybe -25
 
       monkeys[humn].action = monkey::action::yell(outcome);
     }

@@ -127,8 +127,8 @@ fn main -> int
     {
       struct state
       {
-        stockpile stockpile;
-        std::flat_hash_map<resource, int> bots;
+        stockpile bots;
+        stockpile resources;
 
         fn ==(state&, state&) -> bool = default;
 
@@ -149,17 +149,17 @@ fn main -> int
       var history = std::flat_hash_map<state, void>();
       var threads = std::vector<state>::from([state()]);
 
-      threads[0].bots.insert(resource::ore, 1);
+      threads[0].bots[resource::ore] = 1;
 
       for(var time_remaining = 24; time_remaining != 0; --time_remaining)
       {
         //std::print("time: ", time_remaining, " ", threads.len);
         //for(var &thread : threads)
-        //  std::print("  ", thread.bots, " ", thread.stockpile);
+        //  std::print("  ", thread.bots, " ", thread.resources);
 
         for(var mut &thread : threads.take(threads.begin, threads.end))
         {
-          var estimate = thread.stockpile[resource::geode] + thread.bots.emplace(resource::geode)*time_remaining;
+          var estimate = thread.resources[resource::geode] + thread.bots[resource::geode]*time_remaining;
 
           if (estimate > best)
             best = estimate;
@@ -172,32 +172,32 @@ fn main -> int
 
           for(var &(type, cost) : blueprint.recipes)
           {
-            if (type != resource::geode && thread.bots.emplace(type) == maxcpm[type])
+            if (type != resource::geode && thread.bots[type] == maxcpm[type])
               continue;
 
-            if (std::all_of(std::zip(cost, thread.stockpile), |c| c.0 <= c.1))
+            if (std::all_of(std::zip(cost, thread.resources), |c| c.0 <= c.1))
             {
               var thread = thread;
 
-              for(var i = 0; i < cost.len; ++i)
-                thread.stockpile[i] -= cost[i];
+              for(var i = 0; i < thread.resources.len; ++i)
+                thread.resources[i] -= cost[i];
 
-              for(var mut &(type, count) : thread.bots)
-                thread.stockpile[type] += count;
+              for(var i = 0; i < thread.resources.len; ++i)
+                thread.resources[i] += thread.bots[i];
 
-              thread.bots.emplace(type) += 1;
+              thread.bots[type] += 1;
 
               threads.push_back(&move thread);
             }
           }
 
-          if (std::all_of(std::zip(thread.stockpile, maxcpm), |c| c.0 >= c.1))
-            continue;
-
           history.insert(thread);
 
-          for(var mut &(type, count) : thread.bots)
-            thread.stockpile[type] += count;
+          if (std::all_of(std::zip(thread.resources, maxcpm), |c| c.0 >= c.1))
+            continue;
+
+          for(var i = 0; i < thread.resources.len; ++i)
+            thread.resources[i] += thread.bots[i];
 
           threads.push_back(&move thread);
         }

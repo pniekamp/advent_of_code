@@ -149,7 +149,7 @@ fn main -> int
     packets.push_back("[[2]]");
     packets.push_back("[[6]]");
 
-    std::sort!(&mut packets, |a, b| compare(std::string_view(a), std::string_view(b)) == result::ordered);
+    std::sort(&mut packets, |a, b| compare(std::string_view(a), std::string_view(b)) == result::ordered);
 
     for(var index = 0; index != packets.len; ++index)
     {

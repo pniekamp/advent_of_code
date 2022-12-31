@@ -1,0 +1,139 @@
+advent-of-code 2022
+
+day 01
+part1: max elf calories 71506
+part2: max three elf calories 209603
+
+day 02
+part1: score according to guide 14531
+part2: score according to guide 11258
+
+day 03
+part1: sum of the duplicate priorities 8176
+part2: sum of the badge priorities 2689
+
+day 04
+part1: count assignment pairs fully contained 466
+part1: count assignment pairs overlapping 865
+
+day 05
+part1: crates on top MQTPGLLDN
+part2: crates on top LVZPSTTCZ
+
+day 06
+part1: first start-of-packet 1876
+part2: first start-of-message 2202
+
+day 07
+part1: sum of the total directories sizes 1315285
+part2: total size of the smallest directory 9847279
+
+day 08
+part1: visible from outside grid 1543
+part2: best scenic score 595080
+
+day 09
+part1: tail visited tiles 6057
+part2: tail visited tiles 2514
+
+day 10
+part1: sum of these six signal strengths 14860
+###   ##  #### #### #  # #  # ###  #  # 
+#  # #  #    # #    #  # #  # #  # # #  
+#  # #      #  ###  #### #  # #  # ##   
+###  # ##  #   #    #  # #  # ###  # #  
+# #  #  # #    #    #  # #  # # #  # #  
+#  #  ### #### #### #  #  ##  #  # #  # 
+
+day 11
+part1: total monkey business 98280
+part2: total monkey business 17673687232
+
+day 12
+part1: shortest path from start 468
+part2: shortest path from any a 459
+
+day 13
+part1: sum of indices of ordered pairs 4821
+part2: product of indices of ordered dividers 21890
+
+day 14
+part1: count of settled units of sand 828
+part2: count of settled units of sand 25500
+
+day 15
+part1: count of positions that cannot contain a beacon 4665948
+part2: candidate beacon tuning frequency 13543690671045
+
+day 16
+part1: most pressure released 2077
+part1: most pressure released 2741
+
+day 17
+part1: tower units tall 3119
+part2: tower units tall 1536994219669
+
+day 18
+part1: surface area of scanned droplet 4456
+part2: surface area of scanned droplet 2510
+
+day 19
+part1: blueprint 1 quality level 4
+part1: blueprint 2 quality level 0
+part1: blueprint 3 quality level 0
+part1: blueprint 4 quality level 8
+part1: blueprint 5 quality level 25
+part1: blueprint 6 quality level 18
+part1: blueprint 7 quality level 63
+part1: blueprint 8 quality level 8
+part1: blueprint 9 quality level 0
+part1: blueprint 10 quality level 160
+part1: blueprint 11 quality level 33
+part1: blueprint 12 quality level 24
+part1: blueprint 13 quality level 65
+part1: blueprint 14 quality level 0
+part1: blueprint 15 quality level 30
+part1: blueprint 16 quality level 32
+part1: blueprint 17 quality level 0
+part1: blueprint 18 quality level 54
+part1: blueprint 19 quality level 95
+part1: blueprint 20 quality level 120
+part1: blueprint 21 quality level 105
+part1: blueprint 22 quality level 0
+part1: blueprint 23 quality level 207
+part1: blueprint 24 quality level 0
+part1: blueprint 25 quality level 25
+part1: blueprint 26 quality level 0
+part1: blueprint 27 quality level 351
+part1: blueprint 28 quality level 0
+part1: blueprint 29 quality level 0
+part1: blueprint 30 quality level 0
+part1: sum of blueprint quality level 1427
+part2: blueprint 1 quantity 40
+part2: blueprint 2 quantity 10
+part2: blueprint 3 quantity 11
+part2: product of blueprint quantity 4400
+
+day 20
+part1: sum of the grove coordinates 988
+part2: sum of the grove coordinates 7768531372516
+
+day 21
+part1: number root will yell 169525884255464
+part2: number humn should yell 3247317268284
+
+day 22
+part1: final password 76332
+part2: final password 144012
+
+day 23
+part1: count of empty ground tiles 4082
+part2: rounds 1065
+
+day 24
+part1: minutes to reach the goal 264
+part2: minutes to reach the goal, return, then goal again 789
+
+day 25
+part1: sum of fuel requirements 29361331235500
+part1: sanfu of fuel requirements 2==221=-002=0-02-000

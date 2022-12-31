@@ -8,7 +8,7 @@ fn main -> int
   {
     var sums = [<i64>: 0, 0, 0];
 
-    var input = std::readfile("day01.txt").gsub("\r\n", "\n");
+    var input = std::readfile("day01.txt").chomp.gsub("\r\n", "\n");
 
     for(var snacks : input.split("\n\n"))
     {
