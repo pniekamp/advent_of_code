@@ -1,0 +1,83 @@
+import std.stdio;
+import std.algorithm;
+import std.scan;
+
+struct game
+{
+  int id;
+  std::vector<int[3]> draws;
+
+  game() = default;
+  game(game&) = default;
+  ~game() = default;
+}
+
+fn main -> int
+{
+  try
+  {
+    var games = std::vector<game>();
+
+    var fin = std::file::open("day02.txt");
+
+    for (var line : std::buffered_reader(&mut fin).lines)
+    {
+      var game = game();
+      var draws = std::string_view();
+
+      if (!std::sscanf(line, "Game {}: {}", &mut game.id, &mut draws))
+        std::panic("error scaning game from input '", line, "'");
+
+      for(var handful : draws.split("; "))
+      {
+        var draw = [ 0, 0, 0 ];
+
+        for(var cubes : handful.split(", "))
+        {
+          var n = 0;
+          var color = std::string_view();
+
+          if (!std::sscanf(cubes, "{} {}", &mut n, &mut color))
+            std::panic("error scaning game from input '", line, "'");
+
+          if (color == "red")
+            draw[0] = n;
+
+          else if (color == "green")
+            draw[1] = n;
+
+          else if (color == "blue")
+            draw[2] = n;
+
+          else
+            std::panic("error scaning game from input '", line, "'");
+        }
+
+        game.draws.push_back(draw);
+      }
+
+      games.push_back(game);
+    }
+
+    var power = 0;
+
+    for(var &game : games)
+    {
+      var cubes = [ 0, 0, 0 ];
+
+      #for(const k = usize(0); k < 3; ++k)
+        cubes[k] = game.draws.transform(|draw| draw[k]).max;
+
+      power += cast<i64>(cubes[0]) * cast<i64>(cubes[1]) * cast<i64>(cubes[2]);
+    }
+
+    std::print("part2: games power ", power);
+
+  }
+  catch(std::error e)
+  {
+    std::panic(e);
+  }
+
+  return 0;
+}
