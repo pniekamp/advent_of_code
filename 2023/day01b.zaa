@@ -2,7 +2,7 @@ import std.stdio;
 import std.algorithm;
 import std.scan;
 
-const digit_strings = [
+const numbers = [
   [ "0", "zero" ],
   [ "1", "one" ],
   [ "2", "two" ],
@@ -29,9 +29,9 @@ fn main -> int
 
       for (var i = line.begin; i != line.end; ++i)
       {
-        for (var j = 0; j < 10; ++j)
+        for (var j = 0; j < numbers.len; ++j)
         {
-          for(var str : digit_strings[j])
+          for(var str : numbers[j])
           {
             if (line[i .. line.end].starts_with(str))
               digits.push_back(j);
