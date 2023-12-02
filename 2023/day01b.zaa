@@ -1,0 +1,54 @@
+import std.stdio;
+import std.algorithm;
+import std.scan;
+
+const digit_strings = [
+  [ "0", "zero" ],
+  [ "1", "one" ],
+  [ "2", "two" ],
+  [ "3", "three" ],
+  [ "4", "four" ],
+  [ "5", "five" ],
+  [ "6", "six" ],
+  [ "7", "seven" ],
+  [ "8", "eight" ],
+  [ "9", "nine" ],
+];
+
+fn main -> int
+{
+  try
+  {
+    var sum = 0;
+
+    var fin = std::file::open("day01.txt");
+
+    for (var line : std::buffered_reader(&mut fin).lines)
+    {
+      var digits = std::vector<usize>();
+
+      for (var i = line.begin; i != line.end; ++i)
+      {
+        for (var j = 0; j < 10; ++j)
+        {
+          for(var str : digit_strings[j])
+          {
+            if (line[i .. line.end].starts_with(str))
+              digits.push_back(j);
+          }
+        }
+      }
+
+      sum += cast<i64>(digits.front) * 10 + cast<i64>(digits.back);
+    }
+
+    std::print("part2: sum of calibration values ", sum);
+
+  }
+  catch(std::error e)
+  {
+    std::panic(e);
+  }
+
+  return 0;
+}
