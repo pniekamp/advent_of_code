@@ -1,0 +1,79 @@
+import std.stdio;
+import std.algorithm;
+import std.flat_hash_map;
+import std.scan;
+
+struct map
+{
+  std::vector<std::string> cells;
+  std::flat_hash_map<(int, int), std::vector<int>> gears;
+
+  fn span(this &map, int x, int y, usize len) -> std::string_view
+  {
+    if (y < 0 || y >= cast(map.cells.len))
+      return std::string_view();
+
+    var j = cast<usize>(y);
+    var i0 = std::min(cast<usize>(std::max(x, 0)), map.cells[j].len);
+    var i1 = std::min(cast<usize>(std::max(x + cast<int>(len), 0)), map.cells[j].len);
+
+    return map.cells[j][i0 .. i1];
+  }
+
+  map() = default;
+  ~map() = default;
+}
+
+fn main -> int
+{
+  try
+  {
+    var map = map();
+
+    var fin = std::file::open("day03.txt");
+
+    for (var line : std::buffered_reader(&mut fin).lines)
+    {
+      map.cells.push_back(line);
+    }
+
+    for (var y = 0, var &line : map.cells;; ++y)
+    {
+      for (var x = 0; x < cast(line.len); ++x)
+      {
+        var n = 0;
+
+        if (var len = std::sscanf(map.span(x, y, 8), "{}", &mut n).len; n > 0)
+        {
+          for(var j = y - 1; j <= y + 1; ++j)
+          {
+            for(var i = x - 1; i <= x + cast<int>(len); ++i)
+            {
+              if (map.span(i, j, 1) == "*")
+                map.gears.emplace((i, j)).push_back(n);
+            }
+          }
+
+          x += cast(len);
+        }
+      }
+    }
+
+    var sum = 0;
+
+    for(var &(position, numbers) : map.gears)
+    {
+      if (numbers.len == 2)
+        sum += cast<i64>(numbers[0]) * cast<i64>(numbers[1]);
+    }
+
+    std::print("part2: sum of part numbers ", sum);
+
+  }
+  catch(std::error e)
+  {
+    std::panic(e);
+  }
+
+  return 0;
+}
