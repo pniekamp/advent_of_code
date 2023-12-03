@@ -8,9 +8,6 @@ struct map
 
   fn span(this &map, int x, int y, usize len) -> std::string_view
   {
-    if (y < 0 || y >= cast(map.cells.len))
-      return std::string_view();
-
     var j = cast<usize>(y);
     var i0 = std::min(cast<usize>(std::max(x, 0)), map.cells[j].len);
     var i1 = std::min(cast<usize>(std::max(x + cast<int>(len), 0)), map.cells[j].len);
@@ -47,7 +44,7 @@ fn main -> int
         {
           var adjacent = false;
 
-          for(var j = y - 1; j <= y + 1; ++j)
+          for(var j = std::max(y - 1, 0); j <= std::min(y + 1, cast(map.cells.len - 1)); ++j)
           {
             if (std::any_of(map.span(x - 1, j, len + 2), |cell| !std::is_digit(cell) && cell != cast('.')))
               adjacent = true;
