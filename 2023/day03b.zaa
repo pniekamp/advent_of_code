@@ -64,7 +64,7 @@ fn main -> int
         sum += cast<i64>(numbers[0]) * cast<i64>(numbers[1]);
     }
 
-    std::print("part2: sum of part numbers ", sum);
+    std::print("part2: sum of gear ratios ", sum);
 
   }
   catch(std::error e)
