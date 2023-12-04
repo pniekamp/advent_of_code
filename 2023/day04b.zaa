@@ -1,0 +1,71 @@
+import std.stdio;
+import std.algorithm;
+import std.scan;
+
+struct card
+{
+  usize id;
+  std::vector<int> numbers;
+  std::vector<int> winners;
+
+  card() = default;
+  card(card&&) = default;
+  ~card() = default;
+}
+
+fn main -> int
+{
+  try
+  {
+    var cards = std::vector<card>();
+
+    var fin = std::file::open("day04.txt");
+
+    for (var line : std::buffered_reader(&mut fin).lines)
+    {
+      var card = card();
+      var numbers = std::string_view();
+      var winners = std::string_view();
+
+      if (!std::sscanf(line, "Card {}: {}| {}", &mut card.id, &mut winners, &mut numbers))
+        std::panic("error scaning card from input '", line, "'");
+
+      for (var number : numbers.words)
+      {
+        var n = int(0);
+        std::atoi(number.begin, number.end, &mut n);
+        card.numbers.push_back(n);
+      }
+
+      for (var winner : winners.words)
+      {
+        var n = int(0);
+        std::atoi(winner.begin, winner.end, &mut n);
+        card.winners.push_back(n);
+      }
+
+      cards.push_back(card);
+    }
+
+    var copies = std::vector<int>::with_size(cards.len + 1);
+
+    for(var &card : cards)
+    {
+      copies[card.id] += 1;
+
+      var winners = std::count_if(card.numbers, |n| card.winners.find(n) != card.winners.end);
+
+      for(var i = card.id + 1; i <= card.id + winners; ++i)
+        copies[i] += copies[card.id];
+    }
+
+    std::print("part1: total cards ", copies.sum);
+
+  }
+  catch(std::error e)
+  {
+    std::panic(e);
+  }
+
+  return 0;
+}
