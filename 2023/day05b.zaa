@@ -36,6 +36,9 @@ struct almanac
 
         key.0 += ranges.back.1;
         key.1 -= ranges.back.1;
+
+        if (key.1 == 0)
+          break;
       }
 
       if (src <= key.0 && key.0 < src + len)
@@ -44,10 +47,10 @@ struct almanac
 
         key.0 += ranges.back.1;
         key.1 -= ranges.back.1;
-      }
 
-      if (key.1 == 0)
-        break;
+        if (key.1 == 0)
+          break;
+      }
     }
 
     if (key.1 != 0)
