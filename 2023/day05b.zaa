@@ -28,36 +28,31 @@ struct almanac
   {
     var ranges = std::vector<(i64, i64)>();
 
-    while (key.1 != 0)
+    for (var (src, dst, len) : map)
     {
-      var found = false;
-
-      for (var (src, dst, len) : map)
+      if (key.0 < src)
       {
-        if (src <= key.0 && key.0 < src + len)
-        {
-          ranges.push_back((dst + (key.0 - src), std::min(src + len - key.0, key.1)));
+        ranges.push_back((key.0, std::min(src - key.0, key.1)));
 
-          found = true;
-          break;
-        }
-
-        if (key.0 < src)
-        {
-          ranges.push_back((key.0, std::min(src - key.0, key.1)));
-
-          found = true;
-          break;
-        }
+        key.0 += ranges.back.1;
+        key.1 -= ranges.back.1;
       }
 
-      if (!found)
+      if (src <= key.0 && key.0 < src + len)
       {
-        ranges.push_back((key.0, key.1));
+        ranges.push_back((dst + (key.0 - src), std::min(src + len - key.0, key.1)));
+
+        key.0 += ranges.back.1;
+        key.1 -= ranges.back.1;
       }
 
-      key.0 += ranges.back.1;
-      key.1 -= ranges.back.1;
+      if (key.1 == 0)
+        break;
+    }
+
+    if (key.1 != 0)
+    {
+      ranges.push_back((key.0, key.1));
     }
 
     return ranges;
