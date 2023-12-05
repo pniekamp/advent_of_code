@@ -1,0 +1,123 @@
+import std.stdio;
+import std.algorithm;
+import std.scan;
+
+struct almanac
+{
+  std::vector<i64> seeds;
+  std::vector<(i64, i64, i64)> seed_to_soil;
+  std::vector<(i64, i64, i64)> soil_to_fertilizer;
+  std::vector<(i64, i64, i64)> fertilizer_to_water;
+  std::vector<(i64, i64, i64)> water_to_light;
+  std::vector<(i64, i64, i64)> light_to_temperature;
+  std::vector<(i64, i64, i64)> temperature_to_humidity;
+  std::vector<(i64, i64, i64)> humidity_to_location;
+
+  fn lookup(i64 key, std::vector<(i64, i64, i64)> &map) -> i64
+  {
+    for (var (src, dst, len) : map)
+    {
+      if (src <= key && key < src + len)
+        return dst + (key - src);
+    }
+
+    return key;
+  }
+
+  almanac() = default;
+  almanac(almanac&) = default;
+  ~almanac() = default;
+}
+
+fn main -> int
+{
+  try
+  {
+    var almanac = almanac();
+
+    var fin = std::file::open("day05.txt");
+    var reader = std::buffered_reader(&mut fin);
+
+    var buffer = std::string();
+    std::read_line(&mut reader, &mut buffer);
+
+    for (var seed : buffer.cut(':').1.words)
+    {
+      var id = i64(0);
+      if (!std::sscanf(seed, "{}", &mut id))
+        std::panic("error scaning seed input '", seed, "'");
+
+      almanac.seeds.push_back(id);
+    }
+
+    std::skip_line(&mut reader);
+
+    for (var k = 0; k < 7; ++k)
+    {
+      var head = std::string();
+      std::read_line(&mut reader, &mut head);
+
+      var ranges = std::vector<(i64, i64, i64)>();
+
+      for (var line : reader.lines)
+      {
+        if (line.empty)
+          break;
+
+        var range = (0, 0, 0);
+        if (!std::sscanf(line, "{} {} {}", &mut range.1, &mut range.0, &mut range.2))
+          std::panic("error scaning game map input '", line, "'");
+
+        ranges.push_back(range);
+      }
+
+      if (head.starts_with("seed-to-soil"))
+        almanac.seed_to_soil = &move ranges;
+
+      else if (head.starts_with("soil-to-fertilizer"))
+        almanac.soil_to_fertilizer = &move ranges;
+
+      else if (head.starts_with("fertilizer-to-water"))
+        almanac.fertilizer_to_water = &move ranges;
+
+      else if (head.starts_with("water-to-light"))
+        almanac.water_to_light = &move ranges;
+
+      else if (head.starts_with("light-to-temperature"))
+        almanac.light_to_temperature = &move ranges;
+
+      else if (head.starts_with("temperature-to-humidity"))
+        almanac.temperature_to_humidity = &move ranges;
+
+      else if (head.starts_with("humidity-to-location"))
+        almanac.humidity_to_location = &move ranges;
+
+      std::skip_line(&mut reader);
+    }
+
+    var minimum = std::numeric_traits<i64>::max;
+
+    for (var seed : almanac.seeds)
+    {
+      var soil = almanac::lookup(seed, almanac.seed_to_soil);
+      var fertilizer = almanac::lookup(soil, almanac.soil_to_fertilizer);
+      var water = almanac::lookup(fertilizer, almanac.fertilizer_to_water);
+      var light = almanac::lookup(water, almanac.water_to_light);
+      var temperature = almanac::lookup(light, almanac.light_to_temperature);
+      var humidity = almanac::lookup(temperature, almanac.temperature_to_humidity);
+      var location = almanac::lookup(humidity, almanac.humidity_to_location);
+
+      if (location < minimum)
+        minimum = location;
+    }
+
+    std::print("part1: minimum location ", minimum);
+
+  }
+  catch(std::error e)
+  {
+    std::panic(e);
+  }
+
+  return 0;
+}

@@ -59,7 +59,7 @@ fn main -> int
         copies[i] += copies[card.id];
     }
 
-    std::print("part1: total cards ", copies.sum);
+    std::print("part2: total cards ", copies.sum);
 
   }
   catch(std::error e)

@@ -1,0 +1,179 @@
+import std.stdio;
+import std.algorithm;
+import std.scan;
+
+struct almanac
+{
+  std::vector<(i64, i64)> seeds;
+  std::vector<(i64, i64, i64)> seed_to_soil;
+  std::vector<(i64, i64, i64)> soil_to_fertilizer;
+  std::vector<(i64, i64, i64)> fertilizer_to_water;
+  std::vector<(i64, i64, i64)> water_to_light;
+  std::vector<(i64, i64, i64)> light_to_temperature;
+  std::vector<(i64, i64, i64)> temperature_to_humidity;
+  std::vector<(i64, i64, i64)> humidity_to_location;
+
+  fn lookup(i64 key, std::vector<(i64, i64, i64)> &map) -> i64
+  {
+    for (var (src, dst, len) : map)
+    {
+      if (src <= key && key < src + len)
+        return dst + (key - src);
+    }
+
+    return key;
+  }
+
+  fn lookup((i64, i64) key, std::vector<(i64, i64, i64)> &map) -> std::vector<(i64, i64)>
+  {
+    var ranges = std::vector<(i64, i64)>();
+
+    while (key.1 != 0)
+    {
+      var found = false;
+
+      for (var (src, dst, len) : map)
+      {
+        if (src <= key.0 && key.0 < src + len)
+        {
+          ranges.push_back((dst + (key.0 - src), std::min(src + len - key.0, key.1)));
+
+          found = true;
+          break;
+        }
+
+        if (key.0 < src)
+        {
+          ranges.push_back((key.0, std::min(src - key.0, key.1)));
+
+          found = true;
+          break;
+        }
+      }
+
+      if (!found)
+      {
+        ranges.push_back((key.0, key.1));
+      }
+
+      key.0 += ranges.back.1;
+      key.1 -= ranges.back.1;
+    }
+
+    return ranges;
+  }
+
+  almanac() = default;
+  almanac(almanac&) = default;
+  ~almanac() = default;
+}
+
+fn main -> int
+{
+  try
+  {
+    var almanac = almanac();
+
+    var fin = std::file::open("day05.txt");
+    var reader = std::buffered_reader(&mut fin);
+
+    var buffer = std::string();
+    std::read_line(&mut reader, &mut buffer);
+
+    buffer = buffer.trim.strip_prefix("seeds:");
+
+    while (!buffer.empty)
+    {
+      var id = i64(0);
+      var len = i64(0);
+      buffer.remove_prefix!(std::sscanf(buffer, " {} {}", &mut id, &mut len).len);
+
+      almanac.seeds.push_back((id, len));
+    }
+
+    std::skip_line(&mut reader);
+
+    for (var k = 0; k < 7; ++k)
+    {
+      var head = std::string();
+      std::read_line(&mut reader, &mut head);
+
+      var ranges = std::vector<(i64, i64, i64)>();
+
+      for (var line : reader.lines)
+      {
+        if (line.empty)
+          break;
+
+        var range = (0, 0, 0);
+        if (!std::sscanf(line, "{} {} {}", &mut range.1, &mut range.0, &mut range.2))
+          std::panic("error scaning game map input '", line, "'");
+
+        ranges.push_back(range);
+      }
+
+      std::sort!(&mut ranges);
+
+      if (head.starts_with("seed-to-soil"))
+        almanac.seed_to_soil = &move ranges;
+
+      else if (head.starts_with("soil-to-fertilizer"))
+        almanac.soil_to_fertilizer = &move ranges;
+
+      else if (head.starts_with("fertilizer-to-water"))
+        almanac.fertilizer_to_water = &move ranges;
+
+      else if (head.starts_with("water-to-light"))
+        almanac.water_to_light = &move ranges;
+
+      else if (head.starts_with("light-to-temperature"))
+        almanac.light_to_temperature = &move ranges;
+
+      else if (head.starts_with("temperature-to-humidity"))
+        almanac.temperature_to_humidity = &move ranges;
+
+      else if (head.starts_with("humidity-to-location"))
+        almanac.humidity_to_location = &move ranges;
+
+      std::skip_line(&mut reader);
+    }
+
+    var minimum = std::numeric_traits<i64>::max;
+
+    for (var seed : almanac.seeds)
+    {
+      for (var soil : almanac::lookup(seed, almanac.seed_to_soil))
+      {
+        for (var fertilizer : almanac::lookup(soil, almanac.soil_to_fertilizer))
+        {
+          for (var water : almanac::lookup(fertilizer, almanac.fertilizer_to_water))
+          {
+            for (var light : almanac::lookup(water, almanac.water_to_light))
+            {
+              for (var temperature : almanac::lookup(light, almanac.light_to_temperature))
+              {
+                for (var humidity : almanac::lookup(temperature, almanac.temperature_to_humidity))
+                {
+                  for (var location : almanac::lookup(humidity, almanac.humidity_to_location))
+                  {
+                    if (location.0 < minimum)
+                      minimum = location.0;
+                  }
+                }
+              }
+            }
+          }
+        }
+      }
+    }
+
+    std::print("part2: minimum location ", minimum);
+
+  }
+  catch(std::error e)
+  {
+    std::panic(e);
+  }
+
+  return 0;
+}
