@@ -1,0 +1,61 @@
+import std.stdio;
+import std.algorithm;
+import std.scan;
+
+struct race
+{
+  i64 time;
+  i64 distance;
+
+  race() = default;
+  race(race&) = default;
+  ~race() = default;
+}
+
+fn simulate(i64 time, i64 pressed) -> i64
+{
+  var speed = pressed;
+  var distance = speed * (time - pressed);
+
+  return distance;
+}
+
+fn main -> int
+{
+  try
+  {
+    var race = race();
+
+    var fin = std::file::open("day06.txt");
+    var reader = std::buffered_reader(&mut fin);
+
+    var line1 = std::string();
+    std::read_line(&mut reader, &mut line1);
+
+    if (!std::sscanf(line1.gsub(" ", ""), "Time:{}", &mut race.time))
+      std::panic("error scaning time from input '", line1, "'");
+
+    var line2 = std::string();
+    std::read_line(&mut reader, &mut line2);
+
+    if (!std::sscanf(line2.gsub(" ", ""), "Distance:{}", &mut race.distance))
+      std::panic("error scaning distance from input '", line2, "'");
+
+    var wins = 0;
+
+    for (var j = 0; j <= race.time; ++j)
+    {
+      if (simulate(race.time, j) > race.distance)
+        wins += 1;
+    }
+
+    std::print("part2: ways to win ", wins);
+
+  }
+  catch(std::error e)
+  {
+    std::panic(e);
+  }
+
+  return 0;
+}

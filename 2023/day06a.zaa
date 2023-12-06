@@ -1,0 +1,82 @@
+import std.stdio;
+import std.algorithm;
+import std.scan;
+
+struct races
+{
+  std::vector<int> times;
+  std::vector<int> distances;
+
+  races() = default;
+  races(races&) = default;
+  ~races() = default;
+}
+
+fn simulate(int time, int pressed) -> int
+{
+  var speed = pressed;
+  var distance = speed * (time - pressed);
+
+  return distance;
+}
+
+fn main -> int
+{
+  try
+  {
+    var races = races();
+
+    var fin = std::file::open("day06.txt");
+    var reader = std::buffered_reader(&mut fin);
+
+    var buffer = std::string();
+
+    std::read_line(&mut reader, &mut buffer);
+
+    buffer = buffer.trim.strip_prefix("Time:");
+
+    while (!buffer.empty)
+    {
+      var time = 0;
+      buffer.remove_prefix!(std::sscanf(buffer, " {}", &mut time).len);
+
+      races.times.push_back(time);
+    }
+
+    std::read_line(&mut reader, &mut buffer);
+
+    buffer = buffer.trim.strip_prefix("Distance:");
+
+    while (!buffer.empty)
+    {
+      var distance = 0;
+      buffer.remove_prefix!(std::sscanf(buffer, " {}", &mut distance).len);
+
+      races.distances.push_back(distance);
+    }
+
+    var ways = 1;
+
+    for (var (time, distance) : std::zip(races.times, races.distances))
+    {
+      var wins = 0;
+
+      for (var j = 0; j <= time; ++j)
+      {
+        if (simulate(time, j) > distance)
+          wins += 1;
+      }
+
+      ways *= wins;
+    }
+
+    std::print("part1: ways to win ", ways);
+
+  }
+  catch(std::error e)
+  {
+    std::panic(e);
+  }
+
+  return 0;
+}
