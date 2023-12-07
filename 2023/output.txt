@@ -9,14 +9,24 @@ part1: playable games 1853
 part2: games power 72706
 
 day 03
+part1: sum of part numbers 537732
+part2: sum of gear ratios 84883664
 
 day 04
+part1: total points 26426
+part2: total cards 6227972
 
 day 05
+part1: minimum location 261668924
+part2: minimum location 24261545
 
 day 06
+part1: ways to win 114400
+part2: ways to win 21039729
 
 day 07
+part1: total winnings 248559379
+part2: total winnings 249631254
 
 day 08
 

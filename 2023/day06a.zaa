@@ -29,28 +29,24 @@ fn main -> int
     var fin = std::file::open("day06.txt");
     var reader = std::buffered_reader(&mut fin);
 
-    var buffer = std::string();
+    var buffer1 = std::string();
+    std::read_line(&mut reader, &mut buffer1);
 
-    std::read_line(&mut reader, &mut buffer);
-
-    buffer = buffer.trim.strip_prefix("Time:");
-
-    while (!buffer.empty)
+    for (var line = buffer1.trim.strip_prefix("Time:"); !line.empty; )
     {
       var time = 0;
-      buffer.remove_prefix!(std::sscanf(buffer, " {}", &mut time).len);
+      line.remove_prefix!(std::sscanf(line, " {}", &mut time).len);
 
       races.times.push_back(time);
     }
 
-    std::read_line(&mut reader, &mut buffer);
+    var buffer2 = std::string();
+    std::read_line(&mut reader, &mut buffer2);
 
-    buffer = buffer.trim.strip_prefix("Distance:");
-
-    while (!buffer.empty)
+    for (var line = buffer2.trim.strip_prefix("Distance:"); !line.empty; )
     {
       var distance = 0;
-      buffer.remove_prefix!(std::sscanf(buffer, " {}", &mut distance).len);
+      line.remove_prefix!(std::sscanf(line, " {}", &mut distance).len);
 
       races.distances.push_back(distance);
     }

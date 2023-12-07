@@ -1,0 +1,144 @@
+import std.stdio;
+import std.algorithm;
+import std.scan;
+
+const digits = "AKQT98765432J";
+
+enum type
+{
+  high_card,
+  one_pair,
+  two_pair,
+  three_of_a_kind,
+  full_house,
+  four_of_a_kind,
+  five_of_a_kind,
+}
+
+struct hand
+{
+  std::string cards;
+  i64 bid;
+
+  hand() = default;
+  hand(hand &&) = default;
+  fn =(hand mut &, hand &&) -> hand mut & = default;
+  ~hand() = default;
+}
+
+fn type(hand &hand) -> type
+{
+  var best = type::high_card;
+  var jokers = std::count(hand.cards, cast('J'));
+
+  if (jokers == 5)
+    return type::five_of_a_kind;
+
+  for (var ch = hand.cards.begin; ch != hand.cards.end; ++ch)
+  {
+    if (*ch == cast('J'))
+      continue;
+
+    if (std::find(hand.cards, *ch) != ch)
+      continue;
+
+    switch (std::count(hand.cards, *ch) + jokers)
+    {
+      case 5:
+        best = type::five_of_a_kind;
+
+      case 4:
+        best = type::four_of_a_kind;
+
+      case 3:
+        switch (best)
+        {
+          case three_of_a_kind:
+            if (jokers == 1)
+              best = type::full_house;
+
+          case one_pair:
+            if (jokers == 0)
+              best = type::full_house;
+            else
+              best = type::three_of_a_kind;
+
+          case high_card:
+            best = type::three_of_a_kind;
+        }
+
+      case 2:
+        switch (best)
+        {
+          case one_pair:
+            if (jokers == 0)
+              best = type::two_pair;
+
+          case three_of_a_kind:
+            if (jokers == 0)
+              best = type::full_house;
+
+          case high_card:
+            best = type::one_pair;
+        }
+    }
+  }
+
+  return best;
+}
+
+fn weaker(hand &lhs, hand &rhs) -> bool
+{
+  switch (lhs.type <=> rhs.type)
+  {
+    case 0:
+      for (var (l, r) : std::zip(lhs.cards, rhs.cards))
+      {
+        if (l != r)
+          return std::find(digits, r) < std::find(digits, l);
+      }
+
+    case -1:
+      return true;
+  }
+
+  return false;
+}
+
+fn main -> int
+{
+  try
+  {
+    var hands = std::vector<hand>();
+
+    var fin = std::file::open("day07.txt");
+
+    for (var line : std::buffered_reader(&mut fin).lines)
+    {
+      var hand = hand();
+
+      if (!std::sscanf(line, "{} {}", &mut hand.cards, &mut hand.bid))
+        std::panic("error scaning hand from input '", line, "'");
+
+      hands.push_back(hand);
+    }
+
+    std::sort!(&mut hands, |a, b| weaker(a, b));
+
+    var winnings = 0;
+
+    for (var i = 0; i < hands.len; ++i)
+    {
+      winnings += cast<i64>(i + 1) * hands[i].bid;
+    }
+
+    std::print("part2: total winnings ", winnings);
+
+  }
+  catch(std::error e)
+  {
+    std::panic(e);
+  }
+
+  return 0;
+}

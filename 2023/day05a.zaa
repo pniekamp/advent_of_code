@@ -41,7 +41,7 @@ fn main -> int
     var buffer = std::string();
     std::read_line(&mut reader, &mut buffer);
 
-    for (var seed : buffer.cut(':').1.words)
+    for (var seed : buffer.trim.strip_prefix("seeds:").words)
     {
       var id = i64(0);
       if (!std::sscanf(seed, "{}", &mut id))

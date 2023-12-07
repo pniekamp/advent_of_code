@@ -78,13 +78,11 @@ fn main -> int
     var buffer = std::string();
     std::read_line(&mut reader, &mut buffer);
 
-    buffer = buffer.trim.strip_prefix("seeds:");
-
-    while (!buffer.empty)
+    for (var line = buffer.trim.strip_prefix("seeds:"); !line.empty; )
     {
       var id = i64(0);
       var len = i64(0);
-      buffer.remove_prefix!(std::sscanf(buffer, " {} {}", &mut id, &mut len).len);
+      line.remove_prefix!(std::sscanf(line, " {} {}", &mut id, &mut len).len);
 
       almanac.seeds.push_back((id, len));
     }
