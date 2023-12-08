@@ -1,0 +1,78 @@
+import std.stdio;
+import std.algorithm;
+import std.flat_hash_map;
+import std.math.lcm;
+import std.scan;
+
+struct map
+{
+  std::string instructions;
+  std::flat_hash_map<char[3], (char[3], char[3])> nodes;
+
+  map() = default;
+  map(map &&) = default;
+  ~map() = default;
+}
+fn main -> int
+{
+  try
+  {
+    var map = map();
+
+    var fin = std::file::open("day08.txt");
+    var reader = std::buffered_reader(&mut fin);
+
+    std::read_line(&mut reader, &mut map.instructions);
+
+    std::skip_line(&mut reader);
+
+    for (var line : reader.lines)
+    {
+      var key = [' '; 3];
+      var node = ([' '; 3], [' '; 3]);
+
+      if (!std::sscanf(line, "{} = ({}, {})", &mut key, &mut node.0, &mut node.1))
+        std::panic("error scaning node from input '", line, "'");
+
+      map.nodes.insert(key, node);
+    }
+
+    map.instructions.trim!();
+
+    var lcm = 1;
+
+    for (var &(key, nodes) : map.nodes)
+    {
+      if (key[2] == 'A')
+      {
+        var step = 0;
+        var location = key;
+
+        while (location[2] != 'Z')
+        {
+          switch (map.instructions[step % map.instructions.len])
+          {
+            case 'L':
+              location = map.nodes.get(location)?!.0;
+
+            case 'R':
+              location = map.nodes.get(location)?!.1;
+          }
+
+          step += 1;
+        }
+
+        lcm = std::lcm(lcm, step);
+      }
+    }
+
+    std::print("part2: steps ", lcm);
+
+  }
+  catch(std::error e)
+  {
+    std::panic(e);
+  }
+
+  return 0;
+}

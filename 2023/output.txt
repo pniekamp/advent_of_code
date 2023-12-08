@@ -29,6 +29,8 @@ part1: total winnings 248559379
 part2: total winnings 249631254
 
 day 08
+part1: steps 12599
+part2: steps 8245452805243
 
 day 09
 
