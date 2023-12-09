@@ -13,6 +13,7 @@ struct map
   map(map &&) = default;
   ~map() = default;
 }
+
 fn main -> int
 {
   try

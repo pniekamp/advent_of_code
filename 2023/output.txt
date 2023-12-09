@@ -33,6 +33,8 @@ part1: steps 12599
 part2: steps 8245452805243
 
 day 09
+part1: prediction 1916822650
+part2: prediction 966
 
 day 10
 
