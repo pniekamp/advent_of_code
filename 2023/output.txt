@@ -37,6 +37,8 @@ part1: prediction 1916822650
 part2: prediction 966
 
 day 10
+part1: steps along the loop 6831
+part2: area within loop 305
 
 day 11
 

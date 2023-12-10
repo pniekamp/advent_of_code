@@ -177,7 +177,7 @@ fn main -> int
 
         visited.insert(p, steps);
 
-        for (var dp : [(0, -1), (1, 0), (0, 1), (-1, 0) ])
+        for (var dp : [ (0, -1), (1, 0), (0, 1), (-1, 0) ])
         {
           var np = (p.0 + dp.0, p.1 + dp.1);
 
