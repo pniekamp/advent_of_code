@@ -1,0 +1,256 @@
+import std.stdio;
+import std.algorithm;
+import std.flat_hash_map;
+import std.scan;
+
+struct map
+{
+  std::vector<std::string> tiles;
+
+  fn at(this &map, int x, int y) -> char
+  {
+    if (0 <= y && cast<usize>(y) < map.tiles.len && 0 <= x && cast<usize>(x) < map.tiles[cast<usize>(y)].len)
+      return cast<char>(map.tiles[cast<usize>(y)][cast<usize>(x)]);
+
+    return '.';
+  }
+
+  fn is_path(this &map, (int, int) src, (int, int) dst) -> bool
+  {
+    switch (map.at(src.0, src.1))
+    {
+      case 'S':
+        switch (map.at(dst.0, dst.1))
+        {
+          case '|':
+            return (src.1 + 1 == dst.1) || (src.1 - 1 == dst.1);
+
+          case '-':
+            return (src.0 + 1 == dst.0) || (src.0 - 1 == dst.0);
+
+          case 'L':
+            return (src.1 + 1 == dst.1) || (src.0 - 1 == dst.0);
+
+          case 'J':
+            return (src.1 + 1 == dst.1) || (src.0 + 1 == dst.0);
+
+          case '7':
+            return (src.1 - 1 == dst.1) || (src.0 + 1 == dst.0);
+
+          case 'F':
+            return (src.1 - 1 == dst.1) || (src.0 - 1 == dst.0);
+        }
+
+      case '|':
+        switch (map.at(dst.0, dst.1))
+        {
+          case '|':
+            return (src.1 + 1 == dst.1) || (src.1 - 1 == dst.1);
+
+          case 'L':
+          case 'J':
+            return (src.1 + 1 == dst.1);
+
+          case '7':
+          case 'F':
+            return (src.1 - 1 == dst.1);
+        }
+
+      case '-':
+        switch (map.at(dst.0, dst.1))
+        {
+          case '-':
+            return (src.0 + 1 == dst.0) || (src.0 - 1 == dst.0);
+
+          case 'L':
+          case 'F':
+            return (src.0 - 1 == dst.0);
+
+          case 'J':
+          case '7':
+            return (src.0 + 1 == dst.0);
+        }
+
+      case 'L':
+        switch (map.at(dst.0, dst.1))
+        {
+          case '|':
+          case 'F':
+            return (src.1 - 1 == dst.1);
+
+          case '-':
+          case 'J':
+            return (src.0 + 1 == dst.0);
+
+          case '7':
+            return (src.1 - 1 == dst.1) || (src.0 + 1 == dst.0);
+        }
+
+      case 'J':
+        switch (map.at(dst.0, dst.1))
+        {
+          case '|':
+          case '7':
+            return (src.1 - 1 == dst.1);
+
+          case '-':
+          case 'L':
+            return (src.0 - 1 == dst.0);
+
+          case 'F':
+            return (src.1 - 1 == dst.1) || (src.0 - 1 == dst.0);
+        }
+
+      case '7':
+        switch (map.at(dst.0, dst.1))
+        {
+          case '|':
+          case 'J':
+            return (src.1 + 1 == dst.1);
+
+          case '-':
+          case 'F':
+            return (src.0 - 1 == dst.0);
+
+          case 'L':
+            return (src.1 + 1 == dst.1) || (src.0 - 1 == dst.0);
+        }
+
+      case 'F':
+        switch (map.at(dst.0, dst.1))
+        {
+          case '|':
+          case 'L':
+            return (src.1 + 1 == dst.1);
+
+          case '-':
+          case '7':
+            return (src.0 + 1 == dst.0);
+
+          case 'J':
+            return (src.1 + 1 == dst.1) || (src.0 + 1 == dst.0);
+        }
+    }
+
+    return false;
+  }
+
+  map() = default;
+  ~map() = default;
+}
+
+fn main -> int
+{
+  try
+  {
+    var map = map();
+
+    var fin = std::file::open("day10.txt");
+
+    for (var line : std::buffered_reader(&mut fin).lines)
+    {
+      map.tiles.push_back(line);
+    }
+
+    var S = (int(0), int(0));
+    for (var y = 0; y < cast<int>(map.tiles.len); ++y)
+    {
+      for (var x = 0; x < cast<int>(map.tiles[cast<usize>(y)].len); ++x)
+      {
+        if (map.at(x, y) == 'S')
+          S = (x, y);
+      }
+    }
+
+    if (map.is_path(S, (S.0, S.1 - 1)) && map.is_path(S, (S.0, S.1 + 1)))
+      map.tiles[cast<usize>(S.1)][cast<usize>(S.0)] = cast('|');
+
+    if (map.is_path(S, (S.0 - 1, S.1)) && map.is_path(S, (S.0 + 1, S.1)))
+      map.tiles[cast<usize>(S.1)][cast<usize>(S.0)] = cast('-');
+
+    if (map.is_path(S, (S.0 + 1, S.1)) && map.is_path(S, (S.0, S.1 - 1)))
+      map.tiles[cast<usize>(S.1)][cast<usize>(S.0)] = cast('L');
+
+    if (map.is_path(S, (S.0 - 1, S.1)) && map.is_path(S, (S.0, S.1 - 1)))
+      map.tiles[cast<usize>(S.1)][cast<usize>(S.0)] = cast('J');
+
+    if (map.is_path(S, (S.0 - 1, S.1)) && map.is_path(S, (S.0, S.1 + 1)))
+      map.tiles[cast<usize>(S.1)][cast<usize>(S.0)] = cast('7');
+
+    if (map.is_path(S, (S.0 + 1, S.1)) && map.is_path(S, (S.0, S.1 + 1)))
+      map.tiles[cast<usize>(S.1)][cast<usize>(S.0)] = cast('F');
+
+    var steps = 0;
+    var stack = std::vector<(int, int)>();
+    var visited = std::flat_hash_map<(int, int), int>();
+
+    stack.push_back(S);
+
+    while (stack.len != 0)
+    {
+      for(var p : stack.take(stack.begin, stack.end))
+      {
+        if (visited.contains(p))
+          continue;
+
+        visited.insert(p, steps);
+
+        for (var dp : [(0, -1), (1, 0), (0, 1), (-1, 0) ])
+        {
+          var np = (p.0 + dp.0, p.1 + dp.1);
+
+          if (map.is_path(p, np))
+            stack.push_back(np);
+        }
+      }
+
+      steps += 1;
+    }
+
+    var area = 0;
+
+    for (var y = 0; y < cast<int>(map.tiles.len); ++y)
+    {
+      var within = false;
+
+      for (var x = 0; x < cast<int>(map.tiles[cast<usize>(y)].len); ++x)
+      {
+        if (visited.contains((x, y)))
+        {
+          switch (map.at(x, y))
+          {
+            case '|':
+              within = !within;
+
+            case 'L':
+              while (map.at(x + 1, y) == '-')
+                x += 1;
+              if (map.at(x + 1, y) == '7')
+                within = !within;
+
+            case 'F':
+              while (map.at(x + 1, y) == '-')
+                x += 1;
+              if (map.at(x + 1, y) == 'J')
+                within = !within;
+          }
+        }
+        else
+        {
+          if (within)
+            area += 1;
+        }
+      }
+    }
+
+
+    std::print("part2: area within loop ", area);
+
+  }
+  catch(std::error e)
+  {
+    std::panic(e);
+  }
+
+  return 0;
+}
