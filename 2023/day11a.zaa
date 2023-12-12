@@ -77,7 +77,7 @@ fn main -> int
       }
     }
 
-    std::print("part2: sum shortest paths ", sum);
+    std::print("part1: sum shortest paths ", sum);
 
   }
   catch(std::error e)

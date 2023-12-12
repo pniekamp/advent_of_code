@@ -1,0 +1,86 @@
+import std.stdio;
+import std.algorithm;
+import std.flat_hash_map;
+import std.scan;
+
+struct record
+{
+  std::string springs;
+  std::vector<usize> damaged;
+
+  record() = default;
+  record(record&&) = default;
+  ~record() = default;
+}
+
+fn main -> int
+{
+  try
+  {
+    var records = std::vector<record>();
+
+    var fin = std::file::open("day12.txt");
+
+    for (var line : std::buffered_reader(&mut fin).lines)
+    {
+      var (springs, groups) = line.cut(' ');
+      var damaged = std::vector::from(groups.split(",").transform(|group| { var n = usize(0); std::atoi(group.begin, group.end, &mut n); return n; }));
+
+      var mut &record = records.push_back();
+      record.springs = springs;
+      record.damaged = damaged;
+
+      for (var n = 1; n < 5; ++n)
+      {
+        record.springs += '?';
+        record.springs += springs;
+        record.damaged.append(damaged);
+      }
+    }
+
+    var arrangements = 0;
+    var stack = std::flat_hash_map<std::string_view, usize>();
+
+    for (var &record : records)
+    {
+      stack.insert(record.springs, 1);
+
+      for (var run : record.damaged)
+      {
+        for(var (thread, count) : stack.take(stack.begin, stack.end))
+        {
+          var thread = thread;
+
+          while (!thread.empty)
+          {
+            if (std::count_if(thread.take_n(run), |k| k == cast('#') || k == cast('?')) == run)
+            {
+              if (!thread.remove_prefix(run).starts_with('#'))
+                stack.emplace(thread.remove_prefix(std::min(thread.len, run + 1)), 0) += count;
+            }
+
+            if (thread.starts_with('#'))
+              break;
+
+            thread.remove_prefix!(1);
+          }
+        }
+      }
+
+      for (var (thread, count) : stack.take(stack.begin, stack.end))
+      {
+        if (std::none_of(thread, |remaining| remaining == cast('#')))
+          arrangements += count;
+      }
+    }
+
+    std::print("part2: arrangements count ", arrangements);
+
+  }
+  catch(std::error e)
+  {
+    std::panic(e);
+  }
+
+  return 0;
+}
