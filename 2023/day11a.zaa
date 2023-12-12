@@ -1,0 +1,89 @@
+import std.stdio;
+import std.algorithm;
+import std.flat_hash_map;
+import std.scan;
+
+struct map
+{
+  std::vector<std::string> tiles;
+  std::vector<(i64, i64)> galaxies;
+
+  fn distance(this &map, (i64, i64) src, (i64, i64) dst) -> i64
+  {
+    var dx = std::absdiff(dst.0, src.0);
+    var dy = std::absdiff(dst.1, src.1);
+
+    for (var i = cast<usize>(std::min(src.0, dst.0)); i != cast<usize>(std::max(src.0, dst.0)); ++i)
+    {
+      if (map.tiles[0][i] == cast(' '))
+        dx += 1;
+    }
+
+    for (var j = cast<usize>(std::min(src.1, dst.1)); j != cast<usize>(std::max(src.1, dst.1)); ++j)
+    {
+      if (map.tiles[j][0] == cast(' '))
+        dy += 1;
+    }
+
+    return dx + dy;
+  }
+
+  map() = default;
+  ~map() = default;
+}
+
+fn main -> int
+{
+  try
+  {
+    var map = map();
+
+    var fin = std::file::open("day11.txt");
+
+    for (var y = 0, var line : std::buffered_reader(&mut fin).lines)
+    {
+      for (var x = 0, var ch : line)
+      {
+        if (ch == cast('#'))
+          map.galaxies.push_back((x, y));
+
+        x += 1;
+      }
+
+      map.tiles.push_back(line);
+
+      if (std::none_of(line, |ch| ch == cast('#')))
+        map.tiles.back.replace_all('.', ' ');
+
+      y += 1;
+    }
+
+    for (var i = 0; i < map.tiles[0].len; ++i)
+    {
+      if (std::none_of(map.tiles, |line| line[i] == cast('#')))
+      {
+        for (var j = 0; j < map.tiles.len; ++j)
+          map.tiles[j][i] = cast(' ');
+      }
+    }
+
+    var sum = 0;
+
+    for (var j = 0; j < map.galaxies.len; ++j)
+    {
+      for (var i = j + 1; i < map.galaxies.len; ++i)
+      {
+        sum += map.distance(map.galaxies[j], map.galaxies[i]);
+      }
+    }
+
+    std::print("part2: sum shortest paths ", sum);
+
+  }
+  catch(std::error e)
+  {
+    std::panic(e);
+  }
+
+  return 0;
+}

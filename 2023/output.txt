@@ -41,6 +41,8 @@ part1: steps along the loop 6831
 part2: area within loop 305
 
 day 11
+part2: sum shortest paths 9445168
+part2: sum shortest paths 742305960572
 
 day 12
 
