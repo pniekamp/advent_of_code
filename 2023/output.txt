@@ -49,6 +49,8 @@ part1: arrangements count 7307
 part2: arrangements count 3415570893842
 
 day 13
+part1: reflection summary 29130
+part2: reflection summary 33438
 
 day 14
 

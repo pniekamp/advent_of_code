@@ -1,0 +1,82 @@
+import std.stdio;
+import std.algorithm;
+import std.flat_hash_map;
+import std.scan;
+
+struct pattern
+{
+  std::vector<std::string> tiles;
+  std::vector<std::string> transpose;
+
+  fn is_reflection(this &pattern, std::vector<std::string> &tiles, usize row) -> bool
+  {
+    var height = std::min(row, tiles.len - row);
+
+    for (var i = 0; i < height; ++i)
+    {
+      if (tiles[row - i - 1] != tiles[row + i])
+        return false;
+    }
+
+    return true;
+  }
+
+  pattern() = default;
+  pattern(pattern&&) = default;
+  ~pattern() = default;
+}
+
+fn main -> int
+{
+  try
+  {
+    var patterns = std::vector<pattern>();
+
+    var fin = std::file::open("day13.txt");
+    var reader = std::buffered_reader(&mut fin);
+
+    while (!reader.fetch.empty)
+    {
+      var pattern = pattern();
+
+      for (var line : reader.lines)
+      {
+        if (line.empty)
+          break;
+
+        pattern.tiles.push_back(line);
+      }
+
+      for (var i = usize(0); i < pattern.tiles[0].len; ++i)
+      {
+        pattern.transpose.push_back(std::string::from_utf8(std::transform(pattern.tiles, |line| line[i])));
+      }
+
+      std::skip_line(&mut reader);
+
+      patterns.push_back(pattern);
+    }
+
+    var sum = 0;
+
+    for (var &pattern : patterns)
+    {
+      for (var i = 1; i < pattern.tiles.len; ++i)
+        if (pattern.is_reflection(pattern.tiles, i))
+          sum += 100 * i;
+
+      for (var i = 1; i < pattern.transpose.len; ++i)
+        if (pattern.is_reflection(pattern.transpose, i))
+          sum += i;
+    }
+
+    std::print("part1: reflection summary ", sum);
+
+  }
+  catch(std::error e)
+  {
+    std::panic(e);
+  }
+
+  return 0;
+}
