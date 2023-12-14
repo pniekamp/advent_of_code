@@ -53,6 +53,8 @@ part1: reflection summary 29130
 part2: reflection summary 33438
 
 day 14
+part1: total load 108889
+part2: total load 104671
 
 day 15
 

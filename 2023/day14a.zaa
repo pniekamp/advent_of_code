@@ -1,0 +1,98 @@
+import std.stdio;
+import std.algorithm;
+import std.flat_hash_map;
+import std.scan;
+
+struct map
+{
+  std::vector<std::string> tiles;
+  std::flat_hash_map<(int, int), void> rocks;
+
+  fn at(this &map, int x, int y) -> char
+  {
+    if (map.rocks.contains((x, y)))
+      return 'O';
+
+    if (0 <= y && cast<usize>(y) < map.tiles.len && 0 <= x && cast<usize>(x) < map.tiles[cast<usize>(y)].len)
+      return cast<char>(map.tiles[cast<usize>(y)][cast<usize>(x)]);
+
+    return '#';
+  }
+
+  map() = default;
+  ~map() = default;
+}
+
+fn tilt(map mut &map, (int, int) direction) -> void
+{
+  for (var (rock, _) : map.rocks.take(map.rocks.begin, map.rocks.end))
+  {
+    var np = rock;
+
+    while (map.at(np.0, np.1) == 'O')
+      np = (np.0 - direction.0, np.1 - direction.1);
+
+    while (map.at(np.0 + direction.0, np.1 + direction.1) == '.')
+      np = (np.0 + direction.0, np.1 + direction.1);
+
+    map.rocks.insert(np);
+  }
+}
+
+fn dump(map &map) -> void
+{
+  for (var j = 0; j < map.tiles.len; ++j)
+  {
+    for (var i = 0; i < map.tiles[j].len; ++i)
+    {
+      std::putc(map.at(cast<int>(i), cast<int>(j)));
+    }
+
+    std::putc('\n');
+  }
+
+  std::putc('\n');
+}
+
+fn main -> int
+{
+  try
+  {
+    var map = map();
+
+    var fin = std::file::open("day14.txt");
+
+    for (var y = 0, var line : std::buffered_reader(&mut fin).lines)
+    {
+      for (var x = 0, var ch : line)
+      {
+        if (ch == cast('O'))
+          map.rocks.insert((x, y));
+
+        x += 1;
+      }
+
+      map.tiles.push_back(line.gsub('O', '.'));
+
+      y += 1;
+    }
+
+    map.tilt((0, -1));
+
+    var load = 0;
+
+    for (var (rock, _) : map.rocks)
+    {
+      load += cast<int>(map.tiles.len) - rock.1;
+    }
+
+    std::print("part1: total load ", load);
+
+  }
+  catch(std::error e)
+  {
+    std::panic(e);
+  }
+
+  return 0;
+}
