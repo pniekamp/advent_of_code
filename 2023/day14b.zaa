@@ -78,19 +78,17 @@ fn main -> int
     }
 
     var target = 1000000000;
-    var visited = std::flat_hash_map<std::vector<(int, int)>, int>();
+    var visited = std::flat_hash_map<typeof(map.rocks), int>();
 
     for (var cycle = 0; cycle < target; ++cycle)
     {
-      var key = std::vector::from(std::transform(map.rocks, |kv| kv.key)).sort!;
-
-      switch (visited.get(key))
+      switch (visited.get(map.rocks))
       {
         case Some[n]:
           cycle += std::floor_div(target - cycle, cycle - n) * (cycle - n);
 
         case None:
-          visited.insert(key, cycle);
+          visited.insert(map.rocks, cycle);
       }
 
       map.tilt((0, -1));
