@@ -57,6 +57,8 @@ part1: total load 108889
 part2: total load 104671
 
 day 15
+part1: sum of hashes 510273
+part2: focusing power 212449
 
 day 16
 

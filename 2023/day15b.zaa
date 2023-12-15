@@ -1,0 +1,82 @@
+import std.stdio;
+import std.algorithm;
+import std.scan;
+
+struct box
+{
+  std::vector<(std::string_view, i8)> lenses;
+
+  box() = default;
+  box(box&&) = default;
+  ~box() = default;
+}
+
+fn HASH(std::string_view str) -> usize
+{
+  var seed = 0;
+
+  for (var ch : str)
+  {
+    seed = cast<usize>((cast<u64>(seed) + cast<u64>(ch)) * 17 % 256);
+  }
+
+  return seed;
+}
+
+fn main -> int
+{
+  try
+  {
+    var str = std::string();
+
+    var fin = std::file::open("day15.txt");
+    var reader = std::buffered_reader(&mut fin);
+
+    std::read_line(&mut reader, &mut str);
+
+    var hashmap = std::vector<box>::with_size(256);
+
+    for (var step : str.trim.split(","))
+    {
+      var label = std::string_view(step.begin, step.find_first_of("-="));
+
+      var mut &lenses = hashmap[HASH(label)].lenses;
+
+      switch (step[label.len])
+      {
+        case '-':
+          lenses.erase_if(|lens| lens.0 == label);
+
+        case '=':
+          var focal_length = i8(0);
+          std::atoi(step.begin + label.len + 1, step.end, &mut focal_length);
+
+          if (var j = std::find_if(lenses, |lens| lens.0 == label); j != lenses.end)
+            lenses[j].1 = focal_length;
+          else
+            lenses.push_back((label, focal_length));
+      }
+    }
+
+    var power = 0;
+
+    for (var i = 0; i < hashmap.len; ++i)
+    {
+      var mut &lenses = hashmap[i].lenses;
+
+      for (var j = 0; j < lenses.len; ++j)
+      {
+        power += cast<i64>(i + 1) * cast<i64>(j + 1) * cast<i64>(lenses[j].1);
+      }
+    }
+
+    std::print("part2: focusing power ", power);
+
+  }
+  catch(std::error e)
+  {
+    std::panic(e);
+  }
+
+  return 0;
+}

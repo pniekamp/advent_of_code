@@ -1,0 +1,44 @@
+import std.stdio;
+import std.algorithm;
+import std.scan;
+
+fn HASH(std::string_ref str) -> u8
+{
+  var seed = 0;
+
+  for (var ch : str)
+  {
+    seed = cast<u8>((cast<u64>(seed) + cast<u64>(ch)) * 17 % 256);
+  }
+
+  return seed;
+}
+
+fn main -> int
+{
+  try
+  {
+    var str = std::string();
+
+    var fin = std::file::open("day15.txt");
+    var reader = std::buffered_reader(&mut fin);
+
+    std::read_line(&mut reader, &mut str);
+
+    var sum = 0;
+
+    for (var step : str.trim.split(","))
+    {
+      sum += cast<i64>(HASH(step));
+    }
+
+    std::print("part1: sum of hashes ", sum);
+
+  }
+  catch(std::error e)
+  {
+    std::panic(e);
+  }
+
+  return 0;
+}
