@@ -61,6 +61,8 @@ part1: sum of hashes 510273
 part2: focusing power 212449
 
 day 16
+part1: energised tiles 7562
+part2: max energised tiles 7793
 
 day 17
 

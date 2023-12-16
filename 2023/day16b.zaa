@@ -1,0 +1,157 @@
+import std.stdio;
+import std.algorithm;
+import std.flat_hash_map;
+import std.scan;
+
+struct map
+{
+  std::vector<std::string> tiles;
+
+  fn at(this &map, int x, int y) -> char
+  {
+    if (0 <= y && cast<usize>(y) < map.tiles.len && 0 <= x && cast<usize>(x) < map.tiles[cast<usize>(y)].len)
+      return cast<char>(map.tiles[cast<usize>(y)][cast<usize>(x)]);
+
+    return '#';
+  }
+
+  map() = default;
+  ~map() = default;
+}
+
+fn solve(map &map, (int, int) start, (int, int) direction) -> std::flat_hash_map<(int, int), int>
+{
+  struct beam
+  {
+    (int, int) position;
+    (int, int) direction;
+
+    beam((int, int) position, (int, int) direction)
+      : position(position), direction(direction)
+    {
+    }
+
+    fn ==(beam&, beam&) -> bool = default;
+
+    beam(beam&&) = default;
+    ~beam() = default;
+  }
+
+  var step = 0;
+  var beams = std::vector<beam>();
+  var visited = std::flat_hash_map<beam, void>();
+  var energised = std::flat_hash_map<(int, int), int>();
+
+  beams.push_back(start, direction);
+
+  while (!beams.empty)
+  {
+    for (var beam : beams.take(beams.begin, beams.end))
+    {
+      var dp = beam.direction;
+      var np = (beam.position.0 + beam.direction.0, beam.position.1 + beam.direction.1);
+
+      if (visited.contains(beam))
+        continue;
+
+      visited.insert(beam);
+
+      switch (map.at(np.0, np.1))
+      {
+        case '.':
+          beams.push_back(np, dp);
+
+        case '-':
+          switch (dp.0)
+          {
+            case 0:
+              beams.push_back(np, (-1, 0));
+              beams.push_back(np, (+1, 0));
+
+            else:
+              beams.push_back(np, dp);
+          }
+
+        case '|':
+          switch (dp.1)
+          {
+            case 0:
+              beams.push_back(np, (0, -1));
+              beams.push_back(np, (0, +1));
+
+            else:
+              beams.push_back(np, dp);
+          }
+
+        case '\\':
+          beams.push_back(np, (dp.1, dp.0));
+
+        case '/':
+          beams.push_back(np, (-dp.1, -dp.0));
+      }
+
+      if (map.at(np.0, np.1) != '#')
+        energised.emplace(np) += 1;
+    }
+
+    step += 1;
+  }
+
+  return energised;
+}
+
+fn dump(map &map, std::flat_hash_map<(int, int), int> &energised) -> void
+{
+  for (var j = 0; j < map.tiles.len; ++j)
+  {
+    for (var i = 0; i < map.tiles[j].len; ++i)
+    {
+      if (energised.contains((cast<int>(i), cast<int>(j))))
+        std::putc('#');
+      else
+        std::putc(map.at(cast<int>(i), cast<int>(j)));
+    }
+
+    std::putc('\n');
+  }
+
+  std::putc('\n');
+}
+
+fn main -> int
+{
+  try
+  {
+    var map = map();
+
+    var fin = std::file::open("day16.txt");
+
+    for (var line : std::buffered_reader(&mut fin).lines)
+    {
+      map.tiles.push_back(line);
+    }
+
+    var best = 0;
+
+    for (var j = 0; j < cast<int>(map.tiles.len); ++j)
+      best = std::max(best, solve(map, (-1, j), (+1, 0)).len);
+
+    for (var i = 0; i < cast<int>(map.tiles[0].len); ++i)
+      best = std::max(best, solve(map, (i, -1), (0, +1)).len);
+
+    for (var j = 0; j < cast<int>(map.tiles.len); ++j)
+      best = std::max(best, solve(map, (cast<int>(map.tiles.len), j), (-1, 0)).len);
+
+    for (var i = 0; i < cast<int>(map.tiles[0].len); ++i)
+      best = std::max(best, solve(map, (i, cast<int>(map.tiles[0].len)), (0, -1)).len);
+
+    std::print("part2: max energised tiles ", best);
+
+  }
+  catch(std::error e)
+  {
+    std::panic(e);
+  }
+
+  return 0;
+}
