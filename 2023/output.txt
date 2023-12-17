@@ -65,6 +65,8 @@ part1: energised tiles 7562
 part2: max energised tiles 7793
 
 day 17
+part1: least heat loss 967
+part2: least heat loss 1101
 
 day 18
 

@@ -131,22 +131,6 @@ fn main -> int
       map.tiles.push_back(line);
     }
 
-    struct beam
-    {
-      (int, int) position;
-      (int, int) direction;
-
-      beam((int, int) position, (int, int) direction)
-        : position(position), direction(direction)
-      {
-      }
-
-      fn ==(beam&, beam&) -> bool = default;
-
-      beam(beam&&) = default;
-      ~beam() = default;
-    }
-
     var energised = solve(map, (-1, 0), (+1, 0));
 
     std::print("part1: energised tiles ", energised.len);

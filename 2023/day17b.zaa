@@ -1,0 +1,116 @@
+import std.stdio;
+import std.algorithm;
+import std.flat_hash_map;
+import std.scan;
+
+struct map
+{
+  std::vector<std::string> tiles;
+
+  fn at(this &map, int x, int y) -> char
+  {
+    if (0 <= y && cast<usize>(y) < map.tiles.len && 0 <= x && cast<usize>(x) < map.tiles[cast<usize>(y)].len)
+      return cast<char>(map.tiles[cast<usize>(y)][cast<usize>(x)]);
+
+    return '#';
+  }
+
+  map() = default;
+  ~map() = default;
+}
+
+fn dump(map &map) -> void
+{
+  for (var j = 0; j < map.tiles.len; ++j)
+  {
+    for (var i = 0; i < map.tiles[j].len; ++i)
+    {
+      std::putc(map.at(cast<int>(i), cast<int>(j)));
+    }
+
+    std::putc('\n');
+  }
+
+  std::putc('\n');
+}
+
+fn main -> int
+{
+  try
+  {
+    var map = map();
+
+    var fin = std::file::open("day17.txt");
+
+    for (var line : std::buffered_reader(&mut fin).lines)
+    {
+      map.tiles.push_back(line);
+    }
+
+    struct path
+    {
+      (int, int) head;
+      (int, int) direction;
+      int momentum;
+
+      path((int, int) head, (int, int) direction, int momentum)
+        : head(head), direction(direction), momentum(momentum)
+      {
+      }
+
+      fn ==(path &, path &) -> bool = default;
+
+      path(path&&) = default;
+      ~path() = default;
+    }
+
+    var best = 99999;
+    var paths = std::vector<(path, int)>();
+    var visited = std::flat_hash_map<path, int>();
+
+    paths.push_back(path((0, 0), (1, 0), 0), 0);
+    paths.push_back(path((0, 0), (0, 1), 0), 0);
+
+    while (!paths.empty)
+    {
+      for (var &(path, weight) : paths.take(paths.begin, paths.end))
+      {
+        var np = (path.head.0 + path.direction.0, path.head.1 + path.direction.1);
+
+        if (var j = visited.find(path); j != visited.end && visited[j].value <= weight)
+          continue;
+
+        visited.insert_or_assign(path, weight);
+
+        switch (var ch = map.at(np.0, np.1))
+        {
+          case '0' ..= '9':
+            if (path.momentum < 9)
+              paths.push_back(path(np, path.direction, path.momentum + 1), weight + cast<int>(ch - '0'));
+            if (path.momentum > 2)
+              paths.push_back(path(np, (+path.direction.1, +path.direction.0), 0), weight + cast<int>(ch - '0'));
+            if (path.momentum > 2)
+              paths.push_back(path(np, (-path.direction.1, -path.direction.0), 0), weight + cast<int>(ch - '0'));
+        }
+      }
+
+      for (var &(path, weight) : paths)
+      {
+        if (path.head.0 == cast<int>(map.tiles.back.len - 1) && path.head.1 == cast<int>(map.tiles.len - 1) && path.momentum > 3)
+        {
+          if (weight < best)
+            best = weight;
+        }
+      }
+    }
+
+    std::print("part2: least heat loss ", best);
+
+  }
+  catch(std::error e)
+  {
+    std::panic(e);
+  }
+
+  return 0;
+}
