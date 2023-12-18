@@ -69,6 +69,8 @@ part1: least heat loss 967
 part2: least heat loss 1101
 
 day 18
+part1: contained area 52035
+part2: contained area 60612092439765
 
 day 19
 

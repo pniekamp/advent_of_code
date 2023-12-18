@@ -1,0 +1,60 @@
+import std.stdio;
+import std.algorithm;
+import std.scan;
+
+fn main -> int
+{
+  try
+  {
+    var cursor = (0, 0);
+    var polygon = std::vector<(i64, i64)>();
+
+    var fin = std::file::open("day18.txt");
+
+    for (var line : std::buffered_reader(&mut fin).lines)
+    {
+      var c = ' ';
+      var n = int(0);
+      var distance = i64(0);
+      var direction = i64(0);
+
+      if (!std::sscanf(line, "{} {} (#{:5x}{:x})", &mut c, &mut n, &mut distance, &mut direction))
+        std::panic("error scaning operation from input '", line, "'");
+
+      switch (direction)
+      {
+        case 3: // up
+          cursor.1 -= distance;
+
+        case 1: // down
+          cursor.1 += distance;
+
+        case 2: // left
+          cursor.0 -= distance;
+
+        case 0: // right
+          cursor.0 += distance;
+      }
+
+      polygon.push_back(cursor);
+    }
+
+    var interior = 0;
+    var boundary = 0;
+
+    for (var ic = polygon.begin, var ip = polygon.end - 1; ic != polygon.end; ip = ic, ++ic)
+    {
+      interior += polygon[ip].0 * polygon[ic].1 - polygon[ic].0 * polygon[ip].1;
+      boundary += std::absdiff(polygon[ip].0, polygon[ic].0) + std::absdiff(polygon[ip].1, polygon[ic].1);
+    }
+
+    std::print("part2: contained area ", std::abs(interior) / 2 + boundary / 2 + 1);
+
+  }
+  catch(std::error e)
+  {
+    std::panic(e);
+  }
+
+  return 0;
+}
