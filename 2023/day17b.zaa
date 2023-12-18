@@ -1,6 +1,7 @@
 import std.stdio;
 import std.algorithm;
 import std.flat_hash_map;
+import std.priority_queue;
 import std.scan;
 
 struct map
@@ -61,50 +62,48 @@ fn main -> int
       fn ==(path &, path &) -> bool = default;
 
       path(path&&) = default;
+      fn =(path mut &, path &&) -> path mut & = default;
       ~path() = default;
     }
 
-    var best = 99999;
-    var paths = std::vector<(path, int)>();
+    var loss = 0;
+    var queue = std::priority_queue<(path, int), Cmp: typeof(|x, y| y.1 < x.1) >();
     var visited = std::flat_hash_map<path, int>();
 
-    paths.push_back(path((0, 0), (1, 0), 0), 0);
-    paths.push_back(path((0, 0), (0, 1), 0), 0);
+    queue.push_back(path((0, 0), (1, 0), 0), 0);
+    queue.push_back(path((0, 0), (0, 1), 0), 0);
 
-    while (!paths.empty)
+    while (!queue.empty)
     {
-      for (var &(path, weight) : paths.take(paths.begin, paths.end))
+      var (path, weight) = queue.take_front;
+
+      var np = (path.head.0 + path.direction.0, path.head.1 + path.direction.1);
+
+      if (var j = visited.find(path); j != visited.end && visited[j].value <= weight)
+        continue;
+
+      visited.insert_or_assign(path, weight);
+
+      switch (var ch = map.at(np.0, np.1))
       {
-        var np = (path.head.0 + path.direction.0, path.head.1 + path.direction.1);
-
-        if (var j = visited.find(path); j != visited.end && visited[j].value <= weight)
-          continue;
-
-        visited.insert_or_assign(path, weight);
-
-        switch (var ch = map.at(np.0, np.1))
-        {
-          case '0' ..= '9':
-            if (path.momentum < 9)
-              paths.push_back(path(np, path.direction, path.momentum + 1), weight + cast<int>(ch - '0'));
-            if (path.momentum > 2)
-              paths.push_back(path(np, (+path.direction.1, +path.direction.0), 0), weight + cast<int>(ch - '0'));
-            if (path.momentum > 2)
-              paths.push_back(path(np, (-path.direction.1, -path.direction.0), 0), weight + cast<int>(ch - '0'));
-        }
+        case '0' ..= '9':
+          if (path.momentum < 9)
+            queue.push_back(path(np, path.direction, path.momentum + 1), weight + cast<int>(ch - '0'));
+          if (path.momentum > 2)
+            queue.push_back(path(np, (+path.direction.1, +path.direction.0), 0), weight + cast<int>(ch - '0'));
+          if (path.momentum > 2)
+            queue.push_back(path(np, (-path.direction.1, -path.direction.0), 0), weight + cast<int>(ch - '0'));
       }
 
-      for (var &(path, weight) : paths)
+      if (path.head.0 == cast<int>(map.tiles.back.len - 1) && path.head.1 == cast<int>(map.tiles.len - 1) && path.momentum > 3)
       {
-        if (path.head.0 == cast<int>(map.tiles.back.len - 1) && path.head.1 == cast<int>(map.tiles.len - 1) && path.momentum > 3)
-        {
-          if (weight < best)
-            best = weight;
-        }
+        loss = weight;
+
+        break;
       }
     }
 
-    std::print("part2: least heat loss ", best);
+    std::print("part2: least heat loss ", loss);
 
   }
   catch(std::error e)
