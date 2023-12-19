@@ -1,0 +1,122 @@
+import std.stdio;
+import std.algorithm;
+import std.flat_hash_map;
+import std.scan;
+
+fn main -> int
+{
+  try
+  {
+    var workflows = std::flat_hash_map<std::string, std::string>();
+
+    var fin = std::file::open("day19.txt");
+    var reader = std::buffered_reader(&mut fin);
+
+    for (var line : reader.lines)
+    {
+      if (line.empty)
+        break;
+
+      var (name, rules) = line.strip_suffix("}").cut('{');
+
+      workflows.insert(name, rules);
+    }
+
+    std::skip_line(&mut reader);
+
+    var total = 0;
+
+    for(var line : reader.lines)
+    {
+      var x = int(0);
+      var m = int(0);
+      var a = int(0);
+      var s = int(0);
+
+      if (!std::sscanf(line, "{{x={},m={},a={},s={}}}", &mut x, &mut m, &mut a, &mut s))
+        std::panic("error scaning ratings from input '", line, "'");
+
+      var target = std::string_view("in");
+
+      for (;;)
+      {
+        if (target == "A")
+        {
+          total += x + m + a + s;
+        }
+
+        if (target == "A" || target == "R")
+          break;
+
+        var &workflow = workflows.get(target)?!;
+
+        for (var rule : workflow.split(","))
+        {
+          var lhs = ' ';
+          var rhs = int(0);
+
+          if (std::sscanf(rule, "{}<{}:{}", &mut lhs, &mut rhs, &mut target))
+          {
+            switch (lhs)
+            {
+              case 'x':
+                if (x < rhs)
+                  break;
+
+              case 'm':
+                if (m < rhs)
+                  break;
+
+              case 'a':
+                if (a < rhs)
+                  break;
+
+              case 's':
+                if (s < rhs)
+                  break;
+            }
+          }
+
+          if (std::sscanf(rule, "{}>{}:{}", &mut lhs, &mut rhs, &mut target))
+          {
+            switch (lhs)
+            {
+              case 'x':
+                if (x > rhs)
+                  break;
+
+              case 'm':
+                if (m > rhs)
+                  break;
+
+              case 'a':
+                if (a > rhs)
+                  break;
+
+              case 's':
+                if (s > rhs)
+                  break;
+            }
+          }
+
+          target = rule;
+
+          if (rule == "A")
+            break;
+
+          if (rule == "R")
+            break;
+        }
+      }
+    }
+
+    std::print("part1: accepted ratings ", total);
+
+  }
+  catch(std::error e)
+  {
+    std::panic(e);
+  }
+
+  return 0;
+}

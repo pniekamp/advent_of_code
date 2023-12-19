@@ -73,6 +73,8 @@ part1: contained area 52035
 part2: contained area 60612092439765
 
 day 19
+part1: accepted ratings 376008
+part2: accepted ratings 124078207789312
 
 day 20
 

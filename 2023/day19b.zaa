@@ -1,0 +1,118 @@
+import std.stdio;
+import std.algorithm;
+import std.flat_hash_map;
+import std.scan;
+
+fn main -> int
+{
+  try
+  {
+    var workflows = std::flat_hash_map<std::string, std::string>();
+
+    var fin = std::file::open("day19.txt");
+    var reader = std::buffered_reader(&mut fin);
+
+    for (var line : reader.lines)
+    {
+      if (line.empty)
+        break;
+
+      var (name, rules) = line.strip_suffix("}").cut('{');
+
+      workflows.insert(name, rules);
+    }
+
+    var total = i64(0);
+    var stack = std::vector<(std::string_view, int[2][4])>();
+
+    stack.push_back((std::string_view("in"), [ [1, 4000], [1, 4000], [1, 4000], [1, 4000] ]));
+
+    while (!stack.empty)
+    {
+      for (var (target, range) : stack.take(stack.begin, stack.end))
+      {
+        if (target == "A")
+        {
+          total += std::accumulate(range, i64(1), |seed, span| seed * cast<i64>(std::abs(span[1] - span[0] + 1)));
+        }
+
+        if (target == "A" || target == "R")
+          continue;
+
+        var &workflow = workflows.get(target)?!;
+
+        for (var rule : workflow.split(","))
+        {
+          var lhs = ' ';
+          var rhs = int(0);
+
+          if (std::sscanf(rule, "{}<{}:{}", &mut lhs, &mut rhs, &mut target))
+          {
+            switch (lhs)
+            {
+              case 'x':
+                if (range[0][0] < rhs)
+                  stack.push_back(target, [[range[0][0], std::min(range[0][1], rhs - 1)], range[1], range[2], range[3]]);
+                range[0][0] = std::max(range[0][0], rhs);
+
+              case 'm':
+                if (range[1][0] < rhs)
+                  stack.push_back(target, [range[0], [range[1][0], std::min(range[1][1], rhs - 1)], range[2], range[3]]);
+                range[1][0] = std::max(range[1][0], rhs);
+
+              case 'a':
+                if (range[2][0] < rhs)
+                  stack.push_back(target, [range[0], range[1], [range[2][0], std::min(range[2][1], rhs - 1)], range[3]]);
+                range[2][0] = std::max(range[2][0], rhs);
+
+              case 's':
+                if (range[3][0] < rhs)
+                  stack.push_back(target, [range[0], range[1], range[2], [range[3][0], std::min(range[3][1], rhs - 1)]]);
+                range[3][0] = std::max(range[3][0], rhs);
+            }
+          }
+
+          if (std::sscanf(rule, "{}>{}:{}", &mut lhs, &mut rhs, &mut target))
+          {
+            switch (lhs)
+            {
+              case 'x':
+                if (range[0][1] > rhs)
+                  stack.push_back(target, [[std::max(range[0][0], rhs + 1), range[0][1]], range[1], range[2], range[3]]);
+                range[0][1] = std::min(range[0][1], rhs);
+
+              case 'm':
+                if (range[1][1] > rhs)
+                  stack.push_back(target, [range[0], [std::max(range[1][0], rhs + 1), range[1][1]], range[2], range[3]]);
+                range[1][1] = std::min(range[1][1], rhs);
+
+              case 'a':
+                if (range[2][1] > rhs)
+                  stack.push_back(target, [range[0], range[1], [std::max(range[2][0], rhs + 1), range[2][1]], range[3]]);
+                range[2][1] = std::min(range[2][1], rhs);
+
+              case 's':
+                if (range[3][1] > rhs)
+                  stack.push_back(target, [range[0], range[1], range[2], [std::max(range[3][0], rhs + 1), range[3][1]]]);
+                range[3][1] = std::min(range[3][1], rhs);
+            }
+          }
+
+          if (rule == "A" || rule == "R" || (rule[1] != cast('<') && rule[1] != cast('>')))
+          {
+            stack.push_back(std::string_view(rule), range);
+          }
+        }
+      }
+    }
+
+    std::print("part2: accepted ratings ", total);
+
+  }
+  catch(std::error e)
+  {
+    std::panic(e);
+  }
+
+  return 0;
+}
