@@ -23,19 +23,14 @@ fn main -> int
     }
 
     var total = i64(0);
-    var stack = std::vector<(std::string_view, int[2][4])>();
+    var stack = std::vector<(std::string_view, (int, int)[4])>();
 
-    stack.push_back((std::string_view("in"), [ [1, 4000], [1, 4000], [1, 4000], [1, 4000] ]));
+    stack.push_back((std::string_view("in"), [ (1, 4000), (1, 4000), (1, 4000), (1, 4000) ]));
 
     while (!stack.empty)
     {
       for (var (target, range) : stack.take(stack.begin, stack.end))
       {
-        if (target == "A")
-        {
-          total += std::accumulate(range, i64(1), |seed, span| seed * cast<i64>(std::abs(span[1] - span[0] + 1)));
-        }
-
         if (target == "A" || target == "R")
           continue;
 
@@ -51,24 +46,20 @@ fn main -> int
             switch (lhs)
             {
               case 'x':
-                if (range[0][0] < rhs)
-                  stack.push_back(target, [[range[0][0], std::min(range[0][1], rhs - 1)], range[1], range[2], range[3]]);
-                range[0][0] = std::max(range[0][0], rhs);
+                stack.push_back(target, [(range[0].0, std::min(range[0].1, rhs - 1)), range[1], range[2], range[3]]);
+                range[0].0 = std::max(range[0].0, rhs);
 
               case 'm':
-                if (range[1][0] < rhs)
-                  stack.push_back(target, [range[0], [range[1][0], std::min(range[1][1], rhs - 1)], range[2], range[3]]);
-                range[1][0] = std::max(range[1][0], rhs);
+                stack.push_back(target, [range[0], (range[1].0, std::min(range[1].1, rhs - 1)), range[2], range[3]]);
+                range[1].0 = std::max(range[1].0, rhs);
 
               case 'a':
-                if (range[2][0] < rhs)
-                  stack.push_back(target, [range[0], range[1], [range[2][0], std::min(range[2][1], rhs - 1)], range[3]]);
-                range[2][0] = std::max(range[2][0], rhs);
+                stack.push_back(target, [range[0], range[1], (range[2].0, std::min(range[2].1, rhs - 1)), range[3]]);
+                range[2].0 = std::max(range[2].0, rhs);
 
               case 's':
-                if (range[3][0] < rhs)
-                  stack.push_back(target, [range[0], range[1], range[2], [range[3][0], std::min(range[3][1], rhs - 1)]]);
-                range[3][0] = std::max(range[3][0], rhs);
+                stack.push_back(target, [range[0], range[1], range[2], (range[3].0, std::min(range[3].1, rhs - 1))]);
+                range[3].0 = std::max(range[3].0, rhs);
             }
           }
 
@@ -77,31 +68,35 @@ fn main -> int
             switch (lhs)
             {
               case 'x':
-                if (range[0][1] > rhs)
-                  stack.push_back(target, [[std::max(range[0][0], rhs + 1), range[0][1]], range[1], range[2], range[3]]);
-                range[0][1] = std::min(range[0][1], rhs);
+                stack.push_back(target, [(std::max(range[0].0, rhs + 1), range[0].1), range[1], range[2], range[3]]);
+                range[0].1 = std::min(range[0].1, rhs);
 
               case 'm':
-                if (range[1][1] > rhs)
-                  stack.push_back(target, [range[0], [std::max(range[1][0], rhs + 1), range[1][1]], range[2], range[3]]);
-                range[1][1] = std::min(range[1][1], rhs);
+                stack.push_back(target, [range[0], (std::max(range[1].0, rhs + 1), range[1].1), range[2], range[3]]);
+                range[1].1 = std::min(range[1].1, rhs);
 
               case 'a':
-                if (range[2][1] > rhs)
-                  stack.push_back(target, [range[0], range[1], [std::max(range[2][0], rhs + 1), range[2][1]], range[3]]);
-                range[2][1] = std::min(range[2][1], rhs);
+                stack.push_back(target, [range[0], range[1], (std::max(range[2].0, rhs + 1), range[2].1), range[3]]);
+                range[2].1 = std::min(range[2].1, rhs);
 
               case 's':
-                if (range[3][1] > rhs)
-                  stack.push_back(target, [range[0], range[1], range[2], [std::max(range[3][0], rhs + 1), range[3][1]]]);
-                range[3][1] = std::min(range[3][1], rhs);
+                stack.push_back(target, [range[0], range[1], range[2], (std::max(range[3].0, rhs + 1), range[3].1)]);
+                range[3].1 = std::min(range[3].1, rhs);
             }
           }
 
-          if (rule == "A" || rule == "R" || (rule[1] != cast('<') && rule[1] != cast('>')))
+          if (!rule.contains(":"))
           {
             stack.push_back(std::string_view(rule), range);
           }
+        }
+      }
+
+      for (var (target, range) : stack)
+      {
+        if (target == "A")
+        {
+          total += std::accumulate(range, i64(1), |seed, span| seed * cast<i64>(span.1 - span.0 + 1));
         }
       }
     }

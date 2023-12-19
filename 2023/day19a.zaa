@@ -40,11 +40,6 @@ fn main -> int
 
       for (;;)
       {
-        if (target == "A")
-        {
-          total += x + m + a + s;
-        }
-
         if (target == "A" || target == "R")
           break;
 
@@ -99,14 +94,22 @@ fn main -> int
             }
           }
 
-          target = rule;
+          if (!rule.contains(":"))
+          {
+            target = rule;
 
-          if (rule == "A")
-            break;
+            if (rule == "A")
+              break;
 
-          if (rule == "R")
-            break;
+            if (rule == "R")
+              break;
+          }
         }
+      }
+
+      if (target == "A")
+      {
+        total += x + m + a + s;
       }
     }
 
