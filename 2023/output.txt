@@ -77,6 +77,8 @@ part1: accepted ratings 376008
 part2: accepted ratings 124078207789312
 
 day 20
+part1: pulse count 712543680
+part2: rx count 238920142622879
 
 day 21
 

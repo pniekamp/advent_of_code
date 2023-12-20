@@ -1,0 +1,150 @@
+import std.stdio;
+import std.algorithm;
+import std.flat_hash_map;
+import std.math.lcm;
+import std.scan;
+
+union module
+{
+  broadcaster(std::string),
+  flipflop((std::string, bool)),
+  conjunction((std::string, std::flat_hash_map<std::string, char>)),
+
+  fn destinations(this&) -> std::string &
+  {
+    switch (this)
+    {
+      case broadcaster[broadcaster]:
+        return &broadcaster;
+
+      case flipflop[flipflop]:
+        return &flipflop.0;
+
+      case conjunction[conjunction]:
+        return &conjunction.0;
+    }
+
+    std::panic();
+  }
+
+  module() = default;
+  module(module&&) = default;
+  ~module() = default;
+}
+
+fn broadcast(std::flat_hash_map<std::string, module> mut &modules, i64 step, std::flat_hash_map<std::string_view, i64> mut &targets) -> void
+{
+  var pulses = std::vector<(std::string_view, std::string_view, char)>();
+
+  pulses.push_back(std::string_view("broadcaster"), std::string_view("button"), '0');
+
+  while (!pulses.empty)
+  {
+    for (var (name, src, signal) : pulses.take(pulses.begin, pulses.end))
+    {
+      if (var module = modules.get(name))
+      {
+        switch (module?!)
+        {
+          case broadcaster[destinations]:
+
+            for (var dst : destinations.split(", "))
+              pulses.push_back(std::string_view(dst), std::string_view(name), signal);
+
+          case flipflop[var mut &(destinations, state)]:
+
+            if (signal == '0')
+            {
+              for (var dst : destinations.split(", "))
+                pulses.push_back(std::string_view(dst), std::string_view(name), state ? '0' : '1');
+
+              state = !state;
+            }
+
+          case conjunction[var mut &(destinations, state)]:
+
+            state.insert_or_assign(src, signal);
+
+            for (var dst : destinations.split(", "))
+              pulses.push_back(std::string_view(dst), std::string_view(name), std::all_of(state, |sig| sig.value == '1') ? '0' : '1');
+        }
+
+        if (module?!.destinations == "rx")
+        {
+          if (signal == '1')
+            targets.insert(src, step);
+        }
+      }
+    }
+  }
+}
+
+fn main -> int
+{
+  try
+  {
+    var modules = std::flat_hash_map<std::string, module>();
+
+    var fin = std::file::open("day20.txt");
+
+    for (var line : std::buffered_reader(&mut fin).lines)
+    {
+      var (name, destinations) = line.cut(" -> ");
+
+      switch (name[0])
+      {
+        case '%':
+          modules.insert(name.drop(1), module::flipflop(std::string(destinations), false));
+
+        case '&':
+          modules.insert(name.drop(1), module::conjunction(std::string(destinations), std::flat_hash_map<std::string, char>()));
+
+        else:
+          modules.insert(name, module::broadcaster(destinations));
+      }
+    }
+
+    for (var &module : modules)
+    {
+      for (var dst : module.value.destinations.split(", "))
+      {
+        if (dst == module.key)
+          continue;
+
+        if (!modules.get(dst))
+          continue;
+
+        switch (modules.get(dst)?!)
+        {
+          case conjunction[conjunction]:
+            conjunction.1.insert_or_assign(module.key, '0');
+        }
+      }
+    }
+
+    var n = modules.get("vr")?!.conjunction.1.len;
+    var targets = std::flat_hash_map<std::string_view, i64>();
+
+    for (var step = 1; true; ++step)
+    {
+      broadcast(&mut modules, step, &mut targets);
+
+      if (targets.len == n)
+        break;
+    }
+
+    var lcm = i64(1);
+
+    for (var &(target, step) : targets)
+      lcm = std::lcm(lcm, step);
+
+    std::print("part2: rx count ", lcm);
+
+  }
+  catch(std::error e)
+  {
+    std::panic(e);
+  }
+
+  return 0;
+}
