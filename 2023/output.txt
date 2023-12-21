@@ -81,6 +81,8 @@ part1: pulse count 712543680
 part2: rx count 238920142622879
 
 day 21
+part1: garden plots 3858
+part2: garden plots 636350496972143
 
 day 22
 

@@ -1,0 +1,100 @@
+import std.stdio;
+import std.algorithm;
+import std.flat_hash_map;
+import std.scan;
+
+struct map
+{
+  std::vector<std::string> tiles;
+
+  fn at(this &map, int x, int y) -> char
+  {
+    var j = cast<usize>((y % cast<int>(map.tiles.len)) + cast<int>(map.tiles.len)) % map.tiles.len;
+    var i = cast<usize>((x % cast<int>(map.tiles[j].len)) + cast<int>(map.tiles[j].len)) % map.tiles[j].len;
+
+    return cast<char>(map.tiles[j][i]);
+  }
+
+  map() = default;
+  ~map() = default;
+}
+
+fn dump(map &map, std::flat_hash_map<(int, int), void> &steps) -> void
+{
+  for (var j = 0; j < cast<int>(map.tiles.len); ++j)
+  {
+    for (var i = 0; i < cast<int>(map.tiles[cast<usize>(j)].len); ++i)
+    {
+      if (steps.contains((i, j)))
+        std::putc('O');
+      else
+        std::putc(map.at(i, j));
+    }
+
+    std::putc('\n');
+  }
+
+  std::putc('\n');
+}
+
+fn main -> int
+{
+  try
+  {
+    var s = (0, 0);
+    var map = map();
+
+    var fin = std::file::open("day21.txt");
+
+    for (var line : std::buffered_reader(&mut fin).lines)
+    {
+      if (var j = line.find_first('S'); j != line.end)
+        s = (cast<int>(j - line.begin), cast<int>(map.tiles.len));
+
+      map.tiles.push_back(line);
+    }
+
+    map.tiles[cast<usize>(s.1)][cast<usize>(s.0)] = cast('.');
+
+    var y = [0, 0, 0];
+    var plots = std::flat_hash_map<(int, int), void>();
+
+    plots.insert(s);
+
+    for (var step = 0; step < 328; ++step)
+    {
+      if (step == 65)
+        y[0] = plots.len;
+
+      if (step == 196)
+        y[1] = plots.len;
+
+      if (step == 327)
+        y[2] = plots.len;
+
+      for(var &(p, _) : plots.take(plots.begin, plots.end))
+      {
+        for (var dp : [ (0, -1), (1, 0), (0, 1), (-1, 0) ])
+        {
+          var np = (p.0 + dp.0, p.1 + dp.1);
+
+          if (map.at(np.0, np.1) == '.')
+            plots.insert(np);
+        }
+      }
+    }
+
+    var c = y[0];
+    var a = ((y[2] - c) - (2 * (y[1] - c))) / 2;
+    var b = (y[1] - c) - a;
+
+    std::print("part2: garden plots ", a * 40_925_290_000 + b * 202_300 + c);
+
+  }
+  catch(std::error e)
+  {
+    std::panic(e);
+  }
+
+  return 0;
+}
