@@ -85,6 +85,8 @@ part1: garden plots 3858
 part2: garden plots 636350496972143
 
 day 22
+part1: disintegratable 519
+part2: repercussion 109531
 
 day 23
 

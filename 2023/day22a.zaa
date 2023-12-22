@@ -1,0 +1,117 @@
+import std.stdio;
+import std.algorithm;
+import std.flat_hash_map;
+import std.range : Range;
+import std.scan;
+
+struct brick
+{
+  usize id;
+
+  (int, int, int) lo;
+  (int, int, int) hi;
+
+  brick(usize id, (int, int, int) &lo, (int, int, int) &hi)
+    : id(id), lo(lo), hi(hi)
+  {
+  }
+
+  brick(brick&) = default;
+  fn =(brick mut &, brick &) -> brick mut & = default;
+  ~brick() = default;
+}
+
+fn intersects(brick &lhs, brick &rhs) -> bool
+{
+  #for (const k = 0; k < 3; ++k)
+    if (lhs.lo.#k > rhs.hi.#k || lhs.hi.#k < rhs.lo.#k)
+      return false;
+
+  return true;
+}
+
+fn supported(Range<brick> &bricks, brick &item) -> bool
+{
+  var dst = brick(item.id, (item.lo.0, item.lo.1, item.lo.2 - 1), (item.hi.0, item.hi.1, item.hi.2 - 1));
+
+  if (dst.lo.2 <= 0)
+    return true;
+
+  for (var &brick : bricks)
+  {
+    if (brick.id == dst.id)
+      continue;
+
+    if (intersects(brick, dst))
+      return true;
+  }
+
+  return false;
+}
+
+fn disintegratable(std::vector<brick> &bricks, brick &item) -> bool
+{
+  var remaining = std::filter(bricks, |brick| brick.id != item.id);
+
+  for (var &brick : bricks)
+  {
+    if (!supported(remaining, brick))
+      return false;
+  }
+
+  return true;
+}
+
+fn simulate(std::vector<brick> mut &bricks) -> void
+{
+  std::sort(&mut bricks, |a, b| a.lo.2 < b.lo.2);
+
+  for (var mut &brick : bricks)
+  {
+    while (!supported(bricks, brick))
+    {
+      brick.lo.2 -= 1;
+      brick.hi.2 -= 1;
+    }
+  }
+}
+
+fn main -> int
+{
+  try
+  {
+    var bricks = std::vector<brick>();
+
+    var fin = std::file::open("day22.txt");
+
+    for (var line : std::buffered_reader(&mut fin).lines)
+    {
+      var p0 = (int(0), int(0), int(0));
+      var p1 = (int(0), int(0), int(0));
+
+      if (!std::sscanf(line, "{},{},{}~{},{},{}", &mut p0.0, &mut p0.1, &mut p0.2, &mut p1.0, &mut p1.1, &mut p1.2))
+        std::panic("error scaning brick from input '", line, "'");
+
+      bricks.push_back(brick(bricks.len + 1, (std::min(p0.0, p1.0), std::min(p0.1, p1.1), std::min(p0.2, p1.2)), (std::max(p0.0, p1.0), std::max(p0.1, p1.1), std::max(p0.2, p1.2))));
+    }
+
+    var count = 0;
+
+    simulate(&mut bricks);
+
+    for (var &brick : bricks)
+    {
+      if (disintegratable(bricks, brick))
+        count += 1;
+    }
+
+    std::print("part1: disintegratable ", count);
+
+  }
+  catch(std::error e)
+  {
+    std::panic(e);
+  }
+
+  return 0;
+}
