@@ -40,7 +40,7 @@ fn supported(Range<brick> &bricks, brick &item) -> bool
   for (var &brick : bricks)
   {
     if (brick.id == dst.id)
-      continue;
+      break;
 
     if (intersects(brick, dst))
       return true;
