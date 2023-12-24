@@ -1,0 +1,142 @@
+import std.stdio;
+import std.algorithm;
+import std.flat_hash_map;
+import std.scan;
+
+struct map
+{
+  std::vector<std::string> tiles;
+
+  fn at(this &map, int x, int y) -> char
+  {
+    if (0 <= y && cast<usize>(y) < map.tiles.len && 0 <= x && cast<usize>(x) < map.tiles[cast<usize>(y)].len)
+      return cast<char>(map.tiles[cast<usize>(y)][cast<usize>(x)]);
+
+    return '#';
+  }
+
+  struct node
+  {
+    std::vector<((int, int), int)> neighbors;
+
+    node() = default;
+    node(node&&) = default;
+    ~node() = default;
+  }
+
+  std::flat_hash_map<(int, int), node> graph;
+
+  map() = default;
+  ~map() = default;
+}
+
+fn build(map mut &map) -> void
+{
+  for (var j = 0; j < cast<int>(map.tiles.len); ++j)
+  {
+    for (var i = 0; i < cast<int>(map.tiles[cast<usize>(j)].len); ++i)
+    {
+      switch (map.at(i, j))
+      {
+        case '^':
+        case '>':
+        case 'v':
+        case '<':
+        case '.':
+          for (var dp : [ (0, -1), (1, 0), (0, 1), (-1, 0) ])
+          {
+            var np = (i + dp.0, j + dp.1);
+
+            switch (map.at(np.0, np.1))
+            {
+              case '^':
+              case '>':
+              case 'v':
+              case '<':
+              case '.':
+                map.graph.emplace((i, j)).neighbors.push_back(np, 1);
+            }
+          }
+      }
+    }
+  }
+
+  for (var i = map.graph.begin; i != map.graph.end; )
+  {
+    var key = map.graph[i].key;
+    var &node = map.graph[i].value;
+
+    if (node.neighbors.len == 2)
+    {
+      var mut &lhs = map.graph.get(node.neighbors[0].0)?!;
+      var mut &rhs = map.graph.get(node.neighbors[1].0)?!;
+
+      if (var j = lhs.neighbors.find_if(|node| node.0 == key); j != lhs.neighbors.end)
+        lhs.neighbors[j] = (node.neighbors[1].0, node.neighbors[0].1 + node.neighbors[1].1);
+
+      if (var j = rhs.neighbors.find_if(|node| node.0 == key); j != rhs.neighbors.end)
+        rhs.neighbors[j] = (node.neighbors[0].0, node.neighbors[0].1 + node.neighbors[1].1);
+
+      i = map.graph.erase(i);
+    }
+    else
+      ++i;
+  }
+}
+
+fn main -> int
+{
+  try
+  {
+    var map = map();
+
+    var fin = std::file::open("day23.txt");
+
+    for (var line : std::buffered_reader(&mut fin).lines)
+    {
+      map.tiles.push_back(line);
+    }
+
+    build(&mut map);
+
+    var max = 0;
+    var stack = std::vector<((int, int), std::flat_hash_map<(int, int), int>)>();
+
+    stack.push_back((1, 0), std::flat_hash_map<(int, int), int>());
+
+    while (stack.len != 0)
+    {
+      for (var (p, history) : stack.take(stack.begin, stack.end))
+      {
+        if (p == (cast<int>(map.tiles[0].len - 2), cast<int>(map.tiles.len - 1)))
+        {
+          var steps = std::accumulate(history, int(0), |s, k| s + k.value);
+
+          if (max < steps)
+            max = steps;
+        }
+
+        history.insert(p);
+
+        for (var (q, c) : map.graph.get(p)?!.neighbors)
+        {
+          if (history.contains(q))
+            continue;
+
+          history.insert_or_assign(p, c);
+
+          stack.push_back(q, history);
+        }
+      }
+    }
+
+    std::print("part2: maximum path length ", max);
+
+  }
+  catch(std::error e)
+  {
+    std::panic(e);
+  }
+
+  return 0;
+}

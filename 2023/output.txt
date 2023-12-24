@@ -89,6 +89,8 @@ part1: disintegratable 519
 part2: repercussion 109531
 
 day 23
+part2: maximum path length 2074
+part2: maximum path length 6494
 
 day 24
 
