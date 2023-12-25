@@ -124,8 +124,6 @@ fn main -> int
             max = steps;
         }
 
-        history.insert(p);
-
         for (var (q, c) : map.graph.get(p)?!.neighbors)
         {
           if (history.contains(q))
