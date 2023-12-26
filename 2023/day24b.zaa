@@ -1,0 +1,115 @@
+import std.stdio;
+import std.algorithm;
+import std.flat_hash_map;
+import std.scan;
+import lml.vector;
+import lml.matrix;
+import lml.geometry;
+
+using lml;
+
+struct hailstone
+{
+  vector<float, 3> position;
+  vector<float, 3> velocity;
+
+  hailstone() = default;
+  hailstone(hailstone&&) = default;
+  ~hailstone() = default;
+}
+
+pub fn fmt(std::OutputStream mut &os, std::fmt_context mut &ctx, hailstone &value) throws -> void
+{
+  ctx.written += std::format_to(&mut os, "{} @ {}", value.position, value.velocity);
+}
+
+pub fn scan(std::string_view is, std::scan_context mut &ctx, hailstone mut &value) -> void
+{
+  var str = std::sscanf(is, "{}, {}, {} @ {}, {}, {}", &mut value.position[0], &mut value.position[1], &mut value.position[2], &mut value.velocity[0], &mut value.velocity[1], &mut value.velocity[2]);
+
+  ctx.error = str.error;
+  ctx.cursor += str.len;
+}
+
+fn main -> int
+{
+  try
+  {
+    var storm = std::vector<hailstone>();
+
+    var fin = std::file::open("day24.txt");
+
+    for (var line : std::buffered_reader(&mut fin).lines)
+    {
+      var hailstone = hailstone();
+
+      if (!std::sscanf(line, "{}", &mut hailstone))
+        std::panic("error scaning hailstone from input '", line, "'");
+
+      storm.push_back(hailstone);
+    }
+
+    var stones = std::vector<hailstone>();
+
+    for (var &hail : storm)
+    {
+      if (std::all_of(stones, |stone| !std::fcmp(normsqr(cross(hail.velocity, stone.velocity)), 0.0)))
+        stones.push_back(hail);
+
+      if (stones.len == 3)
+        break;
+    }
+
+    var M = lml::matrix<float, 6, 6>();
+
+    M[0, 0] = stones[0].velocity[1] - stones[1].velocity[1];
+    M[0, 1] = stones[1].velocity[0] - stones[0].velocity[0];
+    M[0, 3] = stones[1].position[1] - stones[0].position[1];
+    M[0, 4] = stones[0].position[0] - stones[1].position[0];
+
+    M[1, 0] = stones[0].velocity[1] - stones[2].velocity[1];
+    M[1, 1] = stones[2].velocity[0] - stones[0].velocity[0];
+    M[1, 3] = stones[2].position[1] - stones[0].position[1];
+    M[1, 4] = stones[0].position[0] - stones[2].position[0];
+
+    M[2, 0] = stones[1].velocity[2] - stones[0].velocity[2];
+    M[2, 2] = stones[0].velocity[0] - stones[1].velocity[0];
+    M[2, 3] = stones[0].position[2] - stones[1].position[2];
+    M[2, 5] = stones[1].position[0] - stones[0].position[0];
+
+    M[3, 0] = stones[2].velocity[2] - stones[0].velocity[2];
+    M[3, 2] = stones[0].velocity[0] - stones[2].velocity[0];
+    M[3, 3] = stones[0].position[2] - stones[2].position[2];
+    M[3, 5] = stones[2].position[0] - stones[0].position[0];
+
+    M[4, 1] = stones[0].velocity[2] - stones[1].velocity[2];
+    M[4, 2] = stones[1].velocity[1] - stones[0].velocity[1];
+    M[4, 4] = stones[1].position[2] - stones[0].position[2];
+    M[4, 5] = stones[0].position[1] - stones[1].position[1];
+
+    M[5, 1] = stones[0].velocity[2] - stones[2].velocity[2];
+    M[5, 2] = stones[2].velocity[1] - stones[0].velocity[1];
+    M[5, 4] = stones[2].position[2] - stones[0].position[2];
+    M[5, 5] = stones[0].position[1] - stones[2].position[1];
+
+    var x = lml::vector<float, 6>();
+
+    x[0] = cross(stones[0].position, stones[0].velocity)[2] - cross(stones[1].position, stones[1].velocity)[2];
+    x[1] = cross(stones[0].position, stones[0].velocity)[2] - cross(stones[2].position, stones[2].velocity)[2];
+    x[2] = cross(stones[0].position, stones[0].velocity)[1] - cross(stones[1].position, stones[1].velocity)[1];
+    x[3] = cross(stones[0].position, stones[0].velocity)[1] - cross(stones[2].position, stones[2].velocity)[1];
+    x[4] = cross(stones[0].position, stones[0].velocity)[0] - cross(stones[1].position, stones[1].velocity)[0];
+    x[5] = cross(stones[0].position, stones[0].velocity)[0] - cross(stones[2].position, stones[2].velocity)[0];
+
+    var solution = inverse(M) * x;
+
+    std::print("part2: initial position ", cast<i64>(std::round(solution[0]) + std::round(solution[1]) + std::round(solution[2])));
+
+  }
+  catch(std::error e)
+  {
+    std::panic(e);
+  }
+
+  return 0;
+}

@@ -89,9 +89,11 @@ part1: disintegratable 519
 part2: repercussion 109531
 
 day 23
-part2: maximum path length 2074
+part1: maximum path length 2074
 part2: maximum path length 6494
 
 day 24
+part1: test area intersections 16502
+part2: initial position 673641951253289
 
 day 25

@@ -1,0 +1,81 @@
+import std.stdio;
+import std.algorithm;
+import std.flat_hash_map;
+import std.scan;
+import lml.vector;
+import lml.geometry;
+
+using lml;
+
+struct hailstone
+{
+  vector<float, 3> position;
+  vector<float, 3> velocity;
+
+  hailstone() = default;
+  hailstone(hailstone&&) = default;
+  ~hailstone() = default;
+}
+
+pub fn fmt(std::OutputStream mut &os, std::fmt_context mut &ctx, hailstone &value) throws -> void
+{
+  ctx.written += std::format_to(&mut os, "{} @ {}", value.position, value.velocity);
+}
+
+pub fn scan(std::string_view is, std::scan_context mut &ctx, hailstone mut &value) -> void
+{
+  var str = std::sscanf(is, "{}, {}, {} @ {}, {}, {}", &mut value.position[0], &mut value.position[1], &mut value.position[2], &mut value.velocity[0], &mut value.velocity[1], &mut value.velocity[2]);
+
+  ctx.error = str.error;
+  ctx.cursor += str.len;
+}
+
+fn main -> int
+{
+  try
+  {
+    var storm = std::vector<hailstone>();
+
+    var fin = std::file::open("day24.txt");
+
+    for (var line : std::buffered_reader(&mut fin).lines)
+    {
+      var hailstone = hailstone();
+
+      if (!std::sscanf(line, "{}", &mut hailstone))
+        std::panic("error scaning hailstone from input '", line, "'");
+
+      storm.push_back(hailstone);
+    }
+
+    var count = 0;
+
+    const Range = (200000000000000.0 ..= 400000000000000.0);
+
+    for (var i = 0; i < storm.len; ++i)
+    {
+      for (var j = i + 1; j < storm.len; ++j)
+      {
+        var pa = swizzle<0, 1>(storm[i].position);
+        var va = swizzle<0, 1>(storm[i].velocity);
+        var pb = swizzle<0, 1>(storm[j].position);
+        var vb = swizzle<0, 1>(storm[j].velocity);
+
+        if (var hit = intersection(pa, pa + va, pb, pb + vb); hit.rayray)
+        {
+          if (Range ~= hit.value[0] && Range ~= hit.value[1])
+            count += 1;
+        }
+      }
+    }
+
+    std::print("part1: test area intersections ", count);
+
+  }
+  catch(std::error e)
+  {
+    std::panic(e);
+  }
+
+  return 0;
+}
