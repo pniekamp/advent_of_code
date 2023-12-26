@@ -2,11 +2,9 @@ import std.stdio;
 import std.algorithm;
 import std.flat_hash_map;
 import std.scan;
-import lml.vector;
-import lml.matrix;
+import lml.vector : vector;
+import lml.matrix : matrix;
 import lml.geometry;
-
-using lml;
 
 struct hailstone
 {

@@ -2,10 +2,8 @@ import std.stdio;
 import std.algorithm;
 import std.flat_hash_map;
 import std.scan;
-import lml.vector;
+import lml.vector : vector;
 import lml.geometry;
-
-using lml;
 
 struct hailstone
 {
@@ -61,9 +59,9 @@ fn main -> int
         var pb = swizzle<0, 1>(storm[j].position);
         var vb = swizzle<0, 1>(storm[j].velocity);
 
-        if (var hit = intersection(pa, pa + va, pb, pb + vb); hit.rayray)
+        if (var hit = lml::intersection(pa, pa + va, pb, pb + vb); hit.rayray)
         {
-          if (Range ~= hit.value[0] && Range ~= hit.value[1])
+          if (Range ~= hit[0] && Range ~= hit[1])
             count += 1;
         }
       }
