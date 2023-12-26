@@ -40,17 +40,20 @@ fn main -> int
           if (!std::sscanf(cubes, "{} {}", &mut n, &mut color))
             std::panic("error scaning game from input '", line, "'");
 
-          if (color == "red")
-            draw[0] = n;
+          switch (color)
+          {
+            case "red":
+              draw[0] = n;
 
-          else if (color == "green")
-            draw[1] = n;
+            case "green":
+              draw[1] = n;
 
-          else if (color == "blue")
-            draw[2] = n;
+            case "blue":
+              draw[2] = n;
 
-          else
-            std::panic("error scaning game from input '", line, "'");
+            else:
+              std::panic("error scaning game from input '", line, "'");
+          }
         }
 
         game.draws.push_back(draw);
