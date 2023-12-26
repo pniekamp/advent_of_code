@@ -15,7 +15,7 @@ fn main -> int
 
     var fin = std::file::open("day04.txt");
 
-    for(var line : std::buffered_reader(&mut fin).lines)
+    for (var line : std::buffered_reader(&mut fin).lines)
     {
       var ab = (i64(0), i64(0));
       var cd = (i64(0), i64(0));

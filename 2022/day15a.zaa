@@ -34,7 +34,7 @@ fn main -> int
 
     var fin = std::file::open("day15.txt");
 
-    for(var line : std::buffered_reader(&mut fin).lines)
+    for (var line : std::buffered_reader(&mut fin).lines)
     {
       var sensor = sensor();
 
@@ -47,14 +47,14 @@ fn main -> int
     var y = 2000000;
     var row = std::vector<(int, int)>();
 
-    for(var &sensor : sensors)
+    for (var &sensor : sensors)
     {
       row.push_back(sensor.span_at(y));
     }
 
     std::sort(&mut row);
 
-    for(var column = row[0].0, var segment : row)
+    for (var column = row[0].0, var segment : row)
     {
       if (segment.1 < column)
         continue;
@@ -64,7 +64,7 @@ fn main -> int
       column = segment.1;
     }
 
-    for(var i = 0; i != sensors.len; ++i)
+    for (var i = 0; i != sensors.len; ++i)
     {
       if (sensors[i].by == y && sensors[0 .. i].count_if(|k| [var x = sensors[i].bx] k.bx == x) == 0)
         count -= 1;

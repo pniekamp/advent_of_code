@@ -72,7 +72,7 @@ fn main -> int
       if (step == 327)
         y[2] = plots.len;
 
-      for(var &(p, _) : plots.take(plots.begin, plots.end))
+      for (var &(p, _) : plots.take(plots.begin, plots.end))
       {
         for (var dp : [ (0, -1), (1, 0), (0, 1), (-1, 0) ])
         {

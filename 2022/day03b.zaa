@@ -20,9 +20,9 @@ fn main -> int
 
     var fin = std::file::open("day03.txt");
 
-    for(var line : std::buffered_reader(&mut fin).lines)
+    for (var line : std::buffered_reader(&mut fin).lines)
     {
-      for(var ch : line)
+      for (var ch : line)
         group[state] |= 1 << (ch - 65);
 
       switch (state)

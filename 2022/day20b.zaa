@@ -11,7 +11,7 @@ fn main -> int
 
     var fin = std::file::open("day20.txt");
 
-    for(var line : std::buffered_reader(&mut fin).lines)
+    for (var line : std::buffered_reader(&mut fin).lines)
     {
       var n = i64(0);
       if (!std::sscanf(line, "{}", &mut n))
@@ -23,9 +23,9 @@ fn main -> int
     var N = cast<i64>(source.len - 1);
     var mapping = std::vector::from(std::iota(0, source.len));
 
-    for(var k = 0; k < 10; ++k)
+    for (var k = 0; k < 10; ++k)
     {
-      for(var i = 0; i < source.len; ++i)
+      for (var i = 0; i < source.len; ++i)
       {
         var j = mapping.erase(mapping.find(i)) - mapping.begin;
         mapping.insert(mapping.begin + cast<usize>((cast<i64>(j) + source[i]) % N + N) % mapping.len, i);
@@ -36,7 +36,7 @@ fn main -> int
 
     var j = mapping.find(source.find(0) - source.begin) - mapping.begin;
 
-    for(var i : [1000, 2000, 3000])
+    for (var i : [1000, 2000, 3000])
       sum += source[mapping[(j + i) % mapping.len]];
 
     std::print("part2: sum of the grove coordinates ", sum);

@@ -31,7 +31,7 @@ fn dijkstra(std::vector<std::vector<usize>> &graph, usize src, usize dst) -> int
 
     std::pop_heap(&mut queue[0 ..= last], |a, b| a.1 > b.1);
 
-    for(var v : graph[u])
+    for (var v : graph[u])
     {
       if (dist[u] + 1 < dist[v])
       {
@@ -50,7 +50,7 @@ fn solve(std::vector<valve> &valves, std::vector<int> &matrix, usize location, i
 {
   var best = time_remaining * rate;
 
-  for(var k = 0; k < targets.len; ++k)
+  for (var k = 0; k < targets.len; ++k)
   {
     var target = targets.head;
 
@@ -81,7 +81,7 @@ fn main -> int
 
     var fin = std::file::open("day16.txt");
 
-    for(var line : std::buffered_reader(&mut fin).lines)
+    for (var line : std::buffered_reader(&mut fin).lines)
     {
       var valve = valve();
       var s = std::string_view();
@@ -98,16 +98,16 @@ fn main -> int
 
     var graph = std::vector<std::vector<usize>>();
 
-    for(var &valve : valves)
+    for (var &valve : valves)
     {
       graph.push_back(std::vector::from(valve.tunnels.transform(|tunnel| [valvemap] valvemap[valvemap.find(tunnel)].value)));
     }
 
     var matrix = std::vector<int>::with_size(valves.len * valves.len);
 
-    for(var j = 0; j != valves.len; ++j)
+    for (var j = 0; j != valves.len; ++j)
     {
-      for(var i = 0; i != valves.len; ++i)
+      for (var i = 0; i != valves.len; ++i)
       {
         matrix[j*valves.len + i] = dijkstra(graph, j, i);
       }

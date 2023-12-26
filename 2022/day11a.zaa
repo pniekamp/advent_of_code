@@ -23,7 +23,7 @@ fn main -> int
     
     var input = std::readfile("day11.txt").chomp.gsub("\r\n", "\n");
 
-    for(var defn : input.split("\n\n"))
+    for (var defn : input.split("\n\n"))
     {
       var monkey = monkey();
       var items = std::string_view();
@@ -35,7 +35,7 @@ fn main -> int
       if (!std::sscanf(defn, "Monkey {}:\n Starting items: {}\n Operation: {}\n Test: {}\n If true: {}\n If false: {}\n", &mut monkey.id, &mut items, &mut operation, &mut test, &mut if_true, &mut if_false))
         std::panic("error scaning monkey from input '", defn, "'");
 
-      for(var item : items.split(", "))
+      for (var item : items.split(", "))
       {
         var level = i64(0);
         if (!std::sscanf(item, "{}", &mut level))
@@ -69,11 +69,11 @@ fn main -> int
     
     var counts = std::vector<i64>::with_size(monkeys.len);
 
-    for(var round = 0; round < 20; ++round)
+    for (var round = 0; round < 20; ++round)
     {
-      for(var mut &monkey : monkeys)
+      for (var mut &monkey : monkeys)
       {
-        for(var item : monkey.items.take(monkey.items.begin, monkey.items.end))
+        for (var item : monkey.items.take(monkey.items.begin, monkey.items.end))
         {
           var level = (monkey.coefficients[0]*item*item + monkey.coefficients[1]*item + monkey.coefficients[2]) / 3;
           var target = monkey.target[cast<usize>(level % monkey.divisor == 0)];

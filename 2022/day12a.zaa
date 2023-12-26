@@ -14,7 +14,7 @@ fn main -> int
 
     var fin = std::file::open("day12.txt");
 
-    for(var line : std::buffered_reader(&mut fin).lines)
+    for (var line : std::buffered_reader(&mut fin).lines)
     {
       if (var j = line.find_first('S'); j != line.end)
         s = (j - line.begin, heightmap.len);
@@ -35,9 +35,9 @@ fn main -> int
     var visited = heightmap;
     var paths = std::vector::from([std::vector::from([s])]);
 
-    for(; !paths.empty; steps += 1)
+    for (; !paths.empty; steps += 1)
     {
-      for(var &path : paths.take(paths.begin, paths.end))
+      for (var &path : paths.take(paths.begin, paths.end))
       {
         var p = path.back;
         var h = heightmap[p.1][p.0];
@@ -66,7 +66,7 @@ fn main -> int
             paths.push_back(path).push_back((p.0 + 1, p.1));
         }
 
-        for(var &path : paths)
+        for (var &path : paths)
         {
           visited[path.back.1][path.back.0] = 126;
         }

@@ -28,11 +28,11 @@ fn main -> int
       if (!std::sscanf(line, "Game {}: {}", &mut game.id, &mut draws))
         std::panic("error scaning game from input '", line, "'");
 
-      for(var handful : draws.split("; "))
+      for (var handful : draws.split("; "))
       {
         var draw = [ 0, 0, 0 ];
 
-        for(var cubes : handful.split(", "))
+        for (var cubes : handful.split(", "))
         {
           var n = 0;
           var color = std::string_view();
@@ -64,7 +64,7 @@ fn main -> int
 
     var count = 0;
 
-    for(var &game : games)
+    for (var &game : games)
     {
       if (std::any_of(game.draws, |draw| draw[0] > 12))
         continue;

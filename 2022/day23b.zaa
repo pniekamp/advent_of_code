@@ -17,7 +17,7 @@ fn dump(map &map)
 {
   var extents = [999999, 999999, 0, 0]; // top, left, bottom, right
 
-  for(var &(elf, _) : map.elves)
+  for (var &(elf, _) : map.elves)
   {
     extents[0] = std::min(extents[0], elf.1);
     extents[1] = std::min(extents[1], elf.0);
@@ -25,9 +25,9 @@ fn dump(map &map)
     extents[3] = std::max(extents[3], elf.0);
   }
 
-  for(var y = extents[0]; y <= extents[2]; ++y)
+  for (var y = extents[0]; y <= extents[2]; ++y)
   {
-    for(var x = extents[1]; x <= extents[3]; ++x)
+    for (var x = extents[1]; x <= extents[3]; ++x)
     {
       if (map.elves.contains((x, y)))
         std::putc('#');
@@ -58,10 +58,10 @@ fn simulate(map mut &map, usize round) -> usize
   var elves = map.elves.take(map.elves.begin, map.elves.end);
   var proposals = std::vector<(position, position)>();
 
-  for(var (p, _) : elves)
+  for (var (p, _) : elves)
   {
     var adjacent = [false; 8];
-    for(var j = 0; j < adjacent.len; ++j)
+    for (var j = 0; j < adjacent.len; ++j)
     {
       var dp = adjacent_positions[j];
 
@@ -72,7 +72,7 @@ fn simulate(map mut &map, usize round) -> usize
     {
       var dp = (0, 0);
 
-      for(var n = 0; n < 4; ++n)
+      for (var n = 0; n < 4; ++n)
       {
         switch ((n + round) % 4)
         {
@@ -107,13 +107,13 @@ fn simulate(map mut &map, usize round) -> usize
 
   std::sort(&mut proposals, |a, b| a.1 < b.1);
 
-  for(var i = proposals.begin; i != proposals.end; ++i)
+  for (var i = proposals.begin; i != proposals.end; ++i)
   {
     if (i+1 != proposals.end && proposals[i].1 == proposals[i+1].1)
     {
       map.elves.insert(proposals[i].0);
 
-      for(var j = i+1; j != proposals.end && proposals[j].1 == proposals[i].1; ++j)
+      for (var j = i+1; j != proposals.end && proposals[j].1 == proposals[i].1; ++j)
       {
         map.elves.insert(proposals[j].0);
 
@@ -139,9 +139,9 @@ fn main -> int
 
     var fin = std::file::open("day23.txt");
 
-    for(var y = 0, var line : std::buffered_reader(&mut fin).lines)
+    for (var y = 0, var line : std::buffered_reader(&mut fin).lines)
     {
-      for(var x = 0, var ch : line)
+      for (var x = 0, var ch : line)
       {
         if (ch == cast('#'))
           map.elves.insert((x, y));
@@ -154,7 +154,7 @@ fn main -> int
 
     var count = 0;
 
-    for(var round = 0; true; ++round)
+    for (var round = 0; true; ++round)
     {
       var n = simulate(&mut map, round);
 

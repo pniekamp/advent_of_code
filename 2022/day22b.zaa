@@ -195,9 +195,9 @@ struct map
 
 fn dump(map&map, position position)
 {
-  for(var y = 0; y < map.tiles.len; ++y)
+  for (var y = 0; y < map.tiles.len; ++y)
   {
-    for(var x = 0; x < map.tiles[y].len; ++x)
+    for (var x = 0; x < map.tiles[y].len; ++x)
     {
       if (x == position.0 && y == position.1)
         std::putc('@');
@@ -221,7 +221,7 @@ fn main -> int
     var fin = std::file::open("day22.txt");
     var reader = std::buffered_reader(&mut fin);
 
-    for(var line : reader.lines)
+    for (var line : reader.lines)
     {
       if (line.empty)
         break;
@@ -235,7 +235,7 @@ fn main -> int
     var facing = direction::east;
     var position = position(map.tiles[0].find_first('.') - map.tiles[0].begin, 0);
 
-    for(var ch = path.begin; ch != path.end; )
+    for (var ch = path.begin; ch != path.end; )
     {
       switch (*ch)
       {
@@ -251,7 +251,7 @@ fn main -> int
           var n = int();
           ch += std::atoi(ch, path.end, &mut n).len;
 
-          for(var i = 0; i < n; ++i)
+          for (var i = 0; i < n; ++i)
           {
             if (var (newpos, newfac) = map.move(position, facing); map.at(newpos) == '.')
             {

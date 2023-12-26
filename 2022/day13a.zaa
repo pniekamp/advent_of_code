@@ -40,7 +40,7 @@ fn lex(std::string_view packet, usize mut &cursor) -> token
     case '[':
       var beg = cursor;
 
-      for(var nesting = 0; cursor != packet.len; )
+      for (var nesting = 0; cursor != packet.len; )
       {
         if (packet[cursor] == cast('['))
           nesting += 1;
@@ -75,7 +75,7 @@ fn lex(std::string_view packet, usize mut &cursor) -> token
 
 fn compare(std::string_view left, std::string_view right) -> result
 {
-  for(var i = 0, var j = 0;; )
+  for (var i = 0, var j = 0;; )
   {
     var lhs = lex(left, &mut i);
     var rhs = lex(right, &mut j);
@@ -142,7 +142,7 @@ fn main -> int
 
     var input = std::readfile("day13.txt").chomp.gsub("\r\n", "\n");
 
-    for(var pairs : input.split("\n\n"))
+    for (var pairs : input.split("\n\n"))
     {
       var packets = pairs.trim.cut('\n');
 

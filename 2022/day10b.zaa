@@ -66,9 +66,9 @@ struct tricorder
 
   fn vsync(this &) -> void
   {
-    for(var &row : this.crt)
+    for (var &row : this.crt)
     {
-      for(var &ch : row)
+      for (var &ch : row)
         std::putc(ch);
 
       std::putc('\n');
@@ -87,7 +87,7 @@ fn main -> int
 
     var fin = std::file::open("day10.txt");
 
-    for(var line : std::buffered_reader(&mut fin).lines)
+    for (var line : std::buffered_reader(&mut fin).lines)
     {
       tricorder.execute(tricorder::decode(line));
     }

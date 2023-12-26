@@ -12,7 +12,7 @@ enum resource
 
   fn from(std::String &tok) -> resource
   {
-    #for(const k : std::meta::enumerators_of($resource))
+    #for (const k : std::meta::enumerators_of($resource))
       if (tok == std::meta::name_of(k))
         return resource::#k;
 
@@ -74,7 +74,7 @@ fn main -> int
 
     var parser = parser();
 
-    for(var tok : input.words)
+    for (var tok : input.words)
     {
       switch (parser.state)
       {
@@ -123,7 +123,7 @@ fn main -> int
       }
     }
 
-    for(var &blueprint : blueprints)
+    for (var &blueprint : blueprints)
     {
       struct state
       {
@@ -139,9 +139,9 @@ fn main -> int
       }
 
       var maxcpm = stockpile();
-      for(var &(type, cost) : blueprint.recipes)
+      for (var &(type, cost) : blueprint.recipes)
       {
-        for(var i = 0; i < cost.len; ++i)
+        for (var i = 0; i < cost.len; ++i)
           maxcpm[i] = std::max(maxcpm[i], cost[i]);
       }
 
@@ -151,13 +151,13 @@ fn main -> int
 
       threads[0].bots[resource::ore] = 1;
 
-      for(var time_remaining = 24; time_remaining != 0; --time_remaining)
+      for (var time_remaining = 24; time_remaining != 0; --time_remaining)
       {
         //std::print("time: ", time_remaining, " ", threads.len);
-        //for(var &thread : threads)
+        //for (var &thread : threads)
         //  std::print("  ", thread.bots, " ", thread.resources);
 
-        for(var mut &thread : threads.take(threads.begin, threads.end))
+        for (var mut &thread : threads.take(threads.begin, threads.end))
         {
           var estimate = thread.resources[resource::geode] + thread.bots[resource::geode]*time_remaining;
 
@@ -170,7 +170,7 @@ fn main -> int
           if (history.contains(thread))
             continue;
 
-          for(var &(type, cost) : blueprint.recipes)
+          for (var &(type, cost) : blueprint.recipes)
           {
             if (type != resource::geode && thread.bots[type] == maxcpm[type])
               continue;
@@ -179,10 +179,10 @@ fn main -> int
             {
               var thread = thread;
 
-              for(var i = 0; i < thread.resources.len; ++i)
+              for (var i = 0; i < thread.resources.len; ++i)
                 thread.resources[i] -= cost[i];
 
-              for(var i = 0; i < thread.resources.len; ++i)
+              for (var i = 0; i < thread.resources.len; ++i)
                 thread.resources[i] += thread.bots[i];
 
               thread.bots[type] += 1;
@@ -196,7 +196,7 @@ fn main -> int
           if (std::all_of(std::zip(thread.resources, maxcpm), |c| c.0 >= c.1))
             continue;
 
-          for(var i = 0; i < thread.resources.len; ++i)
+          for (var i = 0; i < thread.resources.len; ++i)
             thread.resources[i] += thread.bots[i];
 
           threads.push_back(&move thread);

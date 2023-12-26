@@ -34,7 +34,7 @@ fn main -> int
 
     var fin = std::file::open("day21.txt");
 
-    for(var line : std::buffered_reader(&mut fin).lines)
+    for (var line : std::buffered_reader(&mut fin).lines)
     {
       var monkey = monkey();
 
@@ -64,7 +64,7 @@ fn main -> int
     var stack = std::vector<monkey&>();
     var results = std::flat_hash_map<std::string_view, i64>();
 
-    for(var &monkey : monkeys)
+    for (var &monkey : monkeys)
     {
       switch (monkey.action)
       {
@@ -78,7 +78,7 @@ fn main -> int
 
     while (results.len != monkeys.len)
     {
-      for(var &monkey : stack.take(stack.begin, stack.end))
+      for (var &monkey : stack.take(stack.begin, stack.end))
       {
         switch (monkey.action)
         {

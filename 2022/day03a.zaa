@@ -18,14 +18,14 @@ fn main -> int
 
     var fin = std::file::open("day03.txt");
 
-    for(var line : std::buffered_reader(&mut fin).lines)
+    for (var line : std::buffered_reader(&mut fin).lines)
     {
       var compartments = [<u64>: 0, 0];
 
-      for(var ch : line[0 .. line.len/2])
+      for (var ch : line[0 .. line.len/2])
         compartments[0] |= 1 << (ch - 65);
 
-      for(var ch : line[line.len/2 .. line.len])
+      for (var ch : line[line.len/2 .. line.len])
         compartments[1] |= 1 << (ch - 65);
 
       sum += cast<i64>(priority(std::ctz(compartments[0] & compartments[1])));

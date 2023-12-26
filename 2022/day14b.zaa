@@ -13,9 +13,9 @@ using position = (int, int);
 
 fn dump(std::flat_hash_map<position, fill> &cave, int[4] extents)
 {
-  for(var j = 0; j <= extents[2]; ++j)
+  for (var j = 0; j <= extents[2]; ++j)
   {
-    for(var i = extents[1]; i <= extents[3]; ++i)
+    for (var i = extents[1]; i <= extents[3]; ++i)
     {
       if (var j = cave.find((i, j)); j != cave.end)
         switch (cave[j].value)
@@ -88,7 +88,7 @@ fn main -> int
 
     var fin = std::file::open("day14.txt");
 
-    for(var line : std::buffered_reader(&mut fin).lines)
+    for (var line : std::buffered_reader(&mut fin).lines)
     {
       var start = position();
       line.remove_prefix!(std::sscanf(line, "{},{}", &mut start.0, &mut start.1).len);
@@ -101,14 +101,14 @@ fn main -> int
         var dx = std::signum(next.0 - start.0);
         var dy = std::signum(next.1 - start.1);
 
-        for(; start != next; start.0 += dx, start.1 += dy)
+        for (; start != next; start.0 += dx, start.1 += dy)
           cave.insert(start, fill::rock);
 
         cave.insert(next, fill::rock);
       }
     }
 
-    for(var &(pos, fill) : cave)
+    for (var &(pos, fill) : cave)
     {
       extents[0] = std::min(extents[0], pos.1);
       extents[1] = std::min(extents[1], pos.0);

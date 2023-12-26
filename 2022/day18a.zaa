@@ -15,7 +15,7 @@ fn main -> int
 
     var fin = std::file::open("day18.txt");
 
-    for(var line : std::buffered_reader(&mut fin).lines)
+    for (var line : std::buffered_reader(&mut fin).lines)
     {
       var pt = position();
 
@@ -25,11 +25,11 @@ fn main -> int
       cubes.push_back(pt);
     }
 
-    for(var pt : cubes)
+    for (var pt : cubes)
     {
       var adjacent = 0;
 
-      for(var d : D)
+      for (var d : D)
       {
         if (cubes.find((pt.0 + d.0, pt.1 + d.1, pt.2 + d.2)) != cubes.end)
           adjacent += 1;

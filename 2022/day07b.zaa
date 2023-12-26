@@ -12,7 +12,7 @@ fn main -> int
 
     var fin = std::file::open("day07.txt");
 
-    for(var line : std::buffered_reader(&mut fin).lines)
+    for (var line : std::buffered_reader(&mut fin).lines)
     {
       if (line.starts_with("$ cd"))
       {
@@ -36,7 +36,7 @@ fn main -> int
         if (std::sscanf(line, "{} {}", &mut size, &mut name).error)
           std::panic("error scaning file entry '", line, "'");
 
-        for(var part : current_directory.split("/"))
+        for (var part : current_directory.split("/"))
         {
           var path = current_directory[current_directory.begin .. part.end];
 
@@ -51,7 +51,7 @@ fn main -> int
 
     var smallest = used_space;
 
-    for(var &(name, size) : directories)
+    for (var &(name, size) : directories)
     {
       if (size < required)
         continue;

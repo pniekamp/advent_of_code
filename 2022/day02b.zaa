@@ -10,7 +10,7 @@ fn main -> int
 
     var fin = std::file::open("day02.txt");
 
-    for(var line : std::buffered_reader(&mut fin).lines)
+    for (var line : std::buffered_reader(&mut fin).lines)
     {
       switch (line[2])
       {

@@ -12,11 +12,11 @@ fn main -> int
     var n = map[0].len;
     var visible = std::vector<bool>::with_size(m*n);
 
-    for(var j = 0; j != m; ++j)
+    for (var j = 0; j != m; ++j)
     {
       var h = 0;
 
-      for(var i = 0; i != n; ++i)
+      for (var i = 0; i != n; ++i)
       {
         if (h < map[j][i])
           visible[j*n+i] = true;
@@ -40,11 +40,11 @@ fn main -> int
       }
     }
 
-    for(var i = 0; i != n; ++i)
+    for (var i = 0; i != n; ++i)
     {
       var h = 0;
 
-      for(var j = 0; j != m; ++j)
+      for (var j = 0; j != m; ++j)
       {
         if (h < map[j][i])
           visible[j*n+i] = true;

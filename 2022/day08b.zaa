@@ -13,22 +13,22 @@ fn main -> int
     var m = map.len;
     var n = map[0].len;
 
-    for(var j = 1; j != m-1; ++j)
+    for (var j = 1; j != m-1; ++j)
     {
-      for(var i = 1; i != n-1; ++i)
+      for (var i = 1; i != n-1; ++i)
       {
         var d = [1, 1, 1, 1];
 
-        for(var k = i - 1; k != 0 && map[j][k] < map[j][i]; --k)
+        for (var k = i - 1; k != 0 && map[j][k] < map[j][i]; --k)
           d[0] += 1;
 
-        for(var k = j + 1; k != m-1 && map[k][i] < map[j][i]; ++k)
+        for (var k = j + 1; k != m-1 && map[k][i] < map[j][i]; ++k)
           d[1] += 1;
 
-        for(var k = i + 1; k != n-1 && map[j][k] < map[j][i]; ++k)
+        for (var k = i + 1; k != n-1 && map[j][k] < map[j][i]; ++k)
           d[2] += 1;
 
-        for(var k = j - 1; k != 0 && map[k][i] < map[j][i]; --k)
+        for (var k = j - 1; k != 0 && map[k][i] < map[j][i]; --k)
           d[3] += 1;
 
         if (var score = d[0] * d[1] * d[2] * d[3]; best < score)

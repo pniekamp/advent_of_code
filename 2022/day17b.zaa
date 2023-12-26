@@ -63,7 +63,7 @@ fn fits(chamber &chamber, rock &rock, position &position) -> bool
   if (position.1 - rock.height < -1)
     return false;
 
-  for(var &(x, y) : rock.shape)
+  for (var &(x, y) : rock.shape)
   {
     if (chamber.hit((position.0 + x, position.1 - y)))
       return false;
@@ -74,7 +74,7 @@ fn fits(chamber &chamber, rock &rock, position &position) -> bool
 
 fn insert(chamber mut &chamber, rock &rock, position &position) -> bool
 {
-  for(var &(x, y) : rock.shape)
+  for (var &(x, y) : rock.shape)
   {
     chamber.fill.insert((position.0 + x, position.1 - y), true);
   }
@@ -83,7 +83,7 @@ fn insert(chamber mut &chamber, rock &rock, position &position) -> bool
     chamber.height = position.1 + 1;
 
   var max = 0;
-  for(var i = 0; i < chamber.width; ++i)
+  for (var i = 0; i < chamber.width; ++i)
   {
     var depth = 0;
     while (depth < chamber.height && !chamber.hit((i, chamber.height - depth)))
@@ -98,7 +98,7 @@ fn insert(chamber mut &chamber, rock &rock, position &position) -> bool
     var y = chamber.height - max;
     var remaining = std::flat_hash_map<position, bool>();
 
-    for(var &(pt, _) : chamber.fill)
+    for (var &(pt, _) : chamber.fill)
     {
       if (pt.1 >= y)
         remaining.insert((pt.0, pt.1 - y), true);
@@ -116,11 +116,11 @@ fn dump(chamber &chamber, rock &rock, position &position)
 {
   std::print(position, " ", rock);
 
-  for(var y = position.1; y >= 0; --y)
+  for (var y = position.1; y >= 0; --y)
   {
     std::putc('|');
 
-    for(var x = 0; x < chamber.width; ++x)
+    for (var x = 0; x < chamber.width; ++x)
     {
       if (rock.hit((x - position.0, position.1 - y)))
       {
@@ -142,7 +142,7 @@ fn dump(chamber &chamber, rock &rock, position &position)
     std::putc('\n');
   }
 
-  for(var x = 0; x < chamber.width + 2; ++x)
+  for (var x = 0; x < chamber.width + 2; ++x)
     std::putc('-');
 
   std::putc('\n');
@@ -158,13 +158,13 @@ fn main -> int
 
     var input = std::readfile("day17.rocks.txt").chomp.gsub("\r\n", "\n");
 
-    for(var lines : input.split("\n\n"))
+    for (var lines : input.split("\n\n"))
     {
       var rock = rock();
 
-      for(var y = 0, var line : lines.split("\n");; ++y)
+      for (var y = 0, var line : lines.split("\n");; ++y)
       {
-        for(var x = 0, var ch : line;; ++x)
+        for (var x = 0, var ch : line;; ++x)
         {
           if (ch == cast('#'))
             rock.shape.push_back((x, y));
@@ -184,9 +184,9 @@ fn main -> int
 
     var pattern = std::readfile("day17.txt").chomp;
 
-    for(var n = i64(1000000000000); count < n; )
+    for (var n = i64(1000000000000); count < n; )
     {
-      for(var index = 0, var ch : pattern;; ++index)
+      for (var index = 0, var ch : pattern;; ++index)
       {
         switch (ch)
         {

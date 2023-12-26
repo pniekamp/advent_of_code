@@ -10,7 +10,7 @@ fn main -> int
 
     var fin = std::file::open("day25.txt");
 
-    for(var line : std::buffered_reader(&mut fin).lines)
+    for (var line : std::buffered_reader(&mut fin).lines)
     {
       var fuel = 0;
 

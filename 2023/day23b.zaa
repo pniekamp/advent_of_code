@@ -17,7 +17,7 @@ struct map
 
   struct node
   {
-    std::vector<((int, int), int)> neighbors;
+    std::vector<((int, int), int), N:4> neighbors;
 
     node() = default;
     node(node&&) = default;

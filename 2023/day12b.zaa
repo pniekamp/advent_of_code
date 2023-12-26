@@ -47,7 +47,7 @@ fn main -> int
 
       for (var run : record.damaged)
       {
-        for(var (thread, count) : stack.take(stack.begin, stack.end))
+        for (var (thread, count) : stack.take(stack.begin, stack.end))
         {
           var thread = thread;
 

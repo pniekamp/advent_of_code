@@ -16,7 +16,7 @@ fn main -> int
 
     var fin = std::file::open("day18.txt");
 
-    for(var line : std::buffered_reader(&mut fin).lines)
+    for (var line : std::buffered_reader(&mut fin).lines)
     {
       var pt = position();
 
@@ -29,7 +29,7 @@ fn main -> int
     var min = cubes[0];
     var max = cubes[0];
 
-    for(var pt : cubes)
+    for (var pt : cubes)
     {
       min.0 = std::min(min.0, pt.0 - 1);
       min.1 = std::min(min.1, pt.1 - 1);
@@ -42,16 +42,16 @@ fn main -> int
 
     var exterior = std::flat_hash_map<position, bool>();
 
-    for(var stack = std::vector::from([(min.0, min.1, min.2)]); !stack.empty; )
+    for (var stack = std::vector::from([(min.0, min.1, min.2)]); !stack.empty; )
     {
-      for(var pt : stack.take(stack.begin, stack.end))
+      for (var pt : stack.take(stack.begin, stack.end))
       {
         if (exterior.contains(pt))
           continue;
 
         exterior.insert(pt, true);
 
-        for(var d : D)
+        for (var d : D)
         {
           if (!(min.0 <= pt.0 && pt.0 <= max.0 && min.1 <= pt.1 && pt.1 <= max.1 && min.2 <= pt.2 && pt.2 <= max.2))
             continue;
@@ -62,11 +62,11 @@ fn main -> int
       }
     }
 
-    for(var pt : cubes)
+    for (var pt : cubes)
     {
       var surface = 0;
 
-      for(var d : D)
+      for (var d : D)
       {
         if (exterior.contains((pt.0 + d.0, pt.1 + d.1, pt.2 + d.2)))
           surface += 1;

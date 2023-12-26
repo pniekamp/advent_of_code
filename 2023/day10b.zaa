@@ -188,7 +188,7 @@ fn main -> int
 
     while (stack.len != 0)
     {
-      for(var p : stack.take(stack.begin, stack.end))
+      for (var p : stack.take(stack.begin, stack.end))
       {
         if (visited.contains(p))
           continue;

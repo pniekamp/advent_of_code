@@ -29,9 +29,9 @@ struct map
 
 fn dump(map &map, position p) -> void
 {
-  for(var y = 0, var &line : map.tiles)
+  for (var y = 0, var &line : map.tiles)
   {
-    for(var x = 0, var ch : line)
+    for (var x = 0, var ch : line)
     {
       var j = std::equal_range(map.blizzards.transform(|k| k.0), (x, y));
 
@@ -63,7 +63,7 @@ fn dump(map &map, position p) -> void
 
 fn simulate(map mut &map) -> void
 {
-  for(var mut &(xy, d) : map.blizzards)
+  for (var mut &(xy, d) : map.blizzards)
   {
     switch (d)
     {
@@ -100,9 +100,9 @@ fn main -> int
 
     var fin = std::file::open("day24.txt");
 
-    for(var y = 0, var line : std::buffered_reader(&mut fin).lines)
+    for (var y = 0, var line : std::buffered_reader(&mut fin).lines)
     {
-      for(var x = 0, var ch : line)
+      for (var x = 0, var ch : line)
       {
         switch (ch)
         {
@@ -121,7 +121,7 @@ fn main -> int
       y += 1;
     }
 
-    for(var &(xy, d) : map.blizzards)
+    for (var &(xy, d) : map.blizzards)
     {
       map.tiles[cast<usize>(xy.1)][cast<usize>(xy.0)] = cast('.');
     }
@@ -140,9 +140,9 @@ fn main -> int
     {
       simulate(&mut map);
 
-      for(var (p, _) : stack.take(stack.begin, stack.end))
+      for (var (p, _) : stack.take(stack.begin, stack.end))
       {
-        for(var d : [(0, 0), (0, -1), (+1, 0), (0, +1), (-1, 0)])
+        for (var d : [(0, 0), (0, -1), (+1, 0), (0, +1), (-1, 0)])
         {
           var np = (p.0 + d.0, p.1 + d.1);
 

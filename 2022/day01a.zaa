@@ -10,11 +10,11 @@ fn main -> int
 
     var input = std::readfile("day01.txt").chomp.gsub("\r\n", "\n");
 
-    for(var snacks : input.split("\n\n"))
+    for (var snacks : input.split("\n\n"))
     {
       var sum = 0;
 
-      for(var line : snacks.lines)
+      for (var line : snacks.lines)
       {
         var calories = i64(0);
         if (std::sscan(line, &mut calories).error)

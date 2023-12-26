@@ -44,7 +44,7 @@ fn main -> int
         {
           var adjacent = false;
 
-          for(var j = std::max(y - 1, 0); j <= std::min(y + 1, cast(map.cells.len - 1)); ++j)
+          for (var j = std::max(y - 1, 0); j <= std::min(y + 1, cast(map.cells.len - 1)); ++j)
           {
             if (std::any_of(map.span(x - 1, j, len + 2), |cell| !std::is_digit(cell) && cell != cast('.')))
               adjacent = true;

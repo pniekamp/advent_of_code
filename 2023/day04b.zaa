@@ -49,13 +49,13 @@ fn main -> int
 
     var copies = std::vector<int>::with_size(cards.len + 1);
 
-    for(var &card : cards)
+    for (var &card : cards)
     {
       copies[card.id] += 1;
 
       var winners = std::count_if(card.numbers, |n| card.winners.find(n) != card.winners.end);
 
-      for(var i = card.id + 1; i <= card.id + winners; ++i)
+      for (var i = card.id + 1; i <= card.id + winners; ++i)
         copies[i] += copies[card.id];
     }
 

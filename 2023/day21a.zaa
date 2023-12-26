@@ -62,7 +62,7 @@ fn main -> int
 
     for (var step = 0; step < 64; ++step)
     {
-      for(var &(p, _) : plots.take(plots.begin, plots.end))
+      for (var &(p, _) : plots.take(plots.begin, plots.end))
       {
         for (var dp : [ (0, -1), (1, 0), (0, 1), (-1, 0) ])
         {

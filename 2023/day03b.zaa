@@ -42,9 +42,9 @@ fn main -> int
 
         if (var len = std::sscanf(map.span(x, y, 8), "{}", &mut n).len; n > 0)
         {
-          for(var j = std::max(y - 1, 0); j <= std::min(y + 1, cast(map.cells.len - 1)); ++j)
+          for (var j = std::max(y - 1, 0); j <= std::min(y + 1, cast(map.cells.len - 1)); ++j)
           {
-            for(var i = x - 1; i <= x + cast(len); ++i)
+            for (var i = x - 1; i <= x + cast(len); ++i)
             {
               if (map.span(i, j, 1) == "*")
                 map.gears.emplace((i, j)).push_back(n);
@@ -58,7 +58,7 @@ fn main -> int
 
     var sum = 0;
 
-    for(var &(position, numbers) : map.gears)
+    for (var &(position, numbers) : map.gears)
     {
       if (numbers.len == 2)
         sum += cast<i64>(numbers[0]) * cast<i64>(numbers[1]);

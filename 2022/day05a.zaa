@@ -11,7 +11,7 @@ fn main -> int
 
     var defn = std::vector<std::string>();
 
-    for(var line : reader.lines)
+    for (var line : reader.lines)
     {
       if (line.empty)
         break;
@@ -21,16 +21,16 @@ fn main -> int
 
     var stacks = std::vector<std::vector<u8>>::with_size(defn.back.len / 4 + 1);
 
-    for(var line : defn.reverse.drop_n(1))
+    for (var line : defn.reverse.drop_n(1))
     {
-      for(var i = 1; i < line.len; i += 4)
+      for (var i = 1; i < line.len; i += 4)
         if (line[i] != cast(' '))
           stacks[(i - 1)/4].push_back(line[i]);
     }
 
     std::skip_line(&mut reader);
 
-    for(var line : reader.lines)
+    for (var line : reader.lines)
     {
       var n = usize(0);
       var src = usize(0);

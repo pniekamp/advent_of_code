@@ -10,11 +10,11 @@ fn main -> int
 
     var input = std::readfile("day06.txt");
 
-    for( ; i < input.len; ++i)
+    for ( ; i < input.len; ++i)
     {
       var message = 0;
 
-      for(var ch : input[i-14 .. i])
+      for (var ch : input[i-14 .. i])
         message |= 1 << (ch - 65);
 
       if (std::popcnt(message) == 14)

@@ -39,7 +39,7 @@ fn main -> int
 
       for (var run : record.damaged)
       {
-        for(var thread : stack.take(stack.begin, stack.end))
+        for (var thread : stack.take(stack.begin, stack.end))
         {
           while (!thread.empty)
           {

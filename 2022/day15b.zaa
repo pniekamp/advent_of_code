@@ -33,7 +33,7 @@ fn main -> int
 
     var fin = std::file::open("day15.txt");
 
-    for(var line : std::buffered_reader(&mut fin).lines)
+    for (var line : std::buffered_reader(&mut fin).lines)
     {
       var sensor = sensor();
 
@@ -43,13 +43,13 @@ fn main -> int
       sensors.push_back(sensor);
     }
 
-    for(var y = 0; y <= 4000000; ++y)
+    for (var y = 0; y <= 4000000; ++y)
     {
-      for(var x = 0; x <= 4000000; ++x)
+      for (var x = 0; x <= 4000000; ++x)
       {
         var possible = true;
 
-        for(var &sensor : sensors)
+        for (var &sensor : sensors)
         {
           var span = sensor.span_at(y);
 
