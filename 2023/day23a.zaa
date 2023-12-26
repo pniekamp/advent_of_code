@@ -136,7 +136,7 @@ fn main -> int
       }
     }
 
-    std::print("part2: maximum path length ", max);
+    std::print("part1: maximum path length ", max);
 
   }
   catch(std::error e)
