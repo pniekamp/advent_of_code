@@ -97,3 +97,4 @@ part1: test area intersections 16502
 part2: initial position 673641951253289
 
 day 25
+part1: group sizes 533628

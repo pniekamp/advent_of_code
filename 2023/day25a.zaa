@@ -1,0 +1,104 @@
+import std.stdio;
+import std.algorithm;
+import std.flat_hash_map;
+import std.scan;
+
+fn edmonds_karp(std::flat_hash_map<std::string, std::vector<std::string>> &graph, std::string &source, std::string &target) -> (int, usize)
+{
+  var flow = 0;
+  var residual = std::flat_hash_map<(std::string, std::string), int>();
+
+  while (true)
+  {
+    var queue = std::flat_hash_map<std::string, void>();
+    var visited = std::flat_hash_map<std::string, std::string>();
+
+    queue.insert(source);
+
+    while (!queue.empty)
+    {
+      for (var (curr, _) : queue.take(queue.begin, queue.end))
+      {
+        for (var &next : graph[curr])
+        {
+          if (next == source)
+            continue;
+
+          if (!visited.contains(next) && residual.get((curr, next)) ?? 0 < 1)
+          {
+            queue.insert(next);
+            visited.insert(next, curr);
+          }
+        }
+      }
+
+      if (queue.contains(target))
+        break;
+    }
+
+    if (!queue.contains(target))
+      return (flow, visited.len + 1);
+
+    var minflow = std::numeric_traits<int>::max;
+
+    for (var curr = target, var prev = visited.get(curr); prev = visited.get(curr); curr = prev?!)
+    {
+      minflow = std::min(minflow, 1 - residual.get((*prev, curr)) ?? 0);
+    }
+
+    for (var curr = target, var prev = visited.get(curr); prev = visited.get(curr); curr = prev?!)
+    {
+      residual.emplace((*prev, curr)) += minflow;
+      residual.emplace((curr, *prev)) -= minflow;
+    }
+
+    flow += minflow;
+  }
+}
+
+fn main -> int
+{
+  try
+  {
+    var components = std::flat_hash_map<std::string, std::vector<std::string>>();
+
+    var fin = std::file::open("day25.txt");
+
+    for (var line : std::buffered_reader(&mut fin).lines)
+    {
+      var (name, list) = line.cut(": ");
+
+      for (var &item : list.words)
+      {
+        components.emplace(name).push_back(item);
+        components.emplace(item).push_back(name);
+      }
+    }
+
+    for (var mut &(name, list) : components)
+    {
+      list.erase(std::unique(&mut list.sort!), list.end);
+    }
+
+    var length = 0;
+
+    for (var &(target, _) : components)
+    {
+      if (var flow = edmonds_karp(components, components.front.key, target); flow.0 == 3)
+      {
+        length = flow.1;
+
+        break;
+      }
+    }
+
+    std::print("part1: group sizes ", length * (components.len - length));
+
+  }
+  catch(std::error e)
+  {
+    std::panic(e);
+  }
+
+  return 0;
+}
