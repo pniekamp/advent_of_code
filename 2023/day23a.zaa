@@ -118,7 +118,7 @@ fn main -> int
       {
         if (p == (cast<int>(map.tiles[0].len - 2), cast<int>(map.tiles.len - 1)))
         {
-          var steps = std::accumulate(history, int(0), |s, k| s + k.value);
+          var steps = std::accumulate(history, 0, |s, k| s + k.value);
 
           if (max < steps)
             max = steps;
