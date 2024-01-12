@@ -14,7 +14,7 @@ struct map
   {
     var j = std::lower_bound(map.blizzards.transform(|k| k.0), p);
 
-    if (j != map.blizzards.end && map.blizzards[j.base].0 == p)
+    if (j.base != map.blizzards.end && map.blizzards[j.base].0 == p)
       return '*';
 
     if (0 <= p.1 && cast<usize>(p.1) < map.tiles.len && 0 <= p.0 && cast<usize>(p.0) < map.tiles[cast<usize>(p.1)].len)

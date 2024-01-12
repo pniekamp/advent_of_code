@@ -42,7 +42,7 @@ fn main -> int
       stacks[dst - 1].append(stacks[src - 1].take(stacks[src - 1].end - n, stacks[src - 1].end));
     }
 
-    std::print("part2: crates on top ", std::string::from_utf8(stacks.transform(|stack| stack.back)));
+    std::print("part2: crates on top ", std::string::from(stacks.transform(|stack| stack.back)));
 
   }
   catch(std::error e)

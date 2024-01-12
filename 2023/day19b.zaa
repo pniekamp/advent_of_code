@@ -96,7 +96,7 @@ fn main -> int
       {
         if (target == "A")
         {
-          total += std::accumulate(range, 1, |seed, span| seed * cast<i64>(span.1 - span.0 + 1));
+          total += std::fold_left(range, 1, |seed, span| seed * cast<i64>(span.1 - span.0 + 1));
         }
       }
     }
