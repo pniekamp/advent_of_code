@@ -70,7 +70,7 @@ fn solve(std::vector<valve> &valves, std::vector<int> &matrix, usize location, i
         best = released;
     }
 
-    std::rotate_left(&mut targets);
+    std::rotate_left!(&mut targets);
   }
 
   return best;
