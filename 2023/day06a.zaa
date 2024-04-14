@@ -35,7 +35,7 @@ fn main -> int
     for (var line = buffer1.trim.strip_prefix("Time:"); !line.empty; )
     {
       var time = 0;
-      line.remove_prefix!(std::sscanf(line, " {}", &mut time).len);
+      line.drop_front!(std::sscanf(line, " {}", &mut time).len);
 
       races.times.push_back(time);
     }
@@ -46,7 +46,7 @@ fn main -> int
     for (var line = buffer2.trim.strip_prefix("Distance:"); !line.empty; )
     {
       var distance = 0;
-      line.remove_prefix!(std::sscanf(line, " {}", &mut distance).len);
+      line.drop_front!(std::sscanf(line, " {}", &mut distance).len);
 
       races.distances.push_back(distance);
     }

@@ -53,16 +53,16 @@ fn main -> int
 
           while (!thread.empty)
           {
-            if (std::count_if(thread.take_n(run), |k| k == cast('#') || k == cast('?')) == run)
+            if (std::count_if(thread.take_front(run), |k| k == cast('#') || k == cast('?')) == run)
             {
-              if (!thread.remove_prefix(run).starts_with('#'))
-                stack.emplace(thread.remove_prefix(std::min(thread.len, run + 1)), 0) += count;
+              if (!thread.drop_front(run).starts_with('#'))
+                stack.emplace(thread.drop_front(std::min(thread.len, run + 1)), 0) += count;
             }
 
             if (thread.starts_with('#'))
               break;
 
-            thread.remove_prefix!(1);
+            thread.drop_front!(1);
           }
         }
       }

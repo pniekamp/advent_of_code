@@ -82,7 +82,7 @@ fn main -> int
     {
       var id = i64(0);
       var len = i64(0);
-      line.remove_prefix!(std::sscanf(line, " {} {}", &mut id, &mut len).len);
+      line.drop_front!(std::sscanf(line, " {} {}", &mut id, &mut len).len);
 
       almanac.seeds.push_back((id, len));
     }

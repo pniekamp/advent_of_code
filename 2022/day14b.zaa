@@ -91,12 +91,12 @@ fn main -> int
     for (var line : std::buffered_reader(&mut fin).lines)
     {
       var start = position();
-      line.remove_prefix!(std::sscanf(line, "{},{}", &mut start.0, &mut start.1).len);
+      line.drop_front!(std::sscanf(line, "{},{}", &mut start.0, &mut start.1).len);
 
       while (!line.empty)
       {
         var next = position();
-        line.remove_prefix!(std::sscanf(line, " -> {},{}", &mut next.0, &mut next.1).len);
+        line.drop_front!(std::sscanf(line, " -> {},{}", &mut next.0, &mut next.1).len);
 
         var dx = std::signum(next.0 - start.0);
         var dy = std::signum(next.1 - start.1);

@@ -17,7 +17,7 @@ fn main -> int
     {
       if (line.starts_with("$ cd"))
       {
-        var arg = line.remove_prefix(5);
+        var arg = line.drop_front(5);
 
         if (arg == "/")
           current_directory = "";

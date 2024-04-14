@@ -26,7 +26,7 @@ fn main -> int
       while (!line.empty)
       {
         var reading = i64(0);
-        line.remove_prefix!(std::sscanf(line, "{} ", &mut reading).len);
+        line.drop_front!(std::sscanf(line, "{} ", &mut reading).len);
 
         readings.push_back(reading);
       }
