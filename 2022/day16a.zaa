@@ -116,7 +116,7 @@ fn main -> int
     var start = valvemap[valvemap.find("AA")].value;
     var targets = std::vector::from(std::iota(0, valves.len).filter(|i| [valves] valves[i].flow_rate != 0));
 
-    var best = solve(valves, matrix, start, 0, 30, targets.all);
+    var best = solve(valves, matrix, start, 0, 30, targets[0 .. targets.len]);
 
     std::print("part1: most pressure released ", best);
 

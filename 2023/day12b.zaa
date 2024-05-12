@@ -53,7 +53,7 @@ fn main -> int
 
           while (!thread.empty)
           {
-            if (std::count_if(thread.take_front(run), |k| k == cast('#') || k == cast('?')) == run)
+            if (std::count_if(thread.take_n(run), |k| k == cast('#') || k == cast('?')) == run)
             {
               if (!thread.drop_front(run).starts_with('#'))
                 stack.emplace(thread.drop_front(std::min(thread.len, run + 1)), 0) += count;
