@@ -23,7 +23,7 @@ fn main -> int
 
     for (var line : std::buffered_reader(&mut fin).lines)
     {
-      var (springs, groups) = line.cut(' ');
+      var [springs, groups] = line.cut(' ');
       var damaged = std::vector::from(groups.split(",").transform(|group| { var n = usize(0); std::atoi(group.begin, group.end, &mut n); return n; }));
 
       var mut &record = records.push_back();
@@ -47,7 +47,7 @@ fn main -> int
 
       for (var run : record.damaged)
       {
-        for (var (thread, count) : stack.take(stack.begin, stack.end))
+        for (var [thread, count] : stack.take(stack.begin, stack.end))
         {
           var thread = thread;
 
@@ -67,7 +67,7 @@ fn main -> int
         }
       }
 
-      for (var (thread, count) : stack.take(stack.begin, stack.end))
+      for (var [thread, count] : stack.take(stack.begin, stack.end))
       {
         if (std::none_of(thread, |remaining| remaining == cast('#')))
           arrangements += count;

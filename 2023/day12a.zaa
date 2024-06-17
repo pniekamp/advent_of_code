@@ -23,7 +23,7 @@ fn main -> int
 
     for (var line : std::buffered_reader(&mut fin).lines)
     {
-      var (springs, groups) = line.cut(' ');
+      var [springs, groups] = line.cut(' ');
 
       var mut &record = records.push_back();
       record.springs = springs;

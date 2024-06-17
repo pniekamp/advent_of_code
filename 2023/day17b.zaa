@@ -75,7 +75,7 @@ fn main -> int
 
     while (!queue.empty)
     {
-      var (path, weight) = queue.take_front;
+      var [path, weight] = queue.take_front;
 
       var np = (path.head.0 + path.direction.0, path.head.1 + path.direction.1);
 

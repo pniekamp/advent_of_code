@@ -139,7 +139,7 @@ fn main -> int
       }
 
       var maxcpm = stockpile();
-      for (var &(type, cost) : blueprint.recipes)
+      for (var &[type, cost] : blueprint.recipes)
       {
         for (var i = 0; i < cost.len; ++i)
           maxcpm[i] = std::max(maxcpm[i], cost[i]);
@@ -170,7 +170,7 @@ fn main -> int
           if (history.contains(thread))
             continue;
 
-          for (var &(type, cost) : blueprint.recipes)
+          for (var &[type, cost] : blueprint.recipes)
           {
             if (type != resource::geode && thread.bots[type] == maxcpm[type])
               continue;

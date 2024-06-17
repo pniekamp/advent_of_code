@@ -106,7 +106,7 @@ fn main -> int
       }
     }
 
-    for (var &(pos, fill) : cave)
+    for (var &[pos, fill] : cave)
     {
       extents[0] = std::min(extents[0], pos.1);
       extents[1] = std::min(extents[1], pos.0);

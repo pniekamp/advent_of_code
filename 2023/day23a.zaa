@@ -114,7 +114,7 @@ fn main -> int
 
     while (stack.len != 0)
     {
-      for (var (p, history) : stack.take(stack.begin, stack.end))
+      for (var [p, history] : stack.take(stack.begin, stack.end))
       {
         if (p == (cast<int>(map.tiles[0].len - 2), cast<int>(map.tiles.len - 1)))
         {
@@ -124,7 +124,7 @@ fn main -> int
             max = steps;
         }
 
-        for (var (q, c) : map.graph.get(p)?!.neighbors)
+        for (var [q, c] : map.graph.get(p)?!.neighbors)
         {
           if (history.contains(q))
             continue;

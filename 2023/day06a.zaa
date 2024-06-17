@@ -53,7 +53,7 @@ fn main -> int
 
     var ways = 1;
 
-    for (var (time, distance) : std::zip(races.times, races.distances))
+    for (var [time, distance] : std::zip(races.times, races.distances))
     {
       var wins = 0;
 

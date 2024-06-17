@@ -82,7 +82,7 @@ fn main -> int
       {
         switch (monkey.action)
         {
-          case solve[var &(lhs, op, rhs)]:
+          case solve[var &[lhs, op, rhs]]:
             var i = results.find(lhs);
             var j = results.find(rhs);
 

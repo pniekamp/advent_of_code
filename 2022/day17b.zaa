@@ -63,7 +63,7 @@ fn fits(chamber &chamber, rock &rock, position &position) -> bool
   if (position.1 - rock.height < -1)
     return false;
 
-  for (var &(x, y) : rock.shape)
+  for (var &[x, y] : rock.shape)
   {
     if (chamber.hit((position.0 + x, position.1 - y)))
       return false;
@@ -74,7 +74,7 @@ fn fits(chamber &chamber, rock &rock, position &position) -> bool
 
 fn insert(chamber mut &chamber, rock &rock, position &position) -> bool
 {
-  for (var &(x, y) : rock.shape)
+  for (var &[x, y] : rock.shape)
   {
     chamber.fill.insert((position.0 + x, position.1 - y), true);
   }
@@ -98,7 +98,7 @@ fn insert(chamber mut &chamber, rock &rock, position &position) -> bool
     var y = chamber.height - max;
     var remaining = std::flat_hash_map<position, bool>();
 
-    for (var &(pt, _) : chamber.fill)
+    for (var &[pt, _] : chamber.fill)
     {
       if (pt.1 >= y)
         remaining.insert((pt.0, pt.1 - y), true);
@@ -206,7 +206,7 @@ fn main -> int
           if (++count == n)
             break;
 
-          if (var (j, ok) = history.insert((chamber.hash, index, rock), (count, chamber.totalheight)); !ok)
+          if (var [j, ok] = history.insert((chamber.hash, index, rock), (count, chamber.totalheight)); !ok)
           {
             var cycle = count - history[j].value.0;
             var height = chamber.totalheight - history[j].value.1;

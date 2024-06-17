@@ -46,7 +46,7 @@ fn main -> int
       }
     }
 
-    for (var &(name, size) : directories)
+    for (var &[name, size] : directories)
     {
       if (size <= 100000)
         sum += size;

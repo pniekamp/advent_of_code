@@ -51,7 +51,7 @@ fn main -> int
 
     var smallest = used_space;
 
-    for (var &(name, size) : directories)
+    for (var &[name, size] : directories)
     {
       if (size < required)
         continue;

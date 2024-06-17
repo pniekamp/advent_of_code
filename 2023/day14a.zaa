@@ -25,7 +25,7 @@ struct map
 
 fn tilt(map mut &map, (int, int) direction) -> void
 {
-  for (var (rock, _) : map.rocks.take(map.rocks.begin, map.rocks.end))
+  for (var [rock, _] : map.rocks.take(map.rocks.begin, map.rocks.end))
   {
     var np = rock;
 
@@ -81,7 +81,7 @@ fn main -> int
 
     var load = 0;
 
-    for (var (rock, _) : map.rocks)
+    for (var [rock, _] : map.rocks)
     {
       load += cast<int>(map.tiles.len) - rock.1;
     }

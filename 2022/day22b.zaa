@@ -253,7 +253,7 @@ fn main -> int
 
           for (var i = 0; i < n; ++i)
           {
-            if (var (newpos, newfac) = map.move(position, facing); map.at(newpos) == '.')
+            if (var [newpos, newfac] = map.move(position, facing); map.at(newpos) == '.')
             {
               position = newpos;
               facing = newfac;

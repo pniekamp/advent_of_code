@@ -15,7 +15,7 @@ struct almanac
 
   fn lookup(i64 key, std::vector<(i64, i64, i64)> &map) -> i64
   {
-    for (var (src, dst, len) : map)
+    for (var [src, dst, len] : map)
     {
       if (src <= key && key < src + len)
         return dst + (key - src);
@@ -28,7 +28,7 @@ struct almanac
   {
     var ranges = std::vector<(i64, i64)>();
 
-    for (var (src, dst, len) : map)
+    for (var [src, dst, len] : map)
     {
       if (key.0 < src)
       {

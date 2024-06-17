@@ -42,7 +42,7 @@ fn main -> int
 
     var lcm = 1;
 
-    for (var &(key, nodes) : map.nodes)
+    for (var &[key, nodes] : map.nodes)
     {
       if (key[2] == 'A')
       {

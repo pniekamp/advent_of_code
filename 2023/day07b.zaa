@@ -92,7 +92,7 @@ fn weaker(hand &lhs, hand &rhs) -> bool
   switch (lhs.type <=> rhs.type)
   {
     case 0:
-      for (var (l, r) : std::zip(lhs.cards, rhs.cards))
+      for (var [l, r] : std::zip(lhs.cards, rhs.cards))
       {
         if (l != r)
           return std::find(digits, r) < std::find(digits, l);

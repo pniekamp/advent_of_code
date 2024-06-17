@@ -17,7 +17,7 @@ fn main -> int
       if (line.empty)
         break;
 
-      var (name, rules) = line.strip_suffix("}").cut('{');
+      var [name, rules] = line.strip_suffix("}").cut('{');
 
       workflows.insert(name, rules);
     }
@@ -29,7 +29,7 @@ fn main -> int
 
     while (!stack.empty)
     {
-      for (var (target, range) : stack.take(stack.begin, stack.end))
+      for (var [target, range] : stack.take(stack.begin, stack.end))
       {
         if (target == "A" || target == "R")
           continue;
@@ -92,7 +92,7 @@ fn main -> int
         }
       }
 
-      for (var (target, range) : stack)
+      for (var [target, range] : stack)
       {
         if (target == "A")
         {

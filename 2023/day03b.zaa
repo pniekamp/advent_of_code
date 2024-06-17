@@ -58,7 +58,7 @@ fn main -> int
 
     var sum = 0;
 
-    for (var &(position, numbers) : map.gears)
+    for (var &[position, numbers] : map.gears)
     {
       if (numbers.len == 2)
         sum += cast<i64>(numbers[0]) * cast<i64>(numbers[1]);

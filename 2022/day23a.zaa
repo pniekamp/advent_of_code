@@ -17,7 +17,7 @@ fn dump(map &map)
 {
   var extents = [999999, 999999, 0, 0]; // top, left, bottom, right
 
-  for (var &(elf, _) : map.elves)
+  for (var &[elf, _] : map.elves)
   {
     extents[0] = std::min(extents[0], elf.1);
     extents[1] = std::min(extents[1], elf.0);
@@ -58,7 +58,7 @@ fn simulate(map mut &map, usize round) -> usize
   var elves = map.elves.take(map.elves.begin, map.elves.end);
   var proposals = std::vector<(position, position)>();
 
-  for (var (p, _) : elves)
+  for (var [p, _] : elves)
   {
     var adjacent = [false; 8];
     for (var j = 0; j < adjacent.len; ++j)
@@ -160,7 +160,7 @@ fn main -> int
     var count = 0;
     var extents = [999999, 999999, 0, 0]; // top, left, bottom, right
 
-    for (var &(elf, _) : map.elves)
+    for (var &[elf, _] : map.elves)
     {
       extents[0] = std::min(extents[0], elf.1);
       extents[1] = std::min(extents[1], elf.0);

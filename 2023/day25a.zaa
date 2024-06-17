@@ -17,7 +17,7 @@ fn edmonds_karp(std::flat_hash_map<std::string, std::vector<std::string>> &graph
 
     while (!queue.empty)
     {
-      for (var (curr, _) : queue.take(queue.begin, queue.end))
+      for (var [curr, _] : queue.take(queue.begin, queue.end))
       {
         for (var &next : graph[curr])
         {
@@ -66,7 +66,7 @@ fn main -> int
 
     for (var line : std::buffered_reader(&mut fin).lines)
     {
-      var (name, list) = line.cut(": ");
+      var [name, list] = line.cut(": ");
 
       for (var &item : list.words)
       {
@@ -75,14 +75,14 @@ fn main -> int
       }
     }
 
-    for (var mut &(name, list) : components)
+    for (var mut &[name, list] : components)
     {
       list.erase(std::unique(&mut list.sort!), list.end);
     }
 
     var length = 0;
 
-    for (var &(target, _) : components)
+    for (var &[target, _] : components)
     {
       if (var flow = edmonds_karp(components, components.front.key, target); flow.0 == 3)
       {

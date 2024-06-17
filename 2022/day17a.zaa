@@ -52,7 +52,7 @@ fn fits(chamber &chamber, rock &rock, position &position) -> bool
   if (position.1 - rock.height < -1)
     return false;
 
-  for (var &(x, y) : rock.shape)
+  for (var &[x, y] : rock.shape)
   {
     if (chamber.hit((position.0 + x, position.1 - y)))
       return false;
@@ -63,7 +63,7 @@ fn fits(chamber &chamber, rock &rock, position &position) -> bool
 
 fn insert(chamber mut &chamber, rock &rock, position &position) -> bool
 {
-  for (var &(x, y) : rock.shape)
+  for (var &[x, y] : rock.shape)
   {
     chamber.fill.insert((position.0 + x, position.1 - y), true);
   }

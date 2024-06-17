@@ -63,7 +63,7 @@ fn dump(map &map, position p) -> void
 
 fn simulate(map mut &map) -> void
 {
-  for (var mut &(xy, d) : map.blizzards)
+  for (var mut &[xy, d] : map.blizzards)
   {
     switch (d)
     {
@@ -121,7 +121,7 @@ fn main -> int
       y += 1;
     }
 
-    for (var &(xy, d) : map.blizzards)
+    for (var &[xy, d] : map.blizzards)
     {
       map.tiles[cast<usize>(xy.1)][cast<usize>(xy.0)] = cast('.');
     }
@@ -140,7 +140,7 @@ fn main -> int
     {
       simulate(&mut map);
 
-      for (var (p, _) : stack.take(stack.begin, stack.end))
+      for (var [p, _] : stack.take(stack.begin, stack.end))
       {
         for (var d : [(0, 0), (0, -1), (+1, 0), (0, +1), (-1, 0)])
         {

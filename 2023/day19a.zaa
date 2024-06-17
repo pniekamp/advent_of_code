@@ -17,7 +17,7 @@ fn main -> int
       if (line.empty)
         break;
 
-      var (name, rules) = line.strip_suffix("}").cut('{');
+      var [name, rules] = line.strip_suffix("}").cut('{');
 
       workflows.insert(name, rules);
     }
