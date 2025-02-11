@@ -47,10 +47,10 @@ fn main -> int
       switch (map.instructions[step % map.instructions.len])
       {
         case 'L':
-          location = map.nodes.get(location)?!.0;
+          location = map.nodes[location].0;
 
         case 'R':
-          location = map.nodes.get(location)?!.1;
+          location = map.nodes[location].1;
       }
 
       step += 1;

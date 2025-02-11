@@ -69,7 +69,7 @@ fn main -> int
       var cubes = [ 0, 0, 0 ];
 
       #for (const k = usize(0); k < 3; ++k)
-        cubes[k] = game.draws.transform(|draw| draw[k]).max.value;
+        cubes[k] = game.draws.transform(|draw| draw[k]).max?!;
 
       power += cast<i64>(cubes[0]) * cast<i64>(cubes[1]) * cast<i64>(cubes[2]);
     }

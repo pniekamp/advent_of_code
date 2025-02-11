@@ -34,7 +34,7 @@ fn main -> int
         if (target == "A" || target == "R")
           continue;
 
-        var &workflow = workflows.get(target)?!;
+        var &workflow = workflows[target];
 
         for (var rule : workflow.split(","))
         {

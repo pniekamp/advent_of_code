@@ -43,13 +43,13 @@ fn edmonds_karp(std::flat_hash_map<std::string, std::vector<std::string>> &graph
 
     for (var curr = target, var prev = visited.get(curr); prev = visited.get(curr); curr = prev?!)
     {
-      minflow = std::min(minflow, 1 - residual.get((*prev, curr)) ?? 0);
+      minflow = std::min(minflow, 1 - residual.get((prev?!, curr)) ?? 0);
     }
 
     for (var curr = target, var prev = visited.get(curr); prev = visited.get(curr); curr = prev?!)
     {
-      residual.emplace((*prev, curr)) += minflow;
-      residual.emplace((curr, *prev)) -= minflow;
+      residual.emplace((prev?!, curr)) += minflow;
+      residual.emplace((curr, prev?!)) -= minflow;
     }
 
     flow += minflow;

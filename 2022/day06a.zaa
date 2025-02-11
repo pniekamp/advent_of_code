@@ -8,7 +8,7 @@ fn main -> int
   {
     var i = 4;
 
-    var input = std::readfile("day06.txt");
+    var input = std::readfile("day06.txt").chomp;
 
     for ( ; i < input.len; ++i)
     {

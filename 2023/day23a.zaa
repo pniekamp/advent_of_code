@@ -76,8 +76,8 @@ fn build(map mut &map) -> void
 
     if (node.neighbors.len == 2)
     {
-      var mut &lhs = map.graph.get(node.neighbors[0].0)?!;
-      var mut &rhs = map.graph.get(node.neighbors[1].0)?!;
+      var mut &lhs = map.graph[node.neighbors[0].0];
+      var mut &rhs = map.graph[node.neighbors[1].0];
 
       if (var j = lhs.neighbors.find_if(|node| node.0 == key); j != lhs.neighbors.end)
         lhs.neighbors[j] = (node.neighbors[1].0, node.neighbors[0].1 + node.neighbors[1].1);
@@ -124,7 +124,7 @@ fn main -> int
             max = steps;
         }
 
-        for (var [q, c] : map.graph.get(p)?!.neighbors)
+        for (var [q, c] : map.graph[p].neighbors)
         {
           if (history.contains(q))
             continue;

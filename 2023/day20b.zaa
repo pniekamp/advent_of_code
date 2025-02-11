@@ -114,7 +114,7 @@ fn main -> int
         if (!modules.get(dst))
           continue;
 
-        switch (modules.get(dst)?!)
+        switch (modules[dst])
         {
           case conjunction[conjunction]:
             conjunction.1.insert_or_assign(module.key, '0');
@@ -122,7 +122,7 @@ fn main -> int
       }
     }
 
-    var n = modules.get("vr")?!.conjunction.1.len;
+    var n = modules["vr"].conjunction.1.len;
     var targets = std::flat_hash_map<std::string_view, i64>();
 
     for (var step = 1; true; ++step)

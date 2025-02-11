@@ -20,21 +20,6 @@ struct map
   ~map() = default;
 }
 
-fn dump(map &map) -> void
-{
-  for (var j = 0; j < map.tiles.len; ++j)
-  {
-    for (var i = 0; i < map.tiles[j].len; ++i)
-    {
-      std::putc(map.at(cast<int>(i), cast<int>(j)));
-    }
-
-    std::putc('\n');
-  }
-
-  std::putc('\n');
-}
-
 fn main -> int
 {
   try
@@ -48,62 +33,60 @@ fn main -> int
       map.tiles.push_back(line);
     }
 
-    struct path
+    struct node
     {
-      (int, int) head;
-      (int, int) direction;
+      (int, int) p;
+      (int, int) dp;
       int momentum;
 
-      path((int, int) head, (int, int) direction, int momentum)
-        : head(head), direction(direction), momentum(momentum)
+      node((int, int) p, (int, int) dp, int momentum)
+        : p(p), dp(dp), momentum(momentum)
       {
       }
 
-      fn ==(path &, path &) -> bool = default;
+      fn ==(node &, node &) -> bool = default;
 
-      path(path&&) = default;
-      fn =(path mut &, path &&) -> path mut & = default;
-      ~path() = default;
+      node(node&&) = default;
+      fn =(node mut &, node &&) -> node mut & = default;
+      ~node() = default;
     }
 
-    var loss = 0;
-    var queue = std::priority_queue<(path, int), Cmp: typeof(|x, y| y.1 < x.1) >();
-    var visited = std::flat_hash_map<path, int>();
+    var queue = std::priority_queue<(node, int), Cmp: typeof(|x, y| y.1 < x.1)>();
+    var visited = std::flat_hash_map<node, int>();
 
-    queue.push_back(path((0, 0), (1, 0), 0), 0);
-    queue.push_back(path((0, 0), (0, 1), 0), 0);
+    queue.push_back(node((0, 0), (1, 0), 0), 0);
+    queue.push_back(node((0, 0), (0, 1), 0), 0);
 
     while (!queue.empty)
     {
-      var [path, weight] = queue.take_front();
+      var [node, weight] = queue.take_front();
 
-      var np = (path.head.0 + path.direction.0, path.head.1 + path.direction.1);
-
-      if (var j = visited.find(path); j != visited.end && visited[j].value <= weight)
+      if (var j = visited.find(node); j != visited.end && visited[j].value <= weight)
         continue;
 
-      visited.insert_or_assign(path, weight);
+      var np = (node.p.0 + node.dp.0, node.p.1 + node.dp.1);
 
       switch (var ch = map.at(np.0, np.1))
       {
         case '0' ..= '9':
-          if (path.momentum < 9)
-            queue.push_back(path(np, path.direction, path.momentum + 1), weight + cast<int>(ch - '0'));
-          if (path.momentum > 2)
-            queue.push_back(path(np, (+path.direction.1, +path.direction.0), 0), weight + cast<int>(ch - '0'));
-          if (path.momentum > 2)
-            queue.push_back(path(np, (-path.direction.1, -path.direction.0), 0), weight + cast<int>(ch - '0'));
+          if (node.momentum < 9)
+            queue.push_back(node(np, node.dp, node.momentum + 1), weight + cast<int>(ch - '0'));
+          if (node.momentum > 2)
+            queue.push_back(node(np, (+node.dp.1, +node.dp.0), 0), weight + cast<int>(ch - '0'));
+          if (node.momentum > 2)
+            queue.push_back(node(np, (-node.dp.1, -node.dp.0), 0), weight + cast<int>(ch - '0'));
       }
 
-      if (path.head.0 == cast<int>(map.tiles.back.len - 1) && path.head.1 == cast<int>(map.tiles.len - 1) && path.momentum > 3)
-      {
-        loss = weight;
-
-        break;
-      }
+      visited.insert_or_assign(node, weight);
     }
 
-    std::print("part2: least heat loss ", loss);
+    var loss = visited
+         .filter(|node| node.key.p.0 == cast<int>(map.tiles.back.len - 1) && node.key.p.1 == cast<int>(map.tiles.len - 1))
+         .filter(|node| node.key.momentum > 3)
+         .transform(|node| node.value)
+         .min;
+
+    std::print("part2: least heat loss ", loss?!);
 
   }
   catch(std::error e)
