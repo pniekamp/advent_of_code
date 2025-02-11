@@ -1,0 +1,96 @@
+import std.stdio;
+import std.algorithm;
+import std.flat_hash_map;
+import std.scan;
+
+const W = 101;
+const H = 103;
+
+struct robot
+{
+  (int, int) p;
+  (int, int) v;
+
+  robot() = default;
+  robot(robot&) = default;
+  ~robot() = default;
+}
+
+pub fn fmt(std::OutputStream mut &os, std::fmt_context mut &ctx, robot &robot) throws -> void
+{
+  ctx.written += std::format_to(&mut os, "p={},{} v={},{}", robot.p.0, robot.p.1, robot.v.0, robot.v.1);
+}
+
+pub fn scan(std::string_view is, std::scan_context mut &ctx, robot mut &robot) -> void
+{
+  var str = std::sscanf(is, "p={},{} v={},{}", &mut robot.p.0, &mut robot.p.1, &mut robot.v.0, &mut robot.v.1);
+
+  ctx.error = str.error;
+  ctx.cursor += str.len;
+}
+
+fn dump(std::flat_hash_map<(int, int), void> &map) -> void
+{
+  for (var j = 0; j < H; ++j)
+  {
+    for (var i = 0; i < W; ++i)
+    {
+      if (map.contains((i, j)))
+        std::putc('#');
+      else
+        std::putc('.');
+    }
+
+    std::putc('\n');
+  }
+
+  std::putc('\n');
+}
+
+fn main -> int
+{
+  try
+  {
+    var robots = std::vector<robot>();
+
+    var fin = std::file::open("day14.txt");
+
+    for (var line : std::buffered_reader(&mut fin).lines)
+    {
+      var robot = robot();
+
+      if (!std::sscanf(line, "{}", &mut robot))
+        std::panic("error scaning robot input '", line, "'");
+
+      robots.push_back(robot);
+    }
+
+    var time = 0;
+
+    for (;; time += 1)
+    {
+      var map = std::flat_hash_map<(int, int), void>();
+
+      for (var &robot : robots)
+      {
+        var x = ((robot.p.0 + time * robot.v.0) % W + W) % W;
+        var y = ((robot.p.1 + time * robot.v.1) % H + H) % H;
+
+        if (!map.insert((x, y)).1)
+          break;
+      }
+
+      if (map.len == robots.len)
+        break;
+    }
+
+    std::print("part2: time elapsed until tree ", time);
+
+  }
+  catch(std::error e)
+  {
+    std::panic(e);
+  }
+
+  return 0;
+}

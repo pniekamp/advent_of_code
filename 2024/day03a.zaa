@@ -1,0 +1,34 @@
+import std.stdio;
+import std.algorithm;
+import regex;
+
+fn main -> int
+{
+  try
+  {
+    var sum = 0;
+
+    var text = std::readfile("day03.txt").chomp;
+
+    for (var i = text.begin; i != text.end; )
+    {
+      var x = i64(0);
+      var y = i64(0);
+      var op = regex::find("mul\\((\\d{1,3}),(\\d{1,3})\\)", text[i .. text.end], &mut x, &mut y);
+
+      if (!op.empty)
+        sum += x * y;
+
+      i = op.end;
+    }
+
+    std::print("part1: sum of multiplications ", sum);
+
+  }
+  catch(std::error e)
+  {
+    std::panic(e);
+  }
+
+  return 0;
+}

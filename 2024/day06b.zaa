@@ -1,0 +1,113 @@
+import std.stdio;
+import std.algorithm;
+import std.flat_hash_map;
+import std.scan;
+
+struct map
+{
+  std::vector<std::string> tiles;
+
+  fn at(this &map, int x, int y) -> char
+  {
+    if (0 <= y && cast<usize>(y) < map.tiles.len && 0 <= x && cast<usize>(x) < map.tiles[cast<usize>(y)].len)
+      return cast<char>(map.tiles[cast<usize>(y)][cast<usize>(x)]);
+
+    return ' ';
+  }
+
+  map() = default;
+  ~map() = default;
+}
+
+fn walk(map &map, (int, int) p, (int, int) dp) -> (std::flat_hash_map<(int, int), void>, bool)
+{
+  var path = std::flat_hash_map<(int, int), void>();
+  var visited = std::flat_hash_map<(int, int, int, int), void>();
+
+  for (;;)
+  {
+    var np = (p.0 + dp.0, p.1 + dp.1);
+
+    switch (map.at(np.0, np.1))
+    {
+      case '.':
+        p = np;
+
+        if (!visited.insert((p.0, p.1, dp.0, dp.1)).1)
+          return (path, false);
+
+      case '#':
+        dp = (-dp.1, dp.0);
+
+      else:
+        break;
+    }
+
+    path.insert(p);
+  }
+
+  return (path, true);
+}
+
+fn dump(map &map, std::flat_hash_map<(int, int), void> &path) -> void
+{
+  for (var j = 0; j < cast<int>(map.tiles.len); ++j)
+  {
+    for (var i = 0; i < cast<int>(map.tiles[cast<usize>(j)].len); ++i)
+    {
+      if (path.contains((i, j)))
+        std::putc('O');
+      else
+        std::putc(map.at(i, j));
+    }
+
+    std::putc('\n');
+  }
+
+  std::putc('\n');
+}
+
+fn main -> int
+{
+  try
+  {
+    var n = 0;
+    var s = (0, 0);
+    var ds = (0, -1);
+    var map = map();
+
+    var fin = std::file::open("day06.txt");
+
+    for (var line : std::buffered_reader(&mut fin).lines)
+    {
+      if (var j = line.find_first('^'); j != line.end)
+        s = (cast<int>(j - line.begin), cast<int>(map.tiles.len));
+
+      map.tiles.push_back(line);
+    }
+
+    map.tiles[cast<usize>(s.1)][cast<usize>(s.0)] = cast('.');
+
+    for (var [p, _] : map.walk(s, ds).0)
+    {
+      if (p == s)
+        continue;
+
+      map.tiles[cast<usize>(p.1)][cast<usize>(p.0)] = cast('#');
+
+      if (!map.walk(s, ds).1)
+        n += 1;
+
+      map.tiles[cast<usize>(p.1)][cast<usize>(p.0)] = cast('.');
+    }
+
+    std::print("part2: path potential loops ", n);
+
+  }
+  catch(std::error e)
+  {
+    std::panic(e);
+  }
+
+  return 0;
+}

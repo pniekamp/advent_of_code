@@ -1,0 +1,142 @@
+import std.stdio;
+import std.algorithm;
+import std.flat_hash_map;
+import std.scan;
+
+const pad1 = ["789", "456", "123", " 0A"];
+const pad2 = [" ^A", "<v>"];
+
+fn keymap(var &pad) -> std::flat_hash_map<(u8, u8), std::vector<std::string>>
+{
+  var map = std::flat_hash_map<(u8, u8), std::vector<std::string>>();
+
+  for (var sj = 0; sj < pad.len; ++sj)
+  {
+    for (var si = 0; si < pad[sj].len; ++si)
+    {
+      for (var dj = 0; dj < pad.len; ++dj)
+      {
+        for (var di = 0; di < pad[dj].len; ++di)
+        {
+          if (pad[sj][si] == cast(' ') || pad[dj][di] == cast(' '))
+            continue;
+
+          var mut &moves = map.emplace((pad[sj][si], pad[dj][di]));
+
+          if (var p = (si, sj), var q = (di, dj); p.0 != q.0)
+          {
+            var move = std::string();
+
+            for (; p.0 < q.0 && pad[p.1][p.0 + 1] != cast(' '); p.0 += 1)
+              move += '>';
+
+            for (; p.0 > q.0 && pad[p.1][p.0 - 1] != cast(' '); p.0 -= 1)
+              move += '<';
+
+            for (; p.1 < q.1 && pad[p.1 + 1][p.0] != cast(' '); p.1 += 1)
+              move += 'v';
+
+            for (; p.1 > q.1 && pad[p.1 - 1][p.0] != cast(' '); p.1 -= 1)
+              move += '^';
+
+            if (p == q)
+              moves.push_back(move);
+          }
+
+          if (var p = (si, sj), var q = (di, dj); p.1 != q.1)
+          {
+            var move = std::string();
+
+            for (; p.1 < q.1 && pad[p.1 + 1][p.0] != cast(' '); p.1 += 1)
+              move += 'v';
+
+            for (; p.1 > q.1 && pad[p.1 - 1][p.0] != cast(' '); p.1 -= 1)
+              move += '^';
+
+            for (; p.0 < q.0 && pad[p.1][p.0 + 1] != cast(' '); p.0 += 1)
+              move += '>';
+
+            for (; p.0 > q.0 && pad[p.1][p.0 - 1] != cast(' '); p.0 -= 1)
+              move += '<';
+
+            if (p == q)
+              moves.push_back(move);
+          }
+
+          if (var p = (si, sj), var q = (di, dj); p == q)
+          {
+            moves.push_back("");
+          }
+        }
+      }
+    }
+  }
+
+  return map;
+}
+
+fn execute(var &code, var &keymap) -> std::vector<std::string>
+{
+  var moves = std::vector<std::string>::from([""]);
+
+  fn combine[code, keymap, moves](u8 cp, usize idx) -> void
+  {
+    if (idx == code.len)
+      return;
+
+    var base = moves.take_back();
+
+    for (var &part : keymap[(cp, code[idx])])
+    {
+      moves.push_back(base + part + "A");
+
+      combine(code[idx], idx + 1);
+    }
+  };
+
+  combine(cast<u8>('A'), 0);
+
+  return moves;
+}
+
+fn main -> int
+{
+  try
+  {
+    var sum = 0;
+    let keymap1 = keymap(pad1);
+    let keymap2 = keymap(pad2);
+
+    var fin = std::file::open("day21.txt");
+
+    for (var code : std::buffered_reader(&mut fin).lines)
+    {
+      var len = ~0;
+
+      for (var &code : execute(code, keymap1))
+      {
+        for (var &code : execute(code, keymap2))
+        {
+          for (var &code : execute(code, keymap2))
+          {
+            len = std::min(len, code.len);
+          }
+        }
+      }
+
+      var pin = usize(0);
+      std::atoi(code.begin, code.end, &mut pin);
+
+      sum += len * pin;
+    }
+
+    std::print("part1: sum of complexity ", sum);
+
+  }
+  catch(std::error e)
+  {
+    std::panic(e);
+  }
+
+  return 0;
+}

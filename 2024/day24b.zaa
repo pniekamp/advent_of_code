@@ -1,0 +1,75 @@
+import std.stdio;
+import std.algorithm;
+import std.flat_hash_map;
+import std.scan;
+
+fn main -> int
+{
+  try
+  {
+    var wires = std::flat_hash_map<std::string, u64>();
+    var gates = std::vector<(std::string, std::string, std::string, std::string)>();
+
+    var fin = std::file::open("day24.txt");
+    var reader = std::buffered_reader(&mut fin);
+
+    for (var line : reader.lines)
+    {
+      if (line.empty)
+        break;
+
+      var name = std::string_view();
+      var value = u64();
+
+      if (!std::sscanf(line, "{}: {}", &mut name, &mut value))
+        std::panic("error scaning wire from input '", line, "'");
+
+      wires.insert(name, value);
+    }
+
+    std::skip_line(&mut reader);
+
+    for (var line : reader.lines)
+    {
+      var lhs = std::string_view();
+      var op = std::string_view();
+      var rhs = std::string_view();
+      var out = std::string_view();
+
+      if (!std::sscanf(line, "{} {} {} -> {}", &mut lhs, &mut op, &mut rhs, &mut out))
+        std::panic("error scaning gate from input '", line, "'");
+
+      gates.push_back((lhs, op, rhs, out));
+    }
+
+    var mismatch = std::flat_hash_map<std::string, void>();
+
+    for (var &[lhs, op, rhs, out] : gates)
+    {
+      if (out.starts_with('z') && out != "z45" && op != "XOR")
+        mismatch.insert(out);
+
+      if (op == "XOR" && !(out.starts_with('z') || (wires.contains(lhs) && wires.contains(rhs))))
+        mismatch.insert(out);
+
+      if (op == "XOR")
+        if (std::any_of(gates, |gate| (gate.0 == out || gate.2 == out) && gate.1 == "OR"))
+          mismatch.insert(out);
+
+      if (lhs != "x00" && rhs != "x00" && op == "AND")
+        if (std::any_of(gates, |gate| (gate.0 == out || gate.2 == out) && gate.1 != "OR"))
+          mismatch.insert(out);
+    }
+
+    var swapped = std::vector::from(mismatch.transform(|kv| kv.key)).sort!;
+
+    std::print("part2: swapped ", std::join(swapped, ","));
+
+  }
+  catch(std::error e)
+  {
+    std::panic(e);
+  }
+
+  return 0;
+}

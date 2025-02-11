@@ -1,0 +1,40 @@
+import std.stdio;
+import std.flat_hash_map;
+import std.algorithm;
+import std.scan;
+
+fn main -> int
+{
+  try
+  {
+    var sum = 0;
+    var ids = std::vector<int>();
+    var cnt = std::flat_hash_map<int, int>();
+
+    var fin = std::file::open("day01.txt");
+
+    for (var line : std::buffered_reader(&mut fin).lines)
+    {
+      var lhs = int(0);
+      var rhs = int(0);
+
+      if (!std::sscanf(line, "{} {}", &mut lhs, &mut rhs))
+        std::panic("error scaning id from input '", line, "'");
+
+      ids.push_back(lhs);
+      cnt.emplace(rhs) += 1;
+    }
+;
+    for (var id : ids)
+      sum += id * (cnt.get(id) ?? 0);
+
+    std::print("part2: similarity score ", sum);
+
+  }
+  catch(std::error e)
+  {
+    std::panic(e);
+  }
+
+  return 0;
+}

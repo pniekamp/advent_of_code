@@ -1,0 +1,92 @@
+import std.stdio;
+import std.algorithm;
+import std.flat_hash_map;
+import std.scan;
+
+struct map
+{
+  std::vector<std::string> tiles;
+  std::flat_hash_map<u8, std::vector<(int, int)>> antennas;
+
+  fn at(this &map, int x, int y) -> char
+  {
+    if (0 <= y && cast<usize>(y) < map.tiles.len && 0 <= x && cast<usize>(x) < map.tiles[cast<usize>(y)].len)
+      return cast<char>(map.tiles[cast<usize>(y)][cast<usize>(x)]);
+
+    return ' ';
+  }
+
+  map() = default;
+  ~map() = default;
+}
+
+fn dump(map &map, std::flat_hash_map<(int, int), void> &anitnodes) -> void
+{
+  for (var j = 0; j < cast<int>(map.tiles.len); ++j)
+  {
+    for (var i = 0; i < cast<int>(map.tiles[cast<usize>(j)].len); ++i)
+    {
+      if (anitnodes.contains((i, j)))
+        std::putc('#');
+      else
+        std::putc(map.at(i, j));
+    }
+
+    std::putc('\n');
+  }
+
+  std::putc('\n');
+}
+
+fn main -> int
+{
+  try
+  {
+    var map = map();
+
+    var fin = std::file::open("day08.txt");
+
+    for (var y = 0, var line : std::buffered_reader(&mut fin).lines)
+    {
+      for (var x = 0, var ch : line)
+      {
+        if (ch != cast('.'))
+          map.antennas.emplace(ch).push_back(x, y);
+
+        x += 1;
+      }
+
+      map.tiles.push_back(line);
+
+      y += 1;
+    }
+
+    var antinodes = std::flat_hash_map<(int, int), void>();
+
+    for (var [antenna, locations] : map.antennas)
+    {
+      for (var i = 0; i < locations.len; ++i)
+      {
+        for (var j = i + 1; j < locations.len; ++j)
+        {
+          var delta = (locations[j].0 - locations[i].0, locations[j].1 - locations[i].1);
+
+          for (var pos = locations[i]; map.at(pos.0, pos.1) != ' '; pos.0 -= delta.0, pos.1 -= delta.1)
+            antinodes.insert(pos);
+
+          for (var pos = locations[j]; map.at(pos.0, pos.1) != ' '; pos.0 += delta.0, pos.1 += delta.1)
+            antinodes.insert(pos);
+        }
+      }
+    }
+
+    std::print("part2: unique antinode harmonics locations ", antinodes.len);
+
+  }
+  catch(std::error e)
+  {
+    std::panic(e);
+  }
+
+  return 0;
+}

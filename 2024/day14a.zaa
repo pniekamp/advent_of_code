@@ -1,0 +1,72 @@
+import std.stdio;
+import std.algorithm;
+import std.flat_hash_map;
+import std.scan;
+
+const W = 101;
+const H = 103;
+
+struct robot
+{
+  (int, int) p;
+  (int, int) v;
+
+  robot() = default;
+  robot(robot&) = default;
+  ~robot() = default;
+}
+
+pub fn fmt(std::OutputStream mut &os, std::fmt_context mut &ctx, robot &robot) throws -> void
+{
+  ctx.written += std::format_to(&mut os, "p={},{} v={},{}", robot.p.0, robot.p.1, robot.v.0, robot.v.1);
+}
+
+pub fn scan(std::string_view is, std::scan_context mut &ctx, robot mut &robot) -> void
+{
+  var str = std::sscanf(is, "p={},{} v={},{}", &mut robot.p.0, &mut robot.p.1, &mut robot.v.0, &mut robot.v.1);
+
+  ctx.error = str.error;
+  ctx.cursor += str.len;
+}
+
+fn main -> int
+{
+  try
+  {
+    var sum = [<int>: 0, 0, 0, 0 ];
+
+    var fin = std::file::open("day14.txt");
+
+    for (var line : std::buffered_reader(&mut fin).lines)
+    {
+      var robot = robot();
+
+      if (!std::sscanf(line, "{}", &mut robot))
+        std::panic("error scaning robot input '", line, "'");
+
+      var x = ((robot.p.0 + 100 * robot.v.0) % W + W) % W;
+      var y = ((robot.p.1 + 100 * robot.v.1) % H + H) % H;
+
+      if (x < W/2 && y < H/2)
+        sum[0] += 1;
+
+      if (x > W/2 && y < H/2)
+        sum[1] += 1;
+
+      if (x < W/2 && y > H/2)
+        sum[2] += 1;
+
+      if (x > W/2 && y > H/2)
+        sum[3] += 1;
+    }
+
+    std::print("part1: 100 second safety factor ", sum[0] * sum[1] * sum[2] * sum[3]);
+
+  }
+  catch(std::error e)
+  {
+    std::panic(e);
+  }
+
+  return 0;
+}

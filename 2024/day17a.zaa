@@ -1,0 +1,170 @@
+import std.stdio;
+import std.algorithm;
+import std.flat_hash_map;
+import std.scan;
+import regex;
+
+struct device
+{
+  int ax;
+  int bx;
+  int cx;
+  usize ip;
+
+  std::vector<u8> memory;
+  std::vector<u8> display;
+
+  union instruction
+  {
+    adv(int),
+    bxl(int),
+    bst(int),
+    jnz(int),
+    bxc(int),
+    out(int),
+    bdv(int),
+    cdv(int),
+
+    ~instruction() = default;
+  }
+
+  fn decode(device &device) -> instruction
+  {
+    fn opcode(device &device) -> u8
+    {
+      return device.memory[device.ip];
+    }
+
+    fn literal(device &device) -> int
+    {
+      return cast(device.memory[device.ip + 1]);
+    }
+
+    fn combo(device &device) -> int
+    {
+      switch (device.memory[device.ip + 1])
+      {
+        case 0 ..= 3:
+          return cast(device.memory[device.ip + 1]);
+
+        case 4:
+          return device.ax;
+
+        case 5:
+          return device.bx;
+
+        case 6:
+          return device.cx;
+      }
+
+      std::panic("halt");
+    }
+
+    switch (opcode(device))
+    {
+      case 0:
+        return instruction::adv(combo(device));
+
+      case 1:
+        return instruction::bxl(literal(device));
+
+      case 2:
+        return instruction::bst(combo(device));
+
+      case 3:
+        return instruction::jnz(literal(device));
+
+      case 4:
+        return instruction::bxc(literal(device));
+
+      case 5:
+        return instruction::out(combo(device));
+
+      case 6:
+        return instruction::bdv(combo(device));
+
+      case 7:
+        return instruction::cdv(combo(device));
+    }
+
+    std::panic("hlt");
+  }
+
+  fn execute(device mut &device, instruction &op) -> void
+  {
+    device.ip += 2;
+
+    switch (op)
+    {
+      case adv[operand]:
+        device.ax /= std::pow(2, operand);
+
+      case bxl[operand]:
+        device.bx ^= operand;
+
+      case bst[operand]:
+        device.bx = operand % 8;
+
+      case jnz[operand]:
+        if (device.ax != 0)
+          device.ip = cast<usize>(operand);
+
+      case bxc[operand]:
+        device.bx ^= device.cx;
+
+      case out[operand]:
+        device.display.push_back(cast<u8>(operand % 8));
+
+      case bdv[operand]:
+        device.bx = device.ax / std::pow(2, operand);
+
+      case cdv[operand]:
+        device.cx = device.ax / std::pow(2, operand);
+    }
+  }
+
+  device() = default;
+  ~device() = default;
+}
+
+fn main -> int
+{
+  try
+  {
+    var device = device();
+
+    var fin = std::file::open("day17.txt");
+
+    for (var line : std::buffered_reader(&mut fin).lines)
+    {
+      switch (line)
+      {
+        case regex::ctre("Register A: (\\d+)"):
+          std::atoi(line.begin + 12, line.end, &mut device.ax);
+
+        case regex::ctre("Register B: \\d+"):
+          std::atoi(line.begin + 12, line.end, &mut device.bx);
+
+        case regex::ctre("Register C: \\d+"):
+          std::atoi(line.begin + 12, line.end, &mut device.cx);
+
+        case regex::ctre("Program: (\\d+,?)*"):
+          device.memory = std::vector::from(line.drop(9).split(",").transform(|str| { var n = u8(0); std::atoi(str.begin, str.end, &mut n); return n; }));
+      }
+    }
+
+    while (device.ip < device.memory.len)
+    {
+      device.execute(device.decode());
+    }
+
+    std::print("part1: ", device.display);
+
+  }
+  catch(std::error e)
+  {
+    std::panic(e);
+  }
+
+  return 0;
+}

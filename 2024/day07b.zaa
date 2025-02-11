@@ -1,0 +1,58 @@
+import std.stdio;
+import std.algorithm;
+import std.flat_hash_map;
+import std.scan;
+
+fn main -> int
+{
+  try
+  {
+    var sum = 0;
+
+    var fin = std::file::open("day07.txt");
+
+    for (var line : std::buffered_reader(&mut fin).lines)
+    {
+      var value = i64(0);
+      var numbers = std::string_view();
+
+      if (!std::sscanf(line, "{}: {}", &mut value, &mut numbers))
+        std::panic("error scaning equation from input '", line, "'");
+
+      var stack = std::vector<i64>();
+
+      for (var number : numbers.words.take_n(1))
+      {
+        var n = i64(0);
+        std::atoi(number.begin, number.end, &mut n);
+
+        stack.push_back(n);
+      }
+
+      for (var number : numbers.words.drop_n(1))
+      {
+        var n = i64(0);
+        std::atoi(number.begin, number.end, &mut n);
+
+        for (var current : stack.take(stack.begin, stack.end))
+        {
+          stack.push_back(current + n);
+          stack.push_back(current * n);
+          stack.push_back(current * std::pow(10, number.len) + n);
+        }
+      }
+
+      if (stack.find(value) != stack.end)
+        sum += value;
+    }
+
+    std::print("part1: total calibration result ", sum);
+
+  }
+  catch(std::error e)
+  {
+    std::panic(e);
+  }
+
+  return 0;
+}

@@ -1,0 +1,100 @@
+advent-of-code 2024
+
+day 01
+part1: total distance 3508942
+part2: similarity score 26593248
+
+day 02
+part1: safe reports 282
+part2: safe dampened reports 349
+
+day 03
+part1: sum of multiplications 178794710
+part2: sum of conditional multiplications 76729637
+
+day 04
+part1: xmas found 2575
+part2: x-mas found 2041
+
+day 05
+part1: sum of middle pages 7307
+part2: sum of fixed middle pages 4713
+
+day 06
+part1: path distinct positions 5269
+part2: path potential loops 1957
+
+day 07
+part2: total calibration result 267566105056
+part1: total calibration result 116094961956019
+
+day 08
+part1: unique antinode locations 320
+part2: unique antinode harmonics locations 1157
+
+day 09
+part1: filesystem checksum 6334655979668
+part2: defraged filesystem checksum 6349492251099
+
+day 10
+part1: trailheads total score 760
+part2: trailheads total rating 1764
+
+day 11
+part1: stones after 25 blinks 217812
+part2: stones after 75 blinks 259112729857522
+
+day 12
+part1: total price of fencing 1522850
+part2: total bulk price of fencing 953738
+
+day 13
+part1: fewest tokens for possible prizes 29438
+part2: fewest tokens for possible prizes 104958599303720
+
+day 14
+part1: 100 second safety factor 228410028
+part2: time elapsed until tree 8258
+
+day 15
+part1: sum of box coordinates 1478649
+part2: sum of wide box coordinates 1495455
+
+day 16
+part1: reindeer lowest score 91464
+part2: number potential seats 494
+
+day 17
+part1: [7, 1, 5, 2, 4, 0, 7, 6, 1]
+part2: initial value 37222273957364
+
+day 18
+part1: minimum steps needed 292
+part2: before first byte (58, 44)
+
+day 19
+part1: possible designes 338
+part2: possible designes 841533074412361
+
+day 20
+part1: possible cheats 1402
+part2: possible cheats 1020244
+
+day 21
+part1: sum of complexity 278748
+part2: sum of complexity 337744744231414
+
+day 22
+part1: sum of secrets 14869099597
+part2: maximum bananas 1717
+
+day 23
+part1: connected networks 1304
+part2: lan password ao,es,fe,if,in,io,ky,qq,rd,rn,rv,vc,vl
+
+day 24
+part1: number 53190357879014
+part2: swapped bks,hnd,nrn,tdv,tjp,z09,z16,z23
+
+day 25
+part1: lock/key pairs 2900

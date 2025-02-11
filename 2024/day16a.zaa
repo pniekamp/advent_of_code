@@ -1,0 +1,95 @@
+import std.stdio;
+import std.algorithm;
+import std.flat_hash_map;
+import std.priority_queue;
+import std.scan;
+
+struct map
+{
+  std::vector<std::string> tiles;
+
+  fn at(this &map, int x, int y) -> char
+  {
+    if (0 <= y && cast<usize>(y) < map.tiles.len && 0 <= x && cast<usize>(x) < map.tiles[cast<usize>(y)].len)
+      return cast<char>(map.tiles[cast<usize>(y)][cast<usize>(x)]);
+
+    return '#';
+  }
+
+  map() = default;
+  ~map() = default;
+}
+
+fn main -> int
+{
+  try
+  {
+    var s = (0, 0);
+    var map = map();
+
+    var fin = std::file::open("day16.txt");
+
+    for (var line : std::buffered_reader(&mut fin).lines)
+    {
+      if (var j = line.find_first('S'); j != line.end)
+        s = (cast<int>(j - line.begin), cast<int>(map.tiles.len));
+
+      map.tiles.push_back(line);
+    }
+
+    struct node
+    {
+      (int, int) p;
+      (int, int) dp;
+
+      node((int, int) p, (int, int) dp)
+        : p(p), dp(dp)
+      {
+      }
+
+      fn ==(node &, node &) -> bool = default;
+
+      node(node&&) = default;
+      fn =(node mut &, node &&) -> node mut & = default;
+      ~node() = default;
+    }
+
+    var queue = std::priority_queue<(node, int), Cmp: typeof(|x, y| y.1 < x.1)>();
+    var visited = std::flat_hash_map<node, int>();
+
+    queue.push_back(node(s, (1, 0)), 0);
+
+    while (!queue.empty)
+    {
+      var [node, score] = queue.take_front();
+
+      if (var j = visited.find(node); j != visited.end && visited[j].value <= score)
+        continue;
+
+      if (var np = (node.p.0 + node.dp.0, node.p.1 + node.dp.1); map.at(np.0, np.1) != '#')
+        queue.push_back(node(np, node.dp), score + 1);
+
+      if (var np = (node.p.0 - node.dp.1, node.p.1 + node.dp.0); map.at(np.0, np.1) != '#')
+        queue.push_back(node(np, (-node.dp.1, node.dp.0)), score + 1001);
+
+      if (var np = (node.p.0 + node.dp.1, node.p.1 - node.dp.0); map.at(np.0, np.1) != '#')
+        queue.push_back(node(np, (node.dp.1, -node.dp.0)), score + 1001);
+
+      visited.insert_or_assign(node, score);
+    }
+
+    var best = visited
+         .filter(|node| map.at(node.key.p.0, node.key.p.1) == 'E')
+         .transform(|node| node.value)
+         .min;
+
+    std::print("part1: reindeer lowest score ", best?!);
+
+  }
+  catch(std::error e)
+  {
+    std::panic(e);
+  }
+
+  return 0;
+}

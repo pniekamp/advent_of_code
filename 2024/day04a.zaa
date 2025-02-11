@@ -1,0 +1,61 @@
+import std.stdio;
+import std.algorithm;
+import std.scan;
+
+struct map
+{
+  std::vector<std::string> tiles;
+
+  fn at(this &map, int x, int y) -> char
+  {
+    if (0 <= y && cast<usize>(y) < map.tiles.len && 0 <= x && cast<usize>(x) < map.tiles[cast<usize>(y)].len)
+      return cast<char>(map.tiles[cast<usize>(y)][cast<usize>(x)]);
+
+    return '#';
+  }
+
+  map() = default;
+  ~map() = default;
+}
+
+fn main -> int
+{
+  try
+  {
+    var n = 0;
+    var map = map();
+
+    var fin = std::file::open("day04.txt");
+
+    for (var line : std::buffered_reader(&mut fin).lines)
+    {
+      map.tiles.push_back(line);
+    }
+
+    for (var j = 0; j < cast<int>(map.tiles.len); ++j)
+    {
+      for (var i = 0; i < cast<int>(map.tiles[cast<usize>(j)].len); ++i)
+      {
+        const word = ['X', 'M', 'A', 'S'];
+
+        if (map.at(i, j) == word[0])
+        {
+          for (var dp : [<(int, int)>: (+1, 0), (-1, 0), (0, +1), (0, -1), (+1, +1), (-1, +1), (+1, -1), (-1, -1)])
+          {
+            if (std::all_of(std::enumerate(word), |k| map.at(i + cast<int>(k.0)*dp.0, j + cast<int>(k.0)*dp.1) == k.1))
+              n += 1;
+          }
+        }
+      }
+    }
+
+    std::print("part1: xmas found ", n);
+
+  }
+  catch(std::error e)
+  {
+    std::panic(e);
+  }
+
+  return 0;
+}

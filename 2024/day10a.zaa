@@ -1,0 +1,79 @@
+import std.stdio;
+import std.algorithm;
+import std.flat_hash_map;
+import std.scan;
+
+struct map
+{
+  std::vector<std::string> tiles;
+
+  fn at(this &map, int x, int y) -> char
+  {
+    if (0 <= y && cast<usize>(y) < map.tiles.len && 0 <= x && cast<usize>(x) < map.tiles[cast<usize>(y)].len)
+      return cast<char>(map.tiles[cast<usize>(y)][cast<usize>(x)]);
+
+    return ' ';
+  }
+
+  map() = default;
+  ~map() = default;
+}
+
+fn walk(map &map, (int, int) s) -> usize
+{
+  var stack = std::vector<(int, int)>::from([s]);
+  var visited = std::flat_hash_map<(int, int), void>();
+
+  while (stack.len != 0)
+  {
+    for (var p : stack.take(stack.begin, stack.end))
+    {
+      if (map.at(p.0, p.1) == '9')
+        visited.insert(p);
+
+      for (var dp : [ (0, -1), (1, 0), (0, 1), (-1, 0) ])
+      {
+        var np = (p.0 + dp.0, p.1 + dp.1);
+
+        if (map.at(np.0, np.1) == map.at(p.0, p.1) + 1)
+          stack.push_back(np);
+      }
+    }
+  }
+
+  return visited.len;
+}
+
+fn main -> int
+{
+  try
+  {
+    var sum = 0;
+    var map = map();
+
+    var fin = std::file::open("day10.txt");
+
+    for (var line : std::buffered_reader(&mut fin).lines)
+    {
+      map.tiles.push_back(line);
+    }
+
+    for (var j = 0; j < cast<int>(map.tiles.len); ++j)
+    {
+      for (var i = 0; i < cast<int>(map.tiles[cast<usize>(j)].len); ++i)
+      {
+        if (map.at(i, j) == '0')
+          sum += map.walk((i, j));
+      }
+    }
+
+    std::print("part1: trailheads total score ", sum);
+
+  }
+  catch(std::error e)
+  {
+    std::panic(e);
+  }
+
+  return 0;
+}

@@ -1,0 +1,45 @@
+import std.stdio;
+import std.algorithm;
+import std.scan;
+
+fn is_safe(std::vector<int> &levels) -> bool
+{
+  var slope = std::signum(levels.back - levels.front);
+
+  for (var i = 1, var j = 0; i < levels.len; ++i, ++j)
+  {
+    var u = (levels[i] - levels[j]) * slope;
+
+    if (u < 1 || u > 3)
+      return false;
+  }
+
+  return true;
+}
+
+fn main -> int
+{
+  try
+  {
+    var n = 0;
+
+    var fin = std::file::open("day02.txt");
+
+    for (var line : std::buffered_reader(&mut fin).lines)
+    {
+      var levels = std::vector::from(line.words.transform(|str| { var u = int(0); std::atoi(str.begin, str.end, &mut u); return u; }));
+
+      if (is_safe(levels))
+        n += 1;
+    }
+
+    std::print("part1: safe reports ", n);
+
+  }
+  catch(std::error e)
+  {
+    std::panic(e);
+  }
+
+  return 0;
+}

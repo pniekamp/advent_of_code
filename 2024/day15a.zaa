@@ -1,0 +1,137 @@
+import std.stdio;
+import std.algorithm;
+import std.flat_hash_map;
+import std.scan;
+
+struct map
+{
+  std::vector<std::string> tiles;
+
+  fn at(this &map, int x, int y) -> char
+  {
+    if (0 <= y && cast<usize>(y) < map.tiles.len && 0 <= x && cast<usize>(x) < map.tiles[cast<usize>(y)].len)
+      return cast<char>(map.tiles[cast<usize>(y)][cast<usize>(x)]);
+
+    return '#';
+  }
+
+  map() = default;
+  ~map() = default;
+}
+
+fn push(map mut &map, (int, int) mut &p, (int, int) &dp) -> void
+{
+  var np = (p.0 + dp.0, p.1 + dp.1);
+
+  switch (map.at(np.0, np.1))
+  {
+    case '.':
+      p = np;
+
+    case 'O':
+      var tp = (np.0 + dp.0, np.1 + dp.1);
+
+      for (;;)
+      {
+        switch (map.at(tp.0, tp.1))
+        {
+          case 'O':
+            tp = (tp.0 + dp.0, tp.1 + dp.1);
+
+          else:
+            break;
+        }
+      }
+
+      if (map.at(tp.0, tp.1) == '.')
+      {
+        map.tiles[cast<usize>(np.1)][cast<usize>(np.0)] = cast('.');
+        map.tiles[cast<usize>(tp.1)][cast<usize>(tp.0)] = cast('O');
+
+        p = np;
+      }
+  }
+}
+
+fn dump(map &map) -> void
+{
+  for (var j = 0; j < cast<int>(map.tiles.len); ++j)
+  {
+    for (var i = 0; i < cast<int>(map.tiles[cast<usize>(j)].len); ++i)
+    {
+      std::putc(map.at(i, j));
+    }
+
+    std::putc('\n');
+  }
+
+  std::putc('\n');
+}
+
+fn main -> int
+{
+  try
+  {
+    var sum = 0;
+    var map = map();
+
+    var fin = std::file::open("day15.txt");
+    var reader = std::buffered_reader(&mut fin);
+
+    var p = (0, 0);
+
+    for (var line : reader.lines)
+    {
+      if (line.empty)
+        break;
+
+      if (var j = line.find_first('@'); j != line.end)
+        p = (cast<int>(j - line.begin), cast<int>(map.tiles.len));
+
+      map.tiles.push_back(line);
+    }
+
+    map.tiles[cast<usize>(p.1)][cast<usize>(p.0)] = cast('.');
+
+    std::skip_line(&mut reader);
+
+    for (var line : reader.lines)
+    {
+      for (var move : line.chars)
+      {
+        switch (move)
+        {
+          case '^':
+            push(&mut map, &mut p, (0, -1));
+
+          case '<':
+            push(&mut map, &mut p, (-1, 0));
+
+          case '>':
+            push(&mut map, &mut p, (+1, 0));
+
+          case 'v':
+            push(&mut map, &mut p, (0, +1));
+        }
+      }
+    }
+
+    for (var j = 0; j < cast<int>(map.tiles.len); ++j)
+    {
+      for (var i = 0; i < cast<int>(map.tiles[cast<usize>(j)].len); ++i)
+      {
+        if (map.at(i, j) == 'O')
+          sum += 100 * j + i;
+      }
+    }
+
+    std::print("part1: sum of box coordinates ", sum);
+
+  }
+  catch(std::error e)
+  {
+    std::panic(e);
+  }
+
+  return 0;
+}

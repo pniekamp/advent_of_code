@@ -1,0 +1,40 @@
+import std.stdio;
+import std.algorithm;
+import std.flat_hash_map;
+import std.scan;
+
+fn main -> int
+{
+  try
+  {
+    var sum = 0;
+
+    var fin = std::file::open("day22.txt");
+
+    for (var line : std::buffered_reader(&mut fin).lines)
+    {
+      var secret = u64();
+
+      if (!std::sscanf(line, "{}", &mut secret))
+        std::panic("error scaning secret from input '", line, "'");
+
+      for (var k = 0; k < 2000; ++k)
+      {
+        secret = ((secret * 64) ^ secret) % 16777216;
+        secret = ((secret / 32) ^ secret) % 16777216;
+        secret = ((secret * 2048) ^ secret) % 16777216;
+      }
+
+      sum += secret;
+    }
+
+    std::print("part1: sum of secrets ", sum);
+
+  }
+  catch(std::error e)
+  {
+    std::panic(e);
+  }
+
+  return 0;
+}

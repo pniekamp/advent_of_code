@@ -1,0 +1,63 @@
+import std.stdio;
+import std.algorithm;
+import std.flat_hash_map;
+import std.scan;
+
+fn is_valid(var &rules, var &update) -> bool
+{
+  for (var i = 0; i < update.len; ++i)
+  {
+    for (var j = i + 1; j < update.len; ++j)
+    {
+      if (!rules.contains(update[i]) || !rules[update[i]].contains(update[j]))
+        return false;
+    }
+  }
+
+  return true;
+}
+
+fn main -> int
+{
+  try
+  {
+    var sum = 0;
+    var rules = std::flat_hash_map<int, std::flat_hash_map<int, void>>();
+
+    var fin = std::file::open("day05.txt");
+    var reader = std::buffered_reader(&mut fin);
+
+    for (var line : reader.lines)
+    {
+      if (line.empty)
+        break;
+
+      var lhs = int(0);
+      var rhs = int(0);
+
+      if (!std::sscanf(line, "{}|{}", &mut lhs, &mut rhs))
+        std::panic("error scaning rule from input '", line, "'");
+
+      rules.emplace(lhs).insert(rhs);
+    }
+
+    std::skip_line(&mut reader);
+
+    for (var line : reader.lines)
+    {
+      var update = std::vector::from(line.split(",").transform(|page| { var n = int(0); std::atoi(page.begin, page.end, &mut n); return n; }));
+
+      if (is_valid(rules, update))
+        sum += update[update.len / 2];
+    }
+
+    std::print("part1: sum of middle pages ", sum);
+
+  }
+  catch(std::error e)
+  {
+    std::panic(e);
+  }
+
+  return 0;
+}

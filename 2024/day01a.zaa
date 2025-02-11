@@ -1,0 +1,42 @@
+import std.stdio;
+import std.algorithm;
+import std.scan;
+
+fn main -> int
+{
+  try
+  {
+    var sum = 0;
+    var grp1 = std::vector<int>();
+    var grp2 = std::vector<int>();
+
+    var fin = std::file::open("day01.txt");
+
+    for (var line : std::buffered_reader(&mut fin).lines)
+    {
+      var lhs = int(0);
+      var rhs = int(0);
+
+      if (!std::sscanf(line, "{} {}", &mut lhs, &mut rhs))
+        std::panic("error scaning id from input '", line, "'");
+
+      grp1.push_back(lhs);
+      grp2.push_back(rhs);
+    }
+
+    std::sort(&mut grp1);
+    std::sort(&mut grp2);
+
+    for (var [lhs, rhs] : std::zip(grp1, grp2))
+      sum += std::absdiff(lhs, rhs);
+
+    std::print("part1: total distance ", sum);
+
+  }
+  catch(std::error e)
+  {
+    std::panic(e);
+  }
+
+  return 0;
+}

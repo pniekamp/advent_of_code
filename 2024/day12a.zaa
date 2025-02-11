@@ -1,0 +1,98 @@
+import std.stdio;
+import std.algorithm;
+import std.flat_hash_map;
+import std.scan;
+
+struct map
+{
+  std::vector<std::string> tiles;
+
+  fn at(this &map, int x, int y) -> char
+  {
+    if (0 <= y && cast<usize>(y) < map.tiles.len && 0 <= x && cast<usize>(x) < map.tiles[cast<usize>(y)].len)
+      return cast<char>(map.tiles[cast<usize>(y)][cast<usize>(x)]);
+
+    return ' ';
+  }
+
+  fn region(this &map, (int, int) s) -> std::flat_hash_map<(int, int), void>
+  {
+    var stack = std::vector<(int, int)>::from([s]);
+    var region = std::flat_hash_map<(int, int), void>();
+
+    while (stack.len != 0)
+    {
+      for (var p : stack.take(stack.begin, stack.end))
+      {
+        if (!region.insert(p).1)
+          continue;
+
+        for (var dp : [ (0, -1), (1, 0), (0, 1), (-1, 0) ])
+        {
+          var np = (p.0 + dp.0, p.1 + dp.1);
+
+          if (map.at(np.0, np.1) == map.at(s.0, s.1))
+            stack.push_back(np);
+        }
+      }
+    }
+
+    return region;
+  }
+
+  map() = default;
+  ~map() = default;
+}
+
+fn main -> int
+{
+  try
+  {
+    var sum = 0;
+    var map = map();
+
+    var fin = std::file::open("day12.txt");
+
+    for (var line : std::buffered_reader(&mut fin).lines)
+    {
+      map.tiles.push_back(line);
+    }
+
+    var visited = std::flat_hash_map<(int, int), void>();
+
+    for (var j = 0; j < cast<int>(map.tiles.len); ++j)
+    {
+      for (var i = 0; i < cast<int>(map.tiles[cast<usize>(j)].len); ++i)
+      {
+        if (visited.contains((i, j)))
+          continue;
+
+        var region = map.region((i, j));
+
+        var inners = 0;
+
+        for (var [p, _] : region)
+        {
+          for (var dp : [ (0, -1), (1, 0), (0, 1), (-1, 0) ])
+          {
+            if (region.contains((p.0 + dp.0, p.1 + dp.1)))
+              inners += 1;
+          }
+
+          visited.insert(p);
+        }
+
+        sum += region.len * (region.len * 4 - inners);
+      }
+    }
+
+    std::print("part1: total price of fencing ", sum);
+
+  }
+  catch(std::error e)
+  {
+    std::panic(e);
+  }
+
+  return 0;
+}

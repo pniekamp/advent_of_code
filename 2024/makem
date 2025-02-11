@@ -1,0 +1,105 @@
+#!/bin/sh
+
+ZZ=${HOME}/work/zaan/zacc/build/bin/zacc
+ZFLAGS="-I${HOME}/work/zaan/std -L${HOME}/work/zaan/zrt/lib -lzrt -O3"
+
+printf "advent-of-code 2024\n"
+
+printf "\nday 01\n"
+${ZZ} ${ZFLAGS} day01a.zaa && ./day01a
+${ZZ} ${ZFLAGS} day01b.zaa && ./day01b
+
+printf "\nday 02\n"
+${ZZ} ${ZFLAGS} day02a.zaa && ./day02a
+${ZZ} ${ZFLAGS} day02b.zaa && ./day02b
+
+printf "\nday 03\n"
+${ZZ} ${ZFLAGS} day03a.zaa && ./day03a
+${ZZ} ${ZFLAGS} day03b.zaa && ./day03b
+
+printf "\nday 04\n"
+${ZZ} ${ZFLAGS} day04a.zaa && ./day04a
+${ZZ} ${ZFLAGS} day04b.zaa && ./day04b
+
+printf "\nday 05\n"
+${ZZ} ${ZFLAGS} day05a.zaa && ./day05a
+${ZZ} ${ZFLAGS} day05b.zaa && ./day05b
+
+printf "\nday 06\n"
+${ZZ} ${ZFLAGS} day06a.zaa && ./day06a
+${ZZ} ${ZFLAGS} day06b.zaa && ./day06b
+
+printf "\nday 07\n"
+${ZZ} ${ZFLAGS} day07a.zaa && ./day07a
+${ZZ} ${ZFLAGS} day07b.zaa && ./day07b
+
+printf "\nday 08\n"
+${ZZ} ${ZFLAGS} day08a.zaa && ./day08a
+${ZZ} ${ZFLAGS} day08b.zaa && ./day08b
+
+printf "\nday 09\n"
+${ZZ} ${ZFLAGS} day09a.zaa && ./day09a
+${ZZ} ${ZFLAGS} day09b.zaa && ./day09b
+
+printf "\nday 10\n"
+${ZZ} ${ZFLAGS} day10a.zaa && ./day10a
+${ZZ} ${ZFLAGS} day10b.zaa && ./day10b
+
+printf "\nday 11\n"
+${ZZ} ${ZFLAGS} day11a.zaa && ./day11a
+${ZZ} ${ZFLAGS} day11b.zaa && ./day11b
+
+printf "\nday 12\n"
+${ZZ} ${ZFLAGS} day12a.zaa && ./day12a
+${ZZ} ${ZFLAGS} day12b.zaa && ./day12b
+
+printf "\nday 13\n"
+${ZZ} ${ZFLAGS} day13a.zaa && ./day13a
+${ZZ} ${ZFLAGS} day13b.zaa && ./day13b
+
+printf "\nday 14\n"
+${ZZ} ${ZFLAGS} day14a.zaa && ./day14a
+${ZZ} ${ZFLAGS} day14b.zaa && ./day14b
+
+printf "\nday 15\n"
+${ZZ} ${ZFLAGS} day15a.zaa && ./day15a
+${ZZ} ${ZFLAGS} day15b.zaa && ./day15b
+
+printf "\nday 16\n"
+${ZZ} ${ZFLAGS} day16a.zaa && ./day16a
+${ZZ} ${ZFLAGS} day16b.zaa && ./day16b
+
+printf "\nday 17\n"
+${ZZ} ${ZFLAGS} day17a.zaa && ./day17a
+${ZZ} ${ZFLAGS} day17b.zaa && ./day17b
+
+printf "\nday 18\n"
+${ZZ} ${ZFLAGS} day18a.zaa && ./day18a
+${ZZ} ${ZFLAGS} day18b.zaa && ./day18b
+
+printf "\nday 19\n"
+${ZZ} ${ZFLAGS} day19a.zaa && ./day19a
+${ZZ} ${ZFLAGS} day19b.zaa && ./day19b
+
+printf "\nday 20\n"
+${ZZ} ${ZFLAGS} day20a.zaa && ./day20a
+${ZZ} ${ZFLAGS} day20b.zaa && ./day20b
+
+printf "\nday 21\n"
+${ZZ} ${ZFLAGS} day21a.zaa && ./day21a
+${ZZ} ${ZFLAGS} day21b.zaa && ./day21b
+
+printf "\nday 22\n"
+${ZZ} ${ZFLAGS} day22a.zaa && ./day22a
+${ZZ} ${ZFLAGS} day22b.zaa && ./day22b
+
+printf "\nday 23\n"
+${ZZ} ${ZFLAGS} day23a.zaa && ./day23a
+${ZZ} ${ZFLAGS} day23b.zaa && ./day23b
+
+printf "\nday 24\n"
+${ZZ} ${ZFLAGS} day24a.zaa && ./day24a
+${ZZ} ${ZFLAGS} day24b.zaa && ./day24b
+
+printf "\nday 25\n"
+${ZZ} ${ZFLAGS} day25a.zaa && ./day25a

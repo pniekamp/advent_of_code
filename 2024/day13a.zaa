@@ -1,0 +1,64 @@
+import std.stdio;
+import std.algorithm;
+import std.flat_hash_map;
+import std.scan;
+
+fn main -> int
+{
+  try
+  {
+    var sum = 0;
+
+    var fin = std::file::open("day13.txt");
+    var reader = std::buffered_reader(&mut fin);
+
+    while (!reader.fetch.empty)
+    {
+      var op_a = (int(0), int(0));
+      var op_b = (int(0), int(0));
+      var prize = (int(0), int(0));
+
+      var buffer_a = std::string();
+      std::read_line(&mut reader, &mut buffer_a);
+
+      if (!std::sscanf(buffer_a, "Button A: X{}, Y{}", &mut op_a.0, &mut op_a.1))
+        std::panic("error scaning button a input '", buffer_a, "'");
+
+      var buffer_b = std::string();
+      std::read_line(&mut reader, &mut buffer_b);
+
+      if (!std::sscanf(buffer_b, "Button B: X{}, Y{}", &mut op_b.0, &mut op_b.1))
+        std::panic("error scaning button b input '", buffer_b, "'");
+
+      var buffer_c = std::string();
+      std::read_line(&mut reader, &mut buffer_c);
+
+      if (!std::sscanf(buffer_c, "Prize: X={}, Y={}", &mut prize.0, &mut prize.1))
+        std::panic("error scaning prize input '", buffer_c, "'");
+
+      // a * op_a + b * op_b = prize
+
+      var u = op_a.0 * op_b.1 - op_b.0 * op_a.1;
+
+      if (u != 0)
+      {
+        var a = prize.0 * op_b.1 - op_b.0 * prize.1;
+        var b = op_a.0 * prize.1 - prize.0 * op_a.1;
+
+        if (a % u == 0 && b % u == 0)
+          sum += (a * 3 + b) / u;
+      }
+
+      std::skip_line(&mut reader);
+    }
+
+    std::print("part1: fewest tokens for possible prizes ", sum);
+
+  }
+  catch(std::error e)
+  {
+    std::panic(e);
+  }
+
+  return 0;
+}

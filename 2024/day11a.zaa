@@ -1,0 +1,57 @@
+import std.stdio;
+import std.algorithm;
+import std.flat_hash_map;
+import std.scan;
+
+fn blink(i64 value, int n) -> int
+{
+  if (n == 0)
+    return 1;
+
+  if (value == 0)
+    return blink(1, n - 1);
+
+  var count = 1;
+
+  var kappa = 1;
+  for (var pow = 10; pow <= value; pow *= 10)
+    ++kappa;
+
+  switch (kappa & 1)
+  {
+    case 0:
+      count = blink(value / std::pow(10, kappa / 2), n - 1) + blink(value % std::pow(10, kappa / 2), n - 1);
+
+    case 1:
+      count = blink(value * 2024, n - 1);
+  }
+
+  return count;
+}
+
+fn main -> int
+{
+  try
+  {
+    var sum = 0;
+
+    var text = std::readfile("day11.txt").chomp;
+
+    for (var stone : text.words)
+    {
+      var value = i64(0);
+      std::atoi(stone.begin, stone.end, &mut value);
+
+      sum += blink(value, 25);
+    }
+
+    std::print("part1: stones after 25 blinks ", sum);
+
+  }
+  catch(std::error e)
+  {
+    std::panic(e);
+  }
+
+  return 0;
+}

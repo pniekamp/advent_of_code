@@ -1,0 +1,45 @@
+import std.stdio;
+import std.algorithm;
+import std.scan;
+
+fn main -> int
+{
+  try
+  {
+    var sum = 0;
+    var blocks = std::vector<int>();
+
+    var text = std::readfile("day09.txt").chomp;
+
+    for (var i = 0, var ch : text.chars;; ++i)
+    {
+      for (var j = '0'; j < ch; ++j)
+        blocks.push_back(i);
+    }
+
+    for (var i = blocks.find_if(|block| block & 1 != 0), var j = blocks.end - 1; i < j; --j)
+    {
+      if (blocks[j] & 1 == 0)
+      {
+        std::swap(&mut blocks[i], &mut blocks[j]);
+
+        while (blocks[i] & 1 == 0)
+          ++i;
+      }
+    }
+
+    for (var i = blocks.begin, var j = blocks.find_if(|block| block & 1 != 0); i < j; ++i)
+    {
+      sum += (i - blocks.begin) * cast(blocks[i] / 2);
+    }
+
+    std::print("part1: filesystem checksum ", sum);
+
+  }
+  catch(std::error e)
+  {
+    std::panic(e);
+  }
+
+  return 0;
+}

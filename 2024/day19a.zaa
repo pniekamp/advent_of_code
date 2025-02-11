@@ -1,0 +1,58 @@
+import std.stdio;
+import std.algorithm;
+import std.flat_hash_map;
+import std.scan;
+
+fn match(std::vector<std::string_ref> &patterns, std::string_view design) -> bool
+{
+  if (design.empty)
+    return true;
+
+  static cache = #std::flat_hash_map<std::string_view, bool>();
+
+  if (var j = cache.find(design); j != cache.end)
+    return cache[j].value;
+
+  for (var &pattern : patterns)
+  {
+    if (design.starts_with(pattern))
+      if (match(patterns, design[pattern.len .. design.len]))
+        return true;
+  }
+
+  cache.insert(design, false);
+
+  return false;
+}
+
+fn main -> int
+{
+  try
+  {
+    var matches = 0;
+
+    var text = std::readfile("day19.txt");
+    var reader = std::string_stream(text);
+
+    var buffer = std::string();
+    std::read_line(&mut reader, &mut buffer);
+    var patterns = std::vector::from(buffer.chomp.split(", "));
+
+    std::skip_line(&mut reader);
+
+    for (var line : reader.lines)
+    {
+      if (match(patterns, line.view))
+        matches += 1;
+    }
+
+    std::print("part1: possible designes ", matches);
+
+  }
+  catch(std::error e)
+  {
+    std::panic(e);
+  }
+
+  return 0;
+}

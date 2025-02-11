@@ -1,0 +1,74 @@
+import std.stdio;
+import std.algorithm;
+import std.flat_hash_map;
+import std.scan;
+
+struct map
+{
+  std::vector<std::string> tiles;
+
+  fn at(this &map, int x, int y) -> char
+  {
+    if (0 <= y && cast<usize>(y) < map.tiles.len && 0 <= x && cast<usize>(x) < map.tiles[cast<usize>(y)].len)
+      return cast<char>(map.tiles[cast<usize>(y)][cast<usize>(x)]);
+
+    return '#';
+  }
+
+  map() = default;
+  ~map() = default;
+}
+
+fn main -> int
+{
+  try
+  {
+    var s = (0, 0);
+    var map = map();
+
+    var fin = std::file::open("day20.txt");
+
+    for (var line : std::buffered_reader(&mut fin).lines)
+    {
+      if (var j = line.find_first('S'); j != line.end)
+        s = (cast<int>(j - line.begin), cast<int>(map.tiles.len));
+
+      map.tiles.push_back(line);
+    }
+
+    var path = std::vector<(int, int)>::from([s]);
+
+    for (var p = path.back, var pp = p; map.at(p.0, p.1) != 'E'; pp = p, p = path.back)
+    {
+      for (var dp : [ (0, -1), (1, 0), (0, 1), (-1, 0) ])
+      {
+        var np = (p.0 + dp.0, p.1 + dp.1);
+
+        if (np != pp && map.at(np.0, np.1) != '#')
+          path.push_back(np);
+      }
+    }
+
+    var count = 0;
+
+    for (var i = 0; i < path.len; ++i)
+    {
+      for (var j = i + 1; j < path.len; ++j)
+      {
+        var seperation = std::absdiff(path[i].0, path[j].0) + std::absdiff(path[i].1, path[j].1);
+
+        if (seperation <= 20 && j - i - cast(seperation) >= 100)
+          count += 1;
+      }
+    }
+
+    std::print("part2: possible cheats ", count);
+
+  }
+  catch(std::error e)
+  {
+    std::panic(e);
+  }
+
+  return 0;
+}
