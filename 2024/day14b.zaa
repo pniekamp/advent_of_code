@@ -16,7 +16,7 @@ struct robot
   ~robot() = default;
 }
 
-pub fn fmt(std::OutputStream mut &os, std::fmt_context mut &ctx, robot &robot) throws -> void
+pub fn fmt(std::OutputStream mut &os, std::fmt_context mut &ctx, robot &robot) throws(std::error) -> void
 {
   ctx.written += std::format_to(&mut os, "p={},{} v={},{}", robot.p.0, robot.p.1, robot.v.0, robot.v.1);
 }

@@ -16,7 +16,7 @@ struct hailstone
   ~hailstone() = default;
 }
 
-pub fn fmt(std::OutputStream mut &os, std::fmt_context mut &ctx, hailstone &value) throws -> void
+pub fn fmt(std::OutputStream mut &os, std::fmt_context mut &ctx, hailstone &value) throws(std::error) -> void
 {
   ctx.written += std::format_to(&mut os, "{} @ {}", value.position, value.velocity);
 }
