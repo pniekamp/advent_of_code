@@ -1,0 +1,47 @@
+import std.stdio;
+import std.algorithm;
+import std.scan;
+
+fn main -> int
+{
+  try
+  {
+    var count = 0;
+    var position = 50;
+
+    var fin = std::file::open("day01.txt");
+
+    for (var line : std::buffered_reader(&mut fin).lines)
+    {
+      var dir = char();
+      var clicks = int(0);
+
+      if (!std::sscanf(line, "{}{}", &mut dir, &mut clicks))
+        std::panic("error scaning id from input '", line, "'");
+
+      switch (dir)
+      {
+        case 'L':
+          if (var x = (position % 100 + 100) % 100; clicks >= x)
+            count += cast(x != 0) + (clicks - x) / 100;
+
+          position -= clicks;
+
+        case 'R':
+          if (var x = (position % 100 + 100) % 100; clicks >= 100 - x)
+            count += 1 + (clicks - (100 - x)) / 100;
+
+          position += clicks;
+      }
+    }
+
+    std::print("part2: zero count ", count);
+
+  }
+  catch(std::error e)
+  {
+    std::panic(e);
+  }
+
+  return 0;
+}
