@@ -1,0 +1,50 @@
+import std.stdio;
+import std.algorithm;
+import std.scan;
+
+fn main -> int
+{
+  try
+  {
+    var sum = 0;
+
+    var input = std::readfile("day02.txt").chomp;
+
+    for (var line : input.split(","))
+    {
+      var range = (i64(0), i64(0));
+
+      if (!std::sscanf(line, "{}-{}", &mut range.0, &mut range.1))
+        std::panic("error scaning id from input '", line, "'");
+
+      for (var id = range.0; id <= range.1; ++id)
+      {
+        var n = 1 + std::floor_log10(id);
+
+        for (var sz = 1; sz <= n/2; ++sz)
+        {
+          var k = 0;
+          var x = id % std::pow(10, sz);
+
+          for (var y = id; y != 0; y /= std::pow(10, sz))
+            k += cast(y % std::pow(10, sz) == x);
+
+          if (k*sz == n)
+            sum += id;
+
+          if (k*sz == n)
+            break;
+        }
+      }
+    }
+
+    std::print("part2: invalid id sum ", sum);
+
+  }
+  catch(std::error e)
+  {
+    std::panic(e);
+  }
+
+  return 0;
+}
