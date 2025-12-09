@@ -1,0 +1,51 @@
+import std.stdio;
+import std.algorithm;
+import std.flat_hash_map;
+import std.scan;
+
+fn main -> int
+{
+  try
+  {
+    var count = 0;
+    var fresh = std::vector<(i64, i64)>();
+
+    var fin = std::file::open("day05.txt");
+    var reader = std::buffered_reader(&mut fin);
+
+    for (var line : reader.lines)
+    {
+      if (line.empty)
+        break;
+
+      var range = (i64(0), i64(0));
+
+      if (!std::sscanf(line, "{}-{}", &mut range.0, &mut range.1))
+        std::panic("error scaning id from input '", line, "'");
+
+      fresh.push_back(range);
+    }
+
+    std::skip_line(&mut reader);
+
+    for (var line : reader.lines)
+    {
+      var id = i64();
+
+      if (!std::sscanf(line, "{}", &mut id))
+        std::panic("error scaning id from input '", line, "'");
+
+      if (std::any_of(fresh, |range| range.0 <= id && id <= range.1))
+        count += 1;
+    }
+
+    std::print("part1: fresh ingrediants ", count);
+
+  }
+  catch(std::error e)
+  {
+    std::panic(e);
+  }
+
+  return 0;
+}
