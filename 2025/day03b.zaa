@@ -22,9 +22,9 @@ fn main -> int
             iis[k] = i;
         }
 
-        iis[k + 1] = iis[k] + 1;
-
         joltage += cast<i64>(line[iis[k]] - cast('0')) * std::pow(10, 11 - k);
+
+        iis[k + 1] = iis[k] + 1;
       }
     }
 
