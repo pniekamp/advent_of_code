@@ -1,0 +1,43 @@
+import std.stdio;
+import std.algorithm;
+import std.scan;
+
+fn main -> int
+{
+  try
+  {
+    var joltage = 0;
+
+    var fin = std::file::open("day03.txt");
+
+    for (var line : std::buffered_reader(&mut fin).lines)
+    {
+      var ii = 0;
+
+      for (var i = ii + 1; i < line.len - 1; ++i)
+      {
+        if (line[i] > line[ii])
+          ii = i;
+      }
+
+      var jj = ii + 1;
+
+      for (var j = jj + 1; j < line.len; ++j)
+      {
+        if (line[j] > line[jj])
+          jj = j;
+      }
+
+      joltage += cast<int>(line[ii] - cast('0')) * 10 + cast<int>(line[jj] - cast('0'));
+    }
+
+    std::print("part1: max joltage ", joltage);
+
+  }
+  catch(std::error e)
+  {
+    std::panic(e);
+  }
+
+  return 0;
+}

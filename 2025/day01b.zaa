@@ -22,14 +22,14 @@ fn main -> int
       switch (dir)
       {
         case 'L':
-          if (var x = (position % 100 + 100) % 100; clicks >= x)
-            count += cast(x != 0) + (clicks - x) / 100;
+          if (var x = 100 - (-position % 100 + 100) % 100; clicks >= x)
+            count += 1 + (clicks - x) / 100;
 
           position -= clicks;
 
         case 'R':
-          if (var x = (position % 100 + 100) % 100; clicks >= 100 - x)
-            count += 1 + (clicks - (100 - x)) / 100;
+          if (var x = 100 - (position % 100 + 100) % 100; clicks >= x)
+            count += 1 + (clicks - x) / 100;
 
           position += clicks;
       }
