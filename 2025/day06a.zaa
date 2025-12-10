@@ -1,0 +1,57 @@
+import std.stdio;
+import std.algorithm;
+import std.flat_hash_map;
+import std.scan;
+
+fn main -> int
+{
+  try
+  {
+    var total = 0;
+    var lines = std::vector<std::string>();
+
+    var fin = std::file::open("day06.txt");
+
+    for (var line : std::buffered_reader(&mut fin).lines)
+    {
+      lines.push_back(line);
+    }
+
+    for (var &op : lines.back.words)
+    {
+      var column = op.data - lines.back.data;
+
+      var adds = i64(0);
+      var muls = i64(1);
+
+      for (var &line : lines.drop_back(1))
+      {
+        var value = i64(0);
+
+        for (var i = line.find_first_not_of(line.begin + column, " "), var end = line.find_first_of(i, " "); i != end; ++i)
+          value = value * 10 + cast<i64>(line[i] - cast('0'));
+
+        adds += value;
+        muls *= value;
+      }
+
+      switch (op)
+      {
+        case "+":
+          total += adds;
+
+        case "*":
+          total += muls;
+      }
+    }
+
+    std::print("part1: grand total ", total);
+
+  }
+  catch(std::error e)
+  {
+    std::panic(e);
+  }
+
+  return 0;
+}
