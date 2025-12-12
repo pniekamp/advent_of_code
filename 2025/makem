@@ -1,0 +1,54 @@
+#!/bin/sh
+
+ZZ=${HOME}/work/zaan/zacc/build/bin/zacc
+ZFLAGS="-I${HOME}/work/zaan/std -L${HOME}/work/zaan/zrt/lib -lzrt -O3"
+
+printf "advent-of-code 2025\n"
+
+printf "\nday 01\n"
+${ZZ} ${ZFLAGS} day01a.zaa && ./day01a
+${ZZ} ${ZFLAGS} day01b.zaa && ./day01b
+
+printf "\nday 02\n"
+${ZZ} ${ZFLAGS} day02a.zaa && ./day02a
+${ZZ} ${ZFLAGS} day02b.zaa && ./day02b
+
+printf "\nday 03\n"
+${ZZ} ${ZFLAGS} day03a.zaa && ./day03a
+${ZZ} ${ZFLAGS} day03b.zaa && ./day03b
+
+printf "\nday 04\n"
+${ZZ} ${ZFLAGS} day04a.zaa && ./day04a
+${ZZ} ${ZFLAGS} day04b.zaa && ./day04b
+
+printf "\nday 05\n"
+${ZZ} ${ZFLAGS} day05a.zaa && ./day05a
+${ZZ} ${ZFLAGS} day05b.zaa && ./day05b
+
+printf "\nday 06\n"
+${ZZ} ${ZFLAGS} day06a.zaa && ./day06a
+${ZZ} ${ZFLAGS} day06b.zaa && ./day06b
+
+printf "\nday 07\n"
+${ZZ} ${ZFLAGS} day07a.zaa && ./day07a
+${ZZ} ${ZFLAGS} day07b.zaa && ./day07b
+
+printf "\nday 08\n"
+${ZZ} ${ZFLAGS} day08a.zaa && ./day08a
+${ZZ} ${ZFLAGS} day08b.zaa && ./day08b
+
+printf "\nday 09\n"
+${ZZ} ${ZFLAGS} day09a.zaa && ./day09a
+${ZZ} ${ZFLAGS} day09b.zaa && ./day09b
+
+printf "\nday 10\n"
+${ZZ} ${ZFLAGS} day10a.zaa && ./day10a
+${ZZ} ${ZFLAGS} day10b.zaa && ./day10b
+
+printf "\nday 11\n"
+${ZZ} ${ZFLAGS} day11a.zaa && ./day11a
+${ZZ} ${ZFLAGS} day11b.zaa && ./day11b
+
+printf "\nday 12\n"
+${ZZ} ${ZFLAGS} day12a.zaa && ./day12a
+${ZZ} ${ZFLAGS} day12b.zaa && ./day12b

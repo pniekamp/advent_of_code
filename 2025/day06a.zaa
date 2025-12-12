@@ -28,7 +28,7 @@ fn main -> int
       {
         var value = i64(0);
 
-        for (var i = line.find_first_not_of(line.begin + column, " "), var end = line.find_first_of(i, " "); i != end; ++i)
+        for (var i = line.find_first_not_of(line.begin + column, " "), var end = line.find_first(i, ' '); i != end; ++i)
           value = value * 10 + cast<i64>(line[i] - cast('0'));
 
         adds += value;

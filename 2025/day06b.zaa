@@ -24,7 +24,7 @@ fn main -> int
 
       for (var &line : lines.drop_back(1))
       {
-        width = std::max(width, std::find(line, column, line.len, 0x20) - column);
+        width = std::max(width, line.find_first(line.begin + column, ' ') - line.begin - column);
       }
 
       var adds = i64(0);
@@ -35,7 +35,7 @@ fn main -> int
         var value = i64(0);
 
         for (var &line : lines.drop_back(1))
-          if (i < line.len && line[i] != cast(' '))
+          if (i < line.len && std::is_digit(line[i]))
             value = value * 10 + cast<i64>(line[i] - cast('0'));
 
         adds += value;
