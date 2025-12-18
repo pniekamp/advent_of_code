@@ -45,9 +45,7 @@ fn main -> int
     for (var i = 0; i < boxes.len; ++i)
     {
       for (var j = i + 1; j < boxes.len; ++j)
-      {
         queue.push_back(i, j, dist(boxes[i], boxes[j]));
-      }
 
       index.insert(i, i);
     }

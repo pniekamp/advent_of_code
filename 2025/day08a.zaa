@@ -44,9 +44,7 @@ fn main -> int
     for (var i = 0; i < boxes.len; ++i)
     {
       for (var j = i + 1; j < boxes.len; ++j)
-      {
         queue.push_back(i, j, dist(boxes[i], boxes[j]));
-      }
 
       index.insert(i, i);
     }
@@ -67,7 +65,7 @@ fn main -> int
     for (var mut &[idx, cid] : index)
       circuits[cid].push_back(idx);
 
-    std::sort(&mut circuits, |x, y| x.len > y.len);
+    std::partial_sort(&mut circuits, circuits.begin + 3, |x, y| x.len > y.len);
 
     std::print("part1: three largest circuits ", circuits[0].len * circuits[1].len * circuits[2].len);
 
