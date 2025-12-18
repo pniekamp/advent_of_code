@@ -1,0 +1,78 @@
+import std.stdio;
+import std.algorithm;
+import std.flat_hash_map;
+import std.priority_queue;
+import std.scan;
+
+struct box
+{
+  i64 x;
+  i64 y;
+  i64 z;
+
+  box() = default;
+  box(box&) = default;
+  ~box() = default;
+}
+
+fn dist(box &u, box &v) -> i64
+{
+  return std::pow(v.x - u.x, 2) + std::pow(v.y - u.y, 2) + std::pow(v.z - u.z, 2);
+}
+
+fn main -> int
+{
+  try
+  {
+    var prod = 0;
+    var boxes = std::vector<box>();
+
+    var fin = std::file::open("day08.txt");
+
+    for (var line : std::buffered_reader(&mut fin).lines)
+    {
+      var box = box();
+
+      if (std::sscanf(line, "{},{},{}", &mut box.x, &mut box.y, &mut box.z).error)
+        std::panic("error scaning box location from input '", line, "'");
+
+      boxes.push_back(box);
+    }
+
+    var index = std::flat_hash_map<usize, usize>();
+    var queue = std::priority_queue<(usize, usize, i64), Cmp: typeof(|x, y| y.2 < x.2)>();
+
+    for (var i = 0; i < boxes.len; ++i)
+    {
+      for (var j = i + 1; j < boxes.len; ++j)
+      {
+        queue.push_back(i, j, dist(boxes[i], boxes[j]));
+      }
+
+      index.insert(i, i);
+    }
+
+    for (var n = boxes.len; n > 1; )
+    {
+      var [i, j, weight] = queue.take_front();
+
+      if (index[i] == index[j])
+        continue;
+
+      for (var mut &[idx, cid] : index.filter(|kv| [var tgt = index[j]] kv.value == tgt))
+        cid = index[i];
+
+      if ((n -= 1) == 1)
+        prod = boxes[i].x * boxes[j].x;
+    }
+
+    std::print("part2: last connected boxes ", prod);
+
+  }
+  catch(std::error e)
+  {
+    std::panic(e);
+  }
+
+  return 0;
+}

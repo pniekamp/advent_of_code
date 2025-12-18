@@ -38,7 +38,7 @@ fn main -> int
       end = range.1 + 1;
     }
 
-    std::print("part2: fresh ingrediants ", count);
+    std::print("part2: fresh ingredients ", count);
 
   }
   catch(std::error e)

@@ -39,7 +39,7 @@ fn main -> int
         count += 1;
     }
 
-    std::print("part1: fresh ingrediants ", count);
+    std::print("part1: fresh ingredients ", count);
 
   }
   catch(std::error e)
