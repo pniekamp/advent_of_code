@@ -1,0 +1,63 @@
+import std.stdio;
+import std.algorithm;
+import std.flat_hash_map;
+import std.scan;
+
+fn contained(std::vector<(i64, i64)> &map, i64 x1, i64 y1, i64 x2, i64 y2) -> bool
+{
+  for (var k = 0; k < map.len; ++k)
+  {
+    var minx = std::min(map[k].0, map[(k + 1) % map.len].0);
+    var miny = std::min(map[k].1, map[(k + 1) % map.len].1);
+    var maxx = std::max(map[k].0, map[(k + 1) % map.len].0);
+    var maxy = std::max(map[k].1, map[(k + 1) % map.len].1);
+
+    if (minx < x2 && maxx > x1 && miny < y2 && maxy > y1)
+      return false;
+  }
+
+  return true;
+}
+
+fn main -> int
+{
+  try
+  {
+    var map = std::vector<(i64, i64)>();
+
+    var fin = std::file::open("day09.txt");
+
+    for (var line : std::buffered_reader(&mut fin).lines)
+    {
+      var pt = (i64(0), i64(0));
+
+      if (std::sscanf(line, "{},{}", &mut pt.0, &mut pt.1).error)
+        std::panic("error scaning positino from input '", line, "'");
+
+      map.push_back(pt);
+    }
+
+    var largest = 0;
+    for (var i = 0; i < map.len; ++i)
+    {
+      for (var j = i + 1; j < map.len; ++j)
+      {
+        var x1 = std::min(map[i].0, map[j].0);
+        var y1 = std::min(map[i].1, map[j].1);
+        var x2 = std::max(map[i].0, map[j].0);
+        var y2 = std::max(map[i].1, map[j].1);
+
+        if (var area = (x2 - x1 + 1) * (y2 - y1 + 1); largest < area && contained(map, x1, y1, x2, y2))
+          largest = area;
+      }
+    }
+
+    std::print("part1: largest rectangle ", largest);
+  }
+  catch(std::error e)
+  {
+    std::panic(e);
+  }
+
+  return 0;
+}
