@@ -81,21 +81,21 @@ fn gauss_jordan_elimination(std::vector<std::vector<float>> mut &matrix) -> std:
 
   for (; j < N && i < M; )
   {
-    var maxj = j;
+    var pivot = j;
 
     for (var jj = j + 1; jj < N; ++jj)
     {
-      if (std::abs(matrix[jj][i]) > std::abs(matrix[maxj][i]))
-        maxj = jj;
+      if (std::abs(matrix[jj][i]) > std::abs(matrix[pivot][i]))
+        pivot = jj;
     }
 
-    if (std::fcmp(matrix[maxj][i], 0.0))
+    if (std::fcmp(matrix[pivot][i], 0.0))
     {
       independents.push_back(i++);
       continue;
     }
 
-    std::swap(&mut matrix[j], &mut matrix[maxj]);
+    std::swap(&mut matrix[j], &mut matrix[pivot]);
 
     for (var ii = i + 1; ii < M + 1; ++ii)
     {
