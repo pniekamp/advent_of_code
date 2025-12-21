@@ -32,7 +32,7 @@ fn gauss_elimination(std::vector<std::vector<int>> mut &matrix) -> std::vector<u
 
     for (var jj = j + 1; jj < N; ++jj)
     {
-      if (matrix[jj][i] != 0)
+      if (matrix[pivot][i] == 0)
         pivot = jj;
     }
 
