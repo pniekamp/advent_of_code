@@ -16,6 +16,60 @@ struct machine
   ~machine() = default;
 }
 
+fn gauss_elimination(std::vector<std::vector<int>> mut &matrix) -> std::vector<usize>
+{
+  let N = matrix.len;
+  let M = matrix[0].len - 1;
+
+  var i = usize(0);
+  var j = usize(0);
+  var prev_pivot = 1;
+  var independents = std::vector<usize>();
+
+  for (; j < N && i < M; )
+  {
+    var pivot = j;
+
+    for (var jj = j + 1; jj < N; ++jj)
+    {
+      if (matrix[jj][i] != 0)
+        pivot = jj;
+    }
+
+    if (matrix[pivot][i] == 0)
+    {
+      independents.push_back(i++);
+      continue;
+    }
+
+    std::swap(&mut matrix[j], &mut matrix[pivot]);
+
+    for (var jj = 0; jj < N; ++jj)
+    {
+      if (jj != j)
+      {
+        var factor = matrix[jj][i];
+
+        for (var ii = 0; ii < M + 1; ++ii)
+        {
+          matrix[jj][ii] = (matrix[jj][ii] * matrix[j][i] - factor * matrix[j][ii]) / prev_pivot;
+        }
+      }
+    }
+
+    prev_pivot = matrix[j][i];
+
+    ++i; ++j;
+  }
+
+  for (; i < M; )
+  {
+    independents.push_back(i++);
+  }
+
+  return independents;
+}
+
 fn gauss_jordan_elimination(std::vector<std::vector<float>> mut &matrix) -> std::vector<usize>
 {
   let N = matrix.len;
@@ -74,39 +128,47 @@ fn gauss_jordan_elimination(std::vector<std::vector<float>> mut &matrix) -> std:
   return independents;
 }
 
-
-fn check(std::vector<std::vector<float>> &matrix, std::vector<usize> &variables, std::vector<int> &state) -> std::optional<int>
+fn check(std::vector<std::vector<int>> &matrix, std::vector<usize> &variables, std::vector<int> &state) -> std::optional<int>
 {
   let N = matrix.len;
   let M = matrix[0].len - 1;
 
-  var solution = std::vector<float>::with_size(M - state.len);
+  var solution = std::vector<int>::with_capacity(M);
 
-  for (var k = 0; k < solution.len; ++k)
+  for (var k = 0; k < N; ++k)
   {
-    solution[k] = matrix[k].back;
+    var pivot = matrix[k].find_if(|v| v != 0);
+
+    if (pivot == matrix[k].end)
+      continue;
+
+    var value = matrix[k].back;
 
     for (var [i, j] : variables.enumerate)
-      solution[k] -= matrix[k][j] * cast<float>(state[i]);
+      value -= matrix[k][j] * state[i];
+
+    if (value % *pivot != 0 || value / *pivot < 0)
+      return None;
+
+    solution.push_back(value / *pivot);
   }
 
 //  for (var [i, j] : variables.enumerate)
 //  {
-//    solution.insert(j, cast<float>(state[i]));
+//    solution.insert(j, state[i]);
 //  }
-//
+
+//  std::print(solution);
 //  for (var j = 0; j < N; ++j)
 //  {
-//    var value = 0.0;
+//    var value = 0;
 //    for (var i = 0; i < M; ++i)
 //      value += matrix[j][i] * solution[i];
 //    std::print(matrix[j], " ", value);
 //  }
+//  std::print("---");
 
-  if (std::any_of(solution, |v| v < -1e-9 || std::absdiff(v, std::round(v)) > 1e-9))
-    return None;
-
-  return state.sum + std::fold_left(solution, 0, |v, k| v += cast(std::round(k)));
+  return state.sum + solution.sum;
 }
 
 fn main -> int
@@ -139,7 +201,7 @@ fn main -> int
     for (var &machine : machines)
     {
       var min = 99999;
-      var matrix = std::vector<std::vector<float>>();
+      var matrix = std::vector<std::vector<int>>();
 
       for (var &joltage : machine.requirements.split(","))
       {
@@ -147,16 +209,16 @@ fn main -> int
         std::atoi(joltage.begin, joltage.end, &mut value);
 
         matrix.push_back().resize(machine.buttons.len + 1);
-        matrix.back.back = cast<float>(value);
+        matrix.back.back = value;
       }
 
       for (var i = 0; i < machine.buttons.len; ++i)
       {
         for (var j : machine.buttons[i])
-          matrix[j][i] = 1.0;
+          matrix[j][i] = 1;
       }
 
-      var variables = gauss_jordan_elimination(&mut matrix);
+      var variables = gauss_elimination(&mut matrix);
 
       var states = std::vector<std::vector<int>>();
 
