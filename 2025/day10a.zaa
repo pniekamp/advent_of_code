@@ -1,0 +1,86 @@
+import std.stdio;
+import std.algorithm;
+import std.flat_hash_map;
+import std.scan;
+
+struct machine
+{
+  std::string diagram;
+  std::string schematics;
+  std::string requirements;
+
+  std::vector<std::vector<usize>> buttons;
+
+  machine() = default;
+  machine(machine &&) = default;
+  ~machine() = default;
+}
+
+fn main -> int
+{
+  try
+  {
+    var machines = std::vector<machine>();
+
+    var fin = std::file::open("day10.txt");
+
+    for (var line : std::buffered_reader(&mut fin).lines)
+    {
+      var machine = machine();
+
+      if (std::sscanf(line, "[{}]{}{{{}}}", &mut machine.diagram, &mut machine.schematics, &mut machine.requirements).error)
+        std::panic("error scaning machine from input '", line, "'");
+
+      for (var &schematic : machine.schematics.words)
+      {
+        var lights = schematic.strip_prefix("(").strip_suffix(")").split(",");
+
+        machine.buttons.push_back(std::vector::from(lights.transform(|str| { var n = usize(); std::atoi(str.begin, str.end, &mut n); return n; })));
+      }
+
+      machines.push_back(machine);
+    }
+
+    var presses = 0;
+
+    for (var &machine : machines)
+    {
+      var states = std::vector<std::string>();
+
+      states.push_back(machine.diagram.gsub('#', '.'));
+
+      for (; !states.empty; )
+      {
+        if (states.find(machine.diagram) != states.end)
+          break;
+
+        for (var state : states.take(states.begin, states.end))
+        {
+          for (var i = 0; i < machine.buttons.len; ++i)
+          {
+            var newstate = state;
+
+            for (var j : machine.buttons[i])
+            {
+              newstate[j] = (newstate[j] == cast('.')) ? cast('#') : cast('.');
+            }
+
+            states.push_back(newstate);
+          }
+        }
+
+        states.erase(std::unique(&mut states.sort!), states.end);
+
+        presses += 1;
+      }
+    }
+
+    std::print("part1: fewest button presses ", presses);
+  }
+  catch(std::error e)
+  {
+    std::panic(e);
+  }
+
+  return 0;
+}

@@ -1,0 +1,199 @@
+import std.stdio;
+import std.algorithm;
+import std.flat_hash_map;
+import std.scan;
+
+struct machine
+{
+  std::string diagram;
+  std::string schematics;
+  std::string requirements;
+
+  std::vector<std::vector<usize>> buttons;
+
+  machine() = default;
+  machine(machine &&) = default;
+  ~machine() = default;
+}
+
+fn gauss_jordan_elimination(std::vector<std::vector<float>> mut &matrix) -> std::vector<usize>
+{
+  let N = matrix.len;
+  let M = matrix[0].len - 1;
+
+  var i = 0;
+  var j = 0;
+  var independents = std::vector<usize>();
+
+  for (; j < N && i < M; )
+  {
+    var maxj = j;
+
+    for (var jj = j + 1; jj < N; ++jj)
+    {
+      if (std::abs(matrix[jj][i]) > std::abs(matrix[maxj][i]))
+        maxj = jj;
+    }
+
+    if (std::fcmp(matrix[maxj][i], 0.0))
+    {
+      independents.push_back(i++);
+      continue;
+    }
+
+    std::swap(&mut matrix[j], &mut matrix[maxj]);
+
+    for (var ii = i + 1; ii < M + 1; ++ii)
+    {
+      matrix[j][ii] /= matrix[j][i];
+    }
+
+    for (var jj = 0; jj < N; ++jj)
+    {
+      if (jj != j && matrix[jj][i] != 0.0)
+      {
+        for (var ii = i + 1; ii < M + 1; ++ii)
+        {
+          matrix[jj][ii] -= matrix[jj][i] * matrix[j][ii];
+        }
+
+        matrix[jj][i] = 0.0;
+      }
+    }
+
+    matrix[j][i] = 1.0;
+
+    ++i; ++j;
+  }
+
+  for (; i < M; )
+  {
+    independents.push_back(i++);
+  }
+
+  return independents;
+}
+
+
+fn check(std::vector<std::vector<float>> &matrix, std::vector<usize> &variables, std::vector<int> &state) -> std::optional<int>
+{
+  let N = matrix.len;
+  let M = matrix[0].len - 1;
+
+  var solution = std::vector<float>::with_size(M - state.len);
+
+  for (var k = 0; k < solution.len; ++k)
+  {
+    solution[k] = matrix[k].back;
+
+    for (var [i, j] : variables.enumerate)
+      solution[k] -= matrix[k][j] * cast<float>(state[i]);
+  }
+
+//  for (var [i, j] : variables.enumerate)
+//  {
+//    solution.insert(j, cast<float>(state[i]));
+//  }
+//
+//  for (var j = 0; j < N; ++j)
+//  {
+//    var value = 0.0;
+//    for (var i = 0; i < M; ++i)
+//      value += matrix[j][i] * solution[i];
+//    std::print(matrix[j], " ", value);
+//  }
+
+  if (std::any_of(solution, |v| v < -1e-9 || std::absdiff(v, std::round(v)) > 1e-9))
+    return None;
+
+  return state.sum + std::fold_left(solution, 0, |v, k| v += cast(std::round(k)));
+}
+
+fn main -> int
+{
+  try
+  {
+    var machines = std::vector<machine>();
+
+    var fin = std::file::open("day10.txt");
+
+    for (var line : std::buffered_reader(&mut fin).lines)
+    {
+      var machine = machine();
+
+      if (std::sscanf(line, "[{}]{}{{{}}}", &mut machine.diagram, &mut machine.schematics, &mut machine.requirements).error)
+        std::panic("error scaning machine from input '", line, "'");
+
+      for (var &schematic : machine.schematics.words)
+      {
+        var lights = schematic.strip_prefix("(").strip_suffix(")").split(",");
+
+        machine.buttons.push_back(std::vector::from(lights.transform(|str| { var n = usize(); std::atoi(str.begin, str.end, &mut n); return n; })));
+      }
+
+      machines.push_back(machine);
+    }
+
+    var presses = 0;
+
+    for (var &machine : machines)
+    {
+      var min = 99999;
+      var matrix = std::vector<std::vector<float>>();
+
+      for (var &joltage : machine.requirements.split(","))
+      {
+        var value = int(0);
+        std::atoi(joltage.begin, joltage.end, &mut value);
+
+        matrix.push_back().resize(machine.buttons.len + 1);
+        matrix.back.back = cast<float>(value);
+      }
+
+      for (var i = 0; i < machine.buttons.len; ++i)
+      {
+        for (var j : machine.buttons[i])
+          matrix[j][i] = 1.0;
+      }
+
+      var variables = gauss_jordan_elimination(&mut matrix);
+
+      var states = std::vector<std::vector<int>>();
+
+      states.push_back(std::vector<int>::with_size(variables.len));
+
+      for (; !states.empty; )
+      {
+        for (var state : states.take(states.begin, states.end))
+        {
+          if (var sum = check(matrix, variables, state); sum && sum < min)
+            min = sum?!;
+
+          if (state.sum >= min)
+            continue;
+
+          for (var i = 0; i < state.len; ++i)
+          {
+            var newstate = state;
+
+            newstate[i] += 1;
+
+            states.push_back(newstate);
+          }
+        }
+
+        states.erase(std::unique(&mut states.sort!), states.end);
+      }
+
+      presses += min;
+    }
+
+    std::print("part2: fewest button presses ", presses);
+  }
+  catch(std::error e)
+  {
+    std::panic(e);
+  }
+
+  return 0;
+}
