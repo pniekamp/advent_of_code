@@ -1,0 +1,56 @@
+import std.stdio;
+import std.algorithm;
+import std.flat_hash_map;
+import std.scan;
+
+fn main -> int
+{
+  try
+  {
+    var paths = std::flat_hash_map<std::string, std::vector<std::string>>();
+
+    var fin = std::file::open("day11.txt");
+
+    for (var line : std::buffered_reader(&mut fin).lines)
+    {
+      var [name, list] = line.cut(": ");
+
+      for (var &item : list.words)
+      {
+        paths.emplace(name).push_back(item);
+      }
+    }
+
+    var count = 0;
+
+    var states = std::flat_hash_map<(std::string, bool, bool), i64>();
+
+    states.insert(("svr", false, false), 1);
+
+    for (; !states.empty; )
+    {
+      for (var [state, cnt] : states.take(states.begin, states.end))
+      {
+        for (var &device : paths[state.0])
+        {
+          if (device == "out")
+          {
+            count += cast(state.1 && state.2) * cnt;
+            continue;
+          }
+
+          states.emplace((device, state.1 | (device == "dac"), state.2 | (device == "fft"))) += cnt;
+        }
+      }
+    }
+
+    std::print("part2: different paths ", count);
+
+  }
+  catch(std::error e)
+  {
+    std::panic(e);
+  }
+
+  return 0;
+}

@@ -29,11 +29,19 @@ part1: splits 1678
 part2: timelines 357525737893560
 
 day 08
+part1: three largest circuits 105952
+part2: last connected boxes 975931446
 
 day 09
+part1: largest rectangle 4743645488
+part1: largest rectangle 1529011204
 
 day 10
+part1: fewest button presses 542
+part2: fewest button presses 20871
 
 day 11
+part1: different paths 472
+part2: different paths 526811953334940
 
 day 12
