@@ -45,3 +45,4 @@ part1: different paths 472
 part2: different paths 526811953334940
 
 day 12
+part1: regions 583

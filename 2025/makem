@@ -51,4 +51,3 @@ ${ZZ} ${ZFLAGS} day11b.zaa && ./day11b
 
 printf "\nday 12\n"
 ${ZZ} ${ZFLAGS} day12a.zaa && ./day12a
-${ZZ} ${ZFLAGS} day12b.zaa && ./day12b

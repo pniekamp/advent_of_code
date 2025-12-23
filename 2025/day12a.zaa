@@ -1,0 +1,100 @@
+import std.stdio;
+import std.algorithm;
+import std.flat_hash_map;
+import std.scan;
+
+struct shape
+{
+  usize area;
+  std::vector<std::string> tiles;
+
+  fn at(this &, int x, int y) -> char
+  {
+    if (0 <= y && cast<usize>(y) < this.tiles.len && 0 <= x && cast<usize>(x) < this.tiles[cast<usize>(y)].len)
+      return cast<char>(this.tiles[cast<usize>(y)][cast<usize>(x)]);
+
+    return '#';
+  }
+
+  shape() = default;
+  shape(shape &&) = default;
+  ~shape() = default;
+}
+
+struct region
+{
+  usize width;
+  usize length;
+  std::vector<usize> counts;
+
+  region() = default;
+  region(region &&) = default;
+  ~region() = default;
+}
+
+fn main -> int
+{
+  try
+  {
+    var shapes = std::vector<shape>();
+    var regions = std::vector<region>();
+
+    var fin = std::file::open("day12.txt");
+    var reader = std::buffered_reader(&mut fin);
+
+    for (var k = 0; k <= 5; ++k)
+    {
+      var shape = shape();
+
+      std::skip_line(&mut reader);
+
+      for (var line : reader.lines)
+      {
+        if (line.empty)
+          break;
+
+        shape.tiles.push_back(line);
+      }
+
+      shape.area = shape.tiles.transform(|tiles| tiles.count(cast<u8>('#'))).sum;
+
+      shapes.push_back(&move shape);
+
+      std::skip_line(&mut reader);
+    }
+
+    for (var line : reader.lines)
+    {
+      var region = region();
+      var presents = std::string_view();
+
+      if (!std::sscanf(line, "{}x{}:{}", &mut region.width, &mut region.length, &mut presents))
+        std::panic("error scaning region from input '", line, "'");
+
+      region.counts = std::vector::from(presents.words.transform(|str| { var n = usize(0); std::atoi(str.begin, str.end, &mut n); return n; }));
+
+      regions.push_back(region);
+    }
+
+    var count = 0;
+
+    for (var &region : regions)
+    {
+      var required = 0;
+      for (var [shape, presents] : std::enumerate(region.counts))
+        required += shapes[shape].area * presents;
+
+      if (required <= region.width * region.length)
+        ++count;
+    }
+
+    std::print("part1: regions ", count);
+
+  }
+  catch(std::error e)
+  {
+    std::panic(e);
+  }
+
+  return 0;
+}
